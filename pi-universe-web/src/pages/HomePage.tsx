@@ -23,6 +23,7 @@ import { apiClient } from '../api/ApiClient';
 import { Sanctuary } from '../types';
 import DonateDialog from '../components/DonateDialog';
 import { BrandLogo, BrandWordmark } from '../components/BrandLogo';
+import CosmosGlobe from '../components/CosmosGlobe';
 import { useI18n } from '../i18n/i18n';
 import { faithName, sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 
@@ -158,6 +159,10 @@ export default function HomePage() {
           </Typography>
         )}
       </Paper>
+
+      {sanctuaries.length > 0 && (
+        <CosmosGlobe sanctuaries={sanctuaries} lang={lang} onSelect={(sanctuary) => navigate(`/sanctuary/${sanctuary.id}`)} />
+      )}
 
       <Suspense fallback={null}>
         <TodayAlmanacCard />

@@ -31,6 +31,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import DonateDialog from '../components/DonateDialog';
+import { SacredGlow } from '../oracle/OracleArt';
 import { useI18n, Lang } from '../i18n/i18n';
 import { sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 import {
@@ -164,6 +165,9 @@ export default function SanctuaryPage() {
   const description = sanctuaryDescription(s, lang);
   const visits = merit?.visits || visit?.visits;
   const color = s?.color && s.color !== '#FFFFFF' ? s.color : '#8B4513';
+  // Glow color per faith (white-gold light for the Christian chapel)
+  const glowHex = s?.color && s.color !== '#FFFFFF' ? s.color : '#F4D27A';
+  const glowRgb = [1, 3, 5].map((i) => parseInt(glowHex.slice(i, i + 2), 16) || 200).join(',');
 
   return (
     <Container maxWidth="md" sx={{ py: 2 }}>
@@ -184,9 +188,14 @@ export default function SanctuaryPage() {
               textAlign: 'center',
               background: 'linear-gradient(180deg, #FFF8E7 0%, #F5E6D3 100%)',
               borderTop: `6px solid ${color}`,
+              overflow: 'hidden',
+              position: 'relative',
             }}
           >
-            <Typography sx={{ fontSize: { xs: '3rem', sm: '3.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>
+            <Box sx={{ position: 'relative', height: { xs: 110, sm: 130 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <SacredGlow size={150} color={glowRgb} />
+              <Typography sx={{ position: 'relative', fontSize: { xs: '3.4rem', sm: '4rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>
+            </Box>
             <Typography sx={{ fontSize: { xs: '1.6rem', sm: '2rem' }, fontWeight: 700, color: '#5a3a1a', mt: 1 }}>
               {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}, to the`)}
             </Typography>
