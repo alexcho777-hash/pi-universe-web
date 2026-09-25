@@ -5,7 +5,7 @@
 export interface User {
   pi_uid: string;
   username: string;
-  user_id?: string;
+  user_id?: string | number;
   sanctuary_id?: number;
   created_at?: string;
 }
@@ -30,6 +30,7 @@ export interface Donation {
 
 export interface AuthState {
   user: User | null;
+  sessionToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;

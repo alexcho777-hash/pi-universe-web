@@ -3,7 +3,7 @@
  * Daily practice (check-in, meditation) and sanctuary donations with Pi.
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import {
   Container,
   Paper,
@@ -28,6 +28,8 @@ import { useAuthStore } from '../stores/authStore';
 import { apiClient } from '../api/ApiClient';
 import { Sanctuary } from '../types';
 import { usePiPayment, PaymentCancelledError } from '../hooks/usePiPayment';
+
+const TodayAlmanacCard = lazy(() => import('../components/TodayAlmanacCard'));
 
 interface PracticeSummary {
   checkins: number;
@@ -182,6 +184,10 @@ export default function HomePage() {
           </Typography>
         )}
       </Paper>
+
+      <Suspense fallback={null}>
+        <TodayAlmanacCard />
+      </Suspense>
 
       <Alert severity="warning" sx={{ mb: 2 }}>
         測試版：目前使用 Pi Testnet 的 Test-Pi，不是真的 Pi。

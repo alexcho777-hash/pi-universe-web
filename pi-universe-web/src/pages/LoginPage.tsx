@@ -97,6 +97,10 @@ export default function LoginPage() {
               </>
             )}
 
+            <Button variant="outlined" size="large" href="/calendar" sx={{ fontSize: '1.05rem' }}>
+              📅 查看今日農民曆・擇日（免登入）
+            </Button>
+
             <Typography variant="caption" color="textSecondary" sx={{ textAlign: 'center', mt: 1 }}>
               <a href="/privacy-policy.html">隱私權政策 Privacy</a>
               {' · '}

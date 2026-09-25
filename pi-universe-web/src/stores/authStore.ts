@@ -1,12 +1,17 @@
 /**
- * Auth Store - π Universe Web with Pi Network SDK
- * Uses Pi.authenticate() instead of JWT
+ * Auth Store - π Universe Web
+ *
+ * Two ways to log in, both verified by our backend with the Pi Platform API:
+ *  - Pi Browser: Pi.authenticate() -> accessToken -> POST /api/users/sync
+ *  - Other browsers: Pi Sign-In (OAuth) -> accessToken -> POST /api/users/pi-signin
+ * The backend answers with a session token, sent on every request as
+ * `Authorization: Bearer <token>` (see api/ApiClient.ts).
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState, User } from '../types';
-import { apiClient } from '../api/ApiClient';
+import { apiClient, AUTH_STORAGE_KEY } from '../api/ApiClient';
 import { isPiBrowser } from '../auth/piSignIn';
 
 declare global {
@@ -15,11 +20,10 @@ declare global {
   }
 }
 
-// Pi SDK callback: called if the user has an unfinished payment from a previous session
-// The backend finishes it (if the user already paid) or cancels it, so new payments aren't blocked.
+// Pi SDK callback for an unfinished payment from a previous session: the backend
+// completes it (if the user already paid) or cancels it, so new payments aren't blocked.
 const onIncompletePaymentFound = (payment: any) => {
   const paymentId = payment?.identifier;
-  console.warn('Incomplete Pi payment found:', paymentId);
   if (paymentId) {
     apiClient.handleIncompletePayment(paymentId).catch((err) =>
       console.error('Failed to resolve incomplete payment:', err)
@@ -27,49 +31,11 @@ const onIncompletePaymentFound = (payment: any) => {
   }
 };
 
-// Pi.authenticate() only resolves inside the Pi Browser. In any other browser it
-// never answers, so we stop waiting after a timeout instead of spinning forever.
-// Short wait on page load (outside the Pi Browser nothing will answer), but a long
-// wait when the user taps Login, so there is time to read and approve Pi's consent dialog.
+// Pi.authenticate() only answers inside the Pi Browser. Wait briefly on page load,
+// and longer when the user taps Login (time to read and approve Pi's consent dialog).
 const PI_AUTH_TIMEOUT_ON_LOAD_MS = 8000;
 const PI_AUTH_TIMEOUT_ON_LOGIN_MS = 60000;
 const NOT_PI_BROWSER_MSG = '請在 Pi Browser 中開啟此網站以登入 (Please open this site in the Pi Browser to log in)';
-
-// ---- Diagnostics (temporary, for Testnet debugging) ------------------------
-// This module loads before main.tsx calls Pi.init(), so we can record what
-// happens with the Pi SDK and show it on screen when login fails.
-const t0 = Date.now();
-const diag: string[] = [];
-const note = (msg: string) => {
-  diag.push(`${((Date.now() - t0) / 1000).toFixed(1)}s ${msg}`);
-  if (diag.length > 12) diag.shift();
-};
-note(`Pi SDK ${window.Pi ? 'loaded' : 'MISSING'}`);
-note(`UA: ${navigator.userAgent.slice(-60)}`);
-window.addEventListener('error', (e) => note(`JS error: ${e.message}`));
-window.addEventListener('unhandledrejection', (e: any) =>
-  note(`Unhandled: ${e?.reason?.message || String(e?.reason)}`)
-);
-if (window.Pi && typeof window.Pi.init === 'function') {
-  const originalInit = window.Pi.init.bind(window.Pi);
-  window.Pi.init = (opts: any) => {
-    note(`Pi.init(${JSON.stringify(opts)})`);
-    try {
-      const r = originalInit(opts);
-      if (r && typeof r.then === 'function') {
-        r.then(() => note('Pi.init resolved')).catch((err: any) => note(`Pi.init rejected: ${err?.message || err}`));
-      } else {
-        note('Pi.init returned');
-      }
-      return r;
-    } catch (err: any) {
-      note(`Pi.init threw: ${err?.message || err}`);
-      throw err;
-    }
-  };
-}
-const withDiag = (msg: string) => `${msg} ▸ [診斷] ${diag.join(' | ')}`;
-// -----------------------------------------------------------------------------
 
 // Only ever run one Pi.authenticate() at a time: if the automatic attempt on page
 // load is still waiting, the Login button reuses it instead of starting a second one.
@@ -77,185 +43,108 @@ let pendingAuth: Promise<any> | null = null;
 
 const authenticateWithTimeout = (timeoutMs: number): Promise<any> => {
   if (!pendingAuth) {
-    note('Pi.authenticate() called');
     pendingAuth = Promise.resolve()
       .then(() => window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound))
-      .then((res: any) => {
-        note(`authenticate OK: ${res?.user?.username || '(no user)'}`);
-        return res;
-      })
-      .catch((err: any) => {
-        note(`authenticate error: ${err?.message || err}`);
-        throw err;
-      })
       .finally(() => {
         pendingAuth = null;
       });
-  } else {
-    note('reusing pending authenticate()');
   }
   return Promise.race([
     pendingAuth,
-    new Promise((_, reject) =>
-      setTimeout(() => {
-        note(`no answer after ${timeoutMs / 1000}s`);
-        reject(new Error(NOT_PI_BROWSER_MSG));
-      }, timeoutMs)
-    ),
+    new Promise((_, reject) => setTimeout(() => reject(new Error(NOT_PI_BROWSER_MSG)), timeoutMs)),
   ]);
 };
+
+type LoginEndpoint = '/api/users/sync' | '/api/users/pi-signin';
+
+/** Exchange a Pi access token for our own session (the server verifies it with Pi). */
+async function exchangePiToken(endpoint: LoginEndpoint, accessToken: string) {
+  const response: any = await apiClient.post(endpoint, { accessToken });
+  if (!response?.success || !response.data?.session_token) {
+    throw new Error(response?.error || 'Pi 登入失敗 (login failed)');
+  }
+  const d = response.data;
+  const user: User = {
+    pi_uid: d.pi_uid,
+    username: d.username,
+    user_id: d.user_id,
+    sanctuary_id: d.sanctuary_id,
+    created_at: d.created_at,
+  };
+  return { user, sessionToken: d.session_token as string };
+}
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      sessionToken: null,
       isAuthenticated: false,
       isLoading: true,
       error: null,
 
       initialize: async () => {
+        // A login saved by an older version (no session token) is no longer valid.
+        if (get().isAuthenticated && !get().sessionToken) {
+          set({ user: null, isAuthenticated: false });
+        }
+
+        // Outside the Pi Browser, Pi.authenticate() never answers: keep any saved
+        // session (e.g. from Pi Sign-In) instead of making the visitor wait.
+        if (!window.Pi || !isPiBrowser()) {
+          set({ isLoading: false });
+          return;
+        }
+
         try {
           set({ isLoading: true });
-
-          // Outside the Pi Browser, Pi.authenticate() never answers: skip it and keep any
-          // saved session (e.g. from Pi Sign-In) instead of making the visitor wait.
-          if (!window.Pi || !isPiBrowser()) {
-            note(isPiBrowser() ? 'Pi SDK not loaded' : 'not Pi Browser: skip auto-login');
-            set({ isLoading: false });
-            return;
-          }
-
-          // Pi.authenticate() will prompt user if not logged in
-          // Returns: { user: { uid, username }, accessToken, ... }
           const authResult = await authenticateWithTimeout(PI_AUTH_TIMEOUT_ON_LOAD_MS);
-
-          if (authResult && authResult.user) {
-            const piUser: User = {
-              pi_uid: authResult.user.uid,
-              username: authResult.user.username || `User_${authResult.user.uid.slice(0, 8)}`,
-              user_id: authResult.user.uid,
-            };
-
-            // Register/sync user with backend
-            try {
-              const response = await apiClient.post('/api/users/sync', {
-                pi_uid: piUser.pi_uid,
-                username: piUser.username,
-              });
-
-              if (response?.data) {
-                piUser.user_id = (response.data as any).user_id;
-                piUser.sanctuary_id = (response.data as any).sanctuary_id;
-                piUser.created_at = (response.data as any).created_at;
-              }
-            } catch (err) {
-              console.error('Failed to sync user:', err);
-            }
-
-            set({
-              user: piUser,
-              isAuthenticated: true,
-              error: null,
-            });
+          if (authResult?.accessToken) {
+            const { user, sessionToken } = await exchangePiToken('/api/users/sync', authResult.accessToken);
+            set({ user, sessionToken, isAuthenticated: true, error: null });
           }
         } catch (err: any) {
-          console.warn('Auth initialization:', err?.message);
-          set({ isAuthenticated: false });
+          // Keep a still-valid saved session; otherwise show the login page.
+          if (!get().sessionToken) set({ isAuthenticated: false });
+          console.warn('Auto login skipped:', err?.message);
         } finally {
           set({ isLoading: false });
         }
       },
 
-      login: async (piUid?: string) => {
+      login: async () => {
         try {
           set({ isLoading: true, error: null });
+          if (!window.Pi) throw new Error(NOT_PI_BROWSER_MSG);
 
-          if (!window.Pi) {
-            throw new Error(NOT_PI_BROWSER_MSG);
-          }
-
-          // Trigger Pi authentication
           const authResult = await authenticateWithTimeout(PI_AUTH_TIMEOUT_ON_LOGIN_MS);
+          if (!authResult?.accessToken) throw new Error('Pi 登入失敗 (authentication failed)');
 
-          if (!authResult?.user) {
-            throw new Error('Authentication failed');
-          }
-
-          const piUser: User = {
-            pi_uid: authResult.user.uid,
-            username: authResult.user.username || `User_${authResult.user.uid.slice(0, 8)}`,
-            user_id: authResult.user.uid,
-          };
-
-          // Sync with backend
-          const response = await apiClient.post('/api/users/sync', {
-            pi_uid: piUser.pi_uid,
-            username: piUser.username,
-          });
-
-          if (response?.data) {
-            piUser.user_id = (response.data as any).user_id;
-            piUser.sanctuary_id = (response.data as any).sanctuary_id;
-            piUser.created_at = (response.data as any).created_at;
-          }
-
-          set({
-            user: piUser,
-            isAuthenticated: true,
-            error: null,
-          });
+          const { user, sessionToken } = await exchangePiToken('/api/users/sync', authResult.accessToken);
+          set({ user, sessionToken, isAuthenticated: true, error: null });
         } catch (err: any) {
-          const errorMsg = withDiag(err?.message || String(err) || 'Login failed');
-          set({
-            error: errorMsg,
-            isAuthenticated: false,
-          });
+          const errorMsg = err?.message || String(err) || 'Login failed';
+          set({ error: errorMsg, isAuthenticated: false });
           throw new Error(errorMsg);
         } finally {
           set({ isLoading: false });
         }
       },
 
-      logout: async () => {
-        try {
-          set({ isLoading: true });
-
-          if (window.Pi?.logout) {
-            await window.Pi.logout();
-          }
-
-          set({
-            user: null,
-            isAuthenticated: false,
-            error: null,
-          });
-        } catch (err: any) {
-          console.error('Logout error:', err);
-          set({ error: err.message });
-        } finally {
-          set({ isLoading: false });
-        }
-      },
-
-      // Pi Sign-In (ordinary browsers): the backend verifies the token with Pi (GET /v2/me)
+      // Pi Sign-In (ordinary browsers)
       signInWithPiToken: async (accessToken: string) => {
         set({ error: null });
-        const response: any = await apiClient.post('/api/users/pi-signin', { accessToken });
-        if (!response?.success || !response.data) {
-          throw new Error(response?.error || 'Pi 登入失敗');
+        const { user, sessionToken } = await exchangePiToken('/api/users/pi-signin', accessToken);
+        set({ user, sessionToken, isAuthenticated: true, error: null });
+      },
+
+      logout: async () => {
+        try {
+          await apiClient.post('/api/users/logout', {});
+        } catch {
+          /* the session is dropped locally either way */
         }
-        const d = response.data;
-        set({
-          user: {
-            pi_uid: d.pi_uid,
-            username: d.username,
-            user_id: d.user_id,
-            sanctuary_id: d.sanctuary_id,
-            created_at: d.created_at,
-          },
-          isAuthenticated: true,
-          error: null,
-        });
+        set({ user: null, sessionToken: null, isAuthenticated: false, error: null, isLoading: false });
       },
 
       setError: (error: string | null) => {
@@ -263,9 +152,10 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'pi-universe-auth',
+      name: AUTH_STORAGE_KEY,
       partialize: (state) => ({
         user: state.user,
+        sessionToken: state.sessionToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }

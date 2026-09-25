@@ -6,6 +6,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { ApiResponse } from '../types';
 
+/** localStorage key used by the auth store (zustand persist). */
+export const AUTH_STORAGE_KEY = 'pi-universe-auth';
+
 class ApiClientClass {
   private instance: AxiosInstance;
   private baseURL: string;
@@ -23,37 +26,43 @@ class ApiClientClass {
       },
     });
 
-    // Add request interceptor to include Pi UID if authenticated
+    // Send the login session issued by our backend (after it verified the user with Pi)
     this.instance.interceptors.request.use((config) => {
-      const piUid = this.getPiUid();
-      if (piUid) {
-        config.headers['X-Pi-UID'] = piUid;
+      const token = this.getSessionToken();
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
       }
       return config;
     });
 
-    // Handle response errors
+    // Session missing/expired: clear the saved login and go back to the login page.
+    // (Not for the login calls themselves, which report their own errors.)
     this.instance.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401) {
-          // Unauthorized - might need re-authentication
-          window.location.href = '/login';
+        const url: string = error.config?.url || '';
+        const isLoginCall = /\/api\/users\/(sync|pi-signin)/.test(url);
+        if (error.response?.status === 401 && !isLoginCall) {
+          try {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+          } catch {
+            /* ignore */
+          }
+          if (window.location.pathname !== '/login') window.location.href = '/login';
         }
         return Promise.reject(error);
       }
     );
   }
 
-  private getPiUid(): string | null {
+  private getSessionToken(): string | null {
     try {
-      const authData = localStorage.getItem('pi-universe-auth');
+      const authData = localStorage.getItem(AUTH_STORAGE_KEY);
       if (authData) {
-        const parsed = JSON.parse(authData);
-        return parsed.state?.user?.pi_uid || null;
+        return JSON.parse(authData).state?.sessionToken || null;
       }
-    } catch (err) {
-      console.error('Error reading auth from localStorage:', err);
+    } catch {
+      /* storage unavailable */
     }
     return null;
   }

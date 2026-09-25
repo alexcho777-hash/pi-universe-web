@@ -2,7 +2,7 @@
  * π Universe Web - Main App Component
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CircularProgress, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { useAuthStore } from './stores/authStore';
@@ -13,6 +13,14 @@ import SettingsPage from './pages/SettingsPage';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import Navigation from './components/Navigation';
+
+// The almanac engine is large, so the calendar page loads only when opened
+const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+const calendarRoute = (
+  <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>}>
+    <CalendarPage />
+  </Suspense>
+);
 
 // Create Material-UI theme (replace React Native Paper colors)
 const theme = createTheme({
@@ -28,7 +36,9 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: 'Roboto, "Noto Sans TC", "Noto Sans JP", sans-serif',
+    // Larger base size so the site is easy to read for all ages (MUI default is 14)
+    fontSize: 16,
     // Keep "π" and "Pi" as written (the default uppercase turns them into "Π" / "PI")
     button: { textTransform: 'none' },
   },
@@ -63,6 +73,7 @@ export default function App() {
                 <Route path="/acknowledgments" element={<AcknowledgmentsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/calendar" element={calendarRoute} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Box>
@@ -74,6 +85,17 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route
+              path="/calendar"
+              element={
+                <Box sx={{ minHeight: '100vh' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1.5 }}>
+                    <a href="/login" style={{ fontSize: '1.05rem' }}>登入 π Universe →</a>
+                  </Box>
+                  {calendarRoute}
+                </Box>
+              }
+            />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         )}
