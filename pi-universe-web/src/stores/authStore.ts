@@ -14,6 +14,11 @@ declare global {
   }
 }
 
+// Pi SDK callback: called if the user has an unfinished payment from a previous session
+const onIncompletePaymentFound = (payment: any) => {
+  console.warn('Incomplete Pi payment found:', payment?.identifier);
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -35,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
 
           // Pi.authenticate() will prompt user if not logged in
           // Returns: { user: { uid, username }, accessToken, ... }
-          const authResult = await window.Pi.authenticate();
+          const authResult = await window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
 
           if (authResult && authResult.user) {
             const piUser: User = {
@@ -51,10 +56,10 @@ export const useAuthStore = create<AuthState>()(
                 username: piUser.username,
               });
 
-              if (response.data?.data) {
-                piUser.user_id = response.data.data.user_id;
-                piUser.sanctuary_id = response.data.data.sanctuary_id;
-                piUser.created_at = response.data.data.created_at;
+              if (response?.data) {
+                piUser.user_id = (response.data as any).user_id;
+                piUser.sanctuary_id = (response.data as any).sanctuary_id;
+                piUser.created_at = (response.data as any).created_at;
               }
             } catch (err) {
               console.error('Failed to sync user:', err);
@@ -86,7 +91,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // Trigger Pi authentication
-          const authResult = await window.Pi.authenticate();
+          const authResult = await window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
 
           if (!authResult?.user) {
             throw new Error('Authentication failed');
@@ -104,10 +109,10 @@ export const useAuthStore = create<AuthState>()(
             username: piUser.username,
           });
 
-          if (response.data?.data) {
-            piUser.user_id = response.data.data.user_id;
-            piUser.sanctuary_id = response.data.data.sanctuary_id;
-            piUser.created_at = response.data.data.created_at;
+          if (response?.data) {
+            piUser.user_id = (response.data as any).user_id;
+            piUser.sanctuary_id = (response.data as any).sanctuary_id;
+            piUser.created_at = (response.data as any).created_at;
           }
 
           set({
