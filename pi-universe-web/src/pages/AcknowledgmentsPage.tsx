@@ -71,7 +71,7 @@ export default function AcknowledgmentsPage() {
     : '';
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={{ pt: 7, pb: 3 }}>
       <Paper elevation={1} sx={{ p: 3, mb: 2, backgroundColor: '#F5E6D3', textAlign: 'center' }}>
         <Typography sx={{ fontSize: '2.2rem', fontWeight: 800, color: '#8B4513' }}>{tr('功德簿', 'Merit Book')}</Typography>
         <Typography sx={{ fontSize: '1.15rem', color: '#5a3a1a' }}>

@@ -22,6 +22,7 @@ import { useAuthStore } from '../stores/authStore';
 import { apiClient } from '../api/ApiClient';
 import { Sanctuary } from '../types';
 import DonateDialog from '../components/DonateDialog';
+import { BrandLogo, BrandWordmark } from '../components/BrandLogo';
 import { useI18n } from '../i18n/i18n';
 import { faithName, sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 
@@ -137,11 +138,17 @@ export default function HomePage() {
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
       {/* Welcome Section */}
-      <Paper elevation={1} sx={{ p: 3, mb: 2, backgroundColor: '#F5E6D3' }}>
+      <Paper elevation={1} sx={{ p: 3, pr: { xs: 3, sm: 3 }, mt: 3, mb: 2, backgroundColor: '#F5E6D3' }}>
         <Typography sx={{ fontSize: { xs: '1.9rem', sm: '2.3rem' }, fontWeight: 800, color: '#8B4513', lineHeight: 1.3 }}>
           {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}`)}
         </Typography>
-        <Typography sx={{ fontSize: { xs: '1.4rem', sm: '1.6rem' }, fontWeight: 700, color: '#5a3a1a' }}>{tr('π Universe 心靈聖地', 'to π Universe')}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
+          <BrandLogo size={64} />
+          <Box>
+            <BrandWordmark fontSize="1.9rem" />
+            <Typography sx={{ fontSize: '1.05rem', color: '#5a3a1a' }}>{tr('多元信仰心靈聖地', 'A home for many faiths')}</Typography>
+          </Box>
+        </Box>
         {summary && (
           <Typography sx={{ mt: 1, color: '#5a3a1a', fontSize: '1.1rem' }}>
             {tr(
@@ -190,7 +197,7 @@ export default function HomePage() {
             <Card>
               <CardContent>
                 {meditationStart === null ? (
-                  <Button variant="contained" fullWidth sx={{ backgroundColor: '#2563EB' }} onClick={startMeditation}>
+                  <Button variant="contained" fullWidth sx={{ backgroundColor: '#5B2A93' }} onClick={startMeditation}>
                     {tr('開始靜坐', 'Start meditation')}
                   </Button>
                 ) : (
@@ -231,7 +238,7 @@ export default function HomePage() {
                   <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
                     <Button
                       variant="contained"
-                      sx={{ backgroundColor: '#2563EB', fontSize: '1.05rem' }}
+                      sx={{ backgroundColor: '#5B2A93', fontSize: '1.05rem' }}
                       onClick={() => navigate(`/sanctuary/${sanctuary.id}`)}
                     >
                       {tr('進入參拜・功德簿', 'Enter · Merit book')}

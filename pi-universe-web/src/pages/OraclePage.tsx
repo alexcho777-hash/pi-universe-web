@@ -138,10 +138,17 @@ const goldButton = {
   '&:hover': { background: 'linear-gradient(180deg,#FFE7A3,#D6A64A)' },
   '&.Mui-disabled': { background: '#5a3a2a', color: '#bba' },
 };
+// Filled fields keep the label inside the cream box, so it never sits on the dark background
 const fieldSx = {
-  '& .MuiInputBase-root': { backgroundColor: 'rgba(255,245,220,.95)', fontSize: '1.1rem' },
-  '& .MuiInputLabel-root': { color: '#5a2a1a' },
-};
+  '& .MuiFilledInput-root': {
+    backgroundColor: 'rgba(255,245,220,.96)',
+    fontSize: '1.1rem',
+    borderRadius: '6px',
+    '&:hover, &.Mui-focused': { backgroundColor: '#FFF6DF' },
+  },
+  '& .MuiInputLabel-root': { color: '#6a3a1a' },
+  '& .MuiInputLabel-root.Mui-focused': { color: '#8B1A1A' },
+}
 
 function Stepper({ step, lang }: { step: Step; lang: Lang }) {
   const idx = STEPS.findIndex((s) => s.key === step);
@@ -525,10 +532,10 @@ export default function OraclePage() {
               </Box>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <TextField label={tr('姓名', 'Name')} value={name} onChange={(e) => setName(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 20 } }} />
+                <TextField variant="filled" label={tr('姓名', 'Name')} value={name} onChange={(e) => setName(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 20 } }} />
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  <TextField label={tr('生辰（國曆）', 'Date of birth')} type="date" value={birth} onChange={(e) => setBirth(e.target.value)} sx={{ ...fieldSx, flex: 1 }} slotProps={{ inputLabel: { shrink: true } }} />
-                  <TextField select label={tr('時辰', 'Hour of birth')} value={shichen} onChange={(e) => setShichen(e.target.value)} sx={{ ...fieldSx, width: lang === 'en' ? 170 : 140 }}>
+                  <TextField variant="filled" label={tr('生辰（國曆）', 'Date of birth')} type="date" value={birth} onChange={(e) => setBirth(e.target.value)} sx={{ ...fieldSx, flex: 1 }} slotProps={{ inputLabel: { shrink: true } }} />
+                  <TextField variant="filled" select label={tr('時辰', 'Hour of birth')} value={shichen} onChange={(e) => setShichen(e.target.value)} sx={{ ...fieldSx, width: lang === 'en' ? 170 : 140 }}>
                     {SHICHEN.map(([zh, en]) => (
                       <MenuItem key={zh} value={zh}>
                         {lang === 'en' ? en : zh}
@@ -536,8 +543,8 @@ export default function OraclePage() {
                     ))}
                   </TextField>
                 </Box>
-                <TextField label={tr('現居地（選填，例如：台中市）', 'Where you live (optional, e.g. Taipei)')} value={address} onChange={(e) => setAddress(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 30 } }} />
-                <TextField label={tr('所問之事', 'Your question')} value={question} onChange={(e) => setQuestion(e.target.value)} multiline minRows={2} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 80 } }} />
+                <TextField variant="filled" label={tr('現居地（選填，例如：台中市）', 'Where you live (optional, e.g. Taipei)')} value={address} onChange={(e) => setAddress(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 30 } }} />
+                <TextField variant="filled" label={tr('所問之事', 'Your question')} value={question} onChange={(e) => setQuestion(e.target.value)} multiline minRows={2} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 80 } }} />
                 <Typography sx={{ fontSize: '0.95rem', color: '#d9b98a' }}>
                   {tr('※ 這些資料只用來組成稟報內容，不會儲存。', '※ These details are only used to write your prayer and are not saved.')}
                 </Typography>

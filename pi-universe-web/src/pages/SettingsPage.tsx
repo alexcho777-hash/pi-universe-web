@@ -20,18 +20,18 @@ export default function SettingsPage() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={{ pt: 7, pb: 3 }}>
       <Typography sx={{ fontSize: '1.4rem', fontWeight: 700, mb: 1.5 }}>{tr('設定', 'Settings')}</Typography>
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
           <Typography sx={{ fontSize: '1.1rem' }}>{tr('語言 Language', 'Language 語言')}</Typography>
           <ToggleButtonGroup exclusive value={lang} onChange={(_, v) => v && setLang(v)}>
-            <ToggleButton value="zh" sx={{ fontSize: '1.05rem', px: 2.5 }}>
-              中文
-            </ToggleButton>
             <ToggleButton value="en" sx={{ fontSize: '1.05rem', px: 2.5 }}>
               English
+            </ToggleButton>
+            <ToggleButton value="zh" sx={{ fontSize: '1.05rem', px: 2.5 }}>
+              中文
             </ToggleButton>
           </ToggleButtonGroup>
         </Box>

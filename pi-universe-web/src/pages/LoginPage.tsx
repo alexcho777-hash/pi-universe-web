@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { isPiBrowser, startPiSignIn } from '../auth/piSignIn';
 import { useI18n } from '../i18n/i18n';
+import { BrandLogo, BrandWordmark, BRAND_PURPLE } from '../components/BrandLogo';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function LoginPage() {
   };
 
   const busy = isLoading || redirecting;
-  const buttonSx = { backgroundColor: '#2563EB', padding: '12px 24px', fontSize: '16px' };
+  const buttonSx = { backgroundColor: BRAND_PURPLE, padding: '12px 24px', fontSize: '1.1rem', '&:hover': { backgroundColor: '#4A1F7C' } };
 
   return (
     <Container maxWidth="sm">
@@ -52,9 +53,12 @@ export default function LoginPage() {
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Typography variant="h3" component="h1" gutterBottom sx={{ color: '#2563EB' }}>
-              π Universe
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1.5 }}>
+              <BrandLogo size={132} />
+            </Box>
+            <Box component="h1" sx={{ m: 0, mb: 1 }}>
+              <BrandWordmark fontSize="2.8rem" />
+            </Box>
             <Typography sx={{ fontSize: '1.1rem', color: 'text.secondary' }}>
               {tr('多元信仰心靈聖地', 'A home for many faiths')}
             </Typography>

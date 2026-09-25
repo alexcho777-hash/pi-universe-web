@@ -49,9 +49,9 @@ export default function Navigation() {
             value={item.path}
             icon={<item.icon />}
             sx={{
-              color: currentPath === item.path ? '#2563EB' : '#999',
+              color: currentPath === item.path ? '#5B2A93' : '#999',
               '&.Mui-selected': {
-                color: '#2563EB',
+                color: '#5B2A93',
               },
             }}
           />

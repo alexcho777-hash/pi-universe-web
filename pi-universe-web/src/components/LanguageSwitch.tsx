@@ -17,7 +17,7 @@ export default function LanguageSwitch() {
         fontWeight: 700,
         borderRadius: 999,
         color: lang === value ? '#fff' : '#555',
-        backgroundColor: lang === value ? '#2563EB' : 'transparent',
+        backgroundColor: lang === value ? '#5B2A93' : 'transparent',
       }}
     >
       {label}
@@ -38,8 +38,8 @@ export default function LanguageSwitch() {
         boxShadow: '0 1px 6px rgba(0,0,0,.25)',
       }}
     >
-      {item('zh', '中文')}
       {item('en', 'EN')}
+      {item('zh', '中文')}
     </Box>
   );
 }

@@ -30,7 +30,7 @@ const calendarRoute = (
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2563EB', // π Universe primary blue
+      main: '#5B2A93', // π Universe primary blue
     },
     secondary: {
       main: '#D4AF37', // Gold

@@ -11,7 +11,7 @@ export default function ProfilePage() {
   const { tr, lang } = useI18n();
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={{ pt: 7, pb: 3 }}>
       <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#F5E6D3' }}>
         <Typography sx={{ fontSize: '2rem', fontWeight: 700 }}>{user?.username || tr('信眾', 'Visitor')}</Typography>
       </Paper>

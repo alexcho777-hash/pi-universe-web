@@ -85,7 +85,7 @@ export default function CalendarPage() {
   const { tr, lang } = useI18n();
 
   return (
-    <Container maxWidth="md" sx={{ py: 2, pb: 12 }}>
+    <Container maxWidth="md" sx={{ pt: 7, pb: 12 }}>
       <ToggleButtonGroup
         exclusive
         fullWidth
