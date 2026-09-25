@@ -48,7 +48,7 @@ const ACTIVITIES: Record<string, Activity[]> = {
   ],
   catholic: [
     { key: 'rosary', icon: '📿', title: ['玫瑰經', 'Pray the Rosary'], minutes: ['約 20 分鐘', 'About 20 min'] },
-    { key: 'candle', icon: '🕯️', title: ['點蠟燭祈禱', 'Light a prayer candle'], minutes: ['約 1 分鐘', 'About 1 min'] },
+    { key: 'candle', icon: '🕯️', title: ['點蠟燭祈禱', 'Light a prayer candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
     { key: 'verse', icon: '📖', title: ['每日經文', 'Verse of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
   ],
   islamic: [
@@ -58,7 +58,7 @@ const ACTIVITIES: Record<string, Activity[]> = {
   ],
   shinto: [
     { key: 'shrine', icon: '⛩️', title: ['參拜作法', 'How to visit a shrine'], minutes: ['約 2 分鐘', 'About 2 min'] },
-    { key: 'ema', icon: '🪧', title: ['繪馬許願', 'Write an ema wish'], minutes: ['約 1 分鐘', 'About 1 min'] },
+    { key: 'ema', icon: '🪧', title: ['繪馬許願', 'Write an ema wish'], minutes: ['最多掛 20 個', 'Up to 20 wishes'] },
   ],
   hindu: [
     { key: 'beads', icon: '📿', title: ['108 念珠持咒', 'Japa mala (108)'], minutes: ['約 10 分鐘', 'About 10 min'] },

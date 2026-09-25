@@ -285,6 +285,23 @@ export function CandlePanel({ tr }: { tr: TR }) {
   const key = `pu-candle-${today()}`;
   const [lit, setLit] = useState<{ intention: string } | null>(() => load(key, null));
   const [intention, setIntention] = useState('');
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(new Date()), 30000);
+    return () => window.clearInterval(t);
+  }, []);
+  // The candle burns until midnight, even after this window is closed
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const minsLeft = Math.max(0, Math.round((midnight.getTime() - now.getTime()) / 60000));
+  const left = tr(`${Math.floor(minsLeft / 60)} 小時 ${minsLeft % 60} 分`, `${Math.floor(minsLeft / 60)} h ${minsLeft % 60} min`);
+  const putOut = () => {
+    setLit(null);
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
+  };
   return (
     <Box sx={{ textAlign: 'center' }}>
       <Box sx={{ py: 3, borderRadius: 2, background: 'linear-gradient(180deg,#1b1030,#2d1a4d)' }}>
@@ -294,11 +311,18 @@ export function CandlePanel({ tr }: { tr: TR }) {
       </Box>
       {lit ? (
         <Box sx={{ mt: 2 }}>
-          <Big>{tr('蠟燭已點燃，今天都會為你的心意燃燒。', 'Your candle is lit and will burn for your intention all day.')}</Big>
-          {lit.intention && <Typography sx={{ mt: 1, fontStyle: 'italic' }}>「{lit.intention}」</Typography>}
+          {lit.intention && <Typography sx={{ mb: 1, fontStyle: 'italic', fontSize: '1.15rem' }}>「{lit.intention}」</Typography>}
+          <Big>{tr('蠟燭會一直亮到今晚 12 點，關掉這個視窗也會繼續亮著。', 'Your candle burns until midnight tonight — it stays lit even after you close this window.')}</Big>
+          <Typography sx={{ mt: 1, fontSize: '1.2rem', fontWeight: 800, color: '#5B2A93' }}>{tr(`還會亮 ${left}`, `${left} left`)}</Typography>
+          <Button variant="outlined" color="inherit" sx={{ mt: 2 }} onClick={putOut}>
+            {tr('熄滅蠟燭', 'Put out the candle')}
+          </Button>
         </Box>
       ) : (
         <Box sx={{ mt: 2 }}>
+          <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
+            {tr('點燃後會亮到今晚 12 點；隨時可以自己熄滅。', 'Once lit, it burns until midnight. You can put it out at any time.')}
+          </Typography>
           <TextField
             fullWidth
             label={tr('祈禱意向（選填，只存在你的手機）', 'Prayer intention (optional, kept on this device only)')}
@@ -568,17 +592,22 @@ export function ShrinePanel({ lang, tr }: { lang: Lang; tr: TR }) {
   );
 }
 
+const EMA_MAX = 20;
+
 export function EmaPanel({ tr }: { tr: TR }) {
   const [wishes, setWishes] = useState<{ text: string; date: string }[]>(() => load('pu-ema', []));
   const [text, setText] = useState('');
-  const add = () => {
-    if (!text.trim()) return;
-    const next = [{ text: text.trim(), date: today() }, ...wishes].slice(0, 20);
+  const update = (next: { text: string; date: string }[]) => {
     setWishes(next);
     save('pu-ema', next);
+  };
+  const add = () => {
+    if (!text.trim()) return;
+    update([{ text: text.trim(), date: today() }, ...wishes].slice(0, EMA_MAX));
     setText('');
     buzz(30);
   };
+  const full = wishes.length >= EMA_MAX;
   return (
     <Box>
       <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
@@ -588,26 +617,55 @@ export function EmaPanel({ tr }: { tr: TR }) {
       <Button variant="contained" size="large" fullWidth sx={{ mt: 1.5, fontSize: '1.15rem' }} onClick={add} disabled={!text.trim()}>
         {tr('掛上繪馬', 'Hang the ema')}
       </Button>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 2, justifyContent: 'center' }}>
+      <Typography sx={{ mt: 2, textAlign: 'center', fontWeight: 700, fontSize: '1.05rem' }}>
+        {tr(`已掛 ${wishes.length} / ${EMA_MAX} 個繪馬`, `${wishes.length} of ${EMA_MAX} ema hung`)}
+      </Typography>
+      <Typography sx={{ textAlign: 'center', fontSize: '0.92rem', color: full ? '#C62828' : 'text.secondary' }}>
+        {full
+          ? tr('已滿 20 個：再掛新的，最舊的一個會被取下。', 'Full: hanging a new one takes down the oldest.')
+          : tr('最多可掛 20 個；點繪馬右上角的 × 可以取下。', 'You can hang up to 20. Tap × on an ema to take it down.')}
+      </Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 1.5, justifyContent: 'center' }}>
         {wishes.map((w, i) => (
-          <Box
-            key={i}
-            sx={{
-              width: 150,
-              minHeight: 100,
-              p: 1.5,
-              pt: 3,
-              position: 'relative',
-              background: 'linear-gradient(180deg,#E9C48B,#D4A461)',
-              clipPath: 'polygon(50% 0, 100% 22%, 100% 100%, 0 100%, 0 22%)',
-              color: '#3A2206',
-              fontSize: '0.95rem',
-              textAlign: 'center',
-            }}
-          >
-            <Box sx={{ position: 'absolute', top: 10, left: '50%', width: 8, height: 8, ml: '-4px', borderRadius: '50%', bgcolor: '#8B1A1A' }} />
-            {w.text}
-            <Typography sx={{ fontSize: '0.75rem', mt: 0.5, opacity: 0.7 }}>{w.date}</Typography>
+          <Box key={`${i}-${w.text}`} sx={{ position: 'relative' }}>
+            <Box
+              sx={{
+                width: 150,
+                minHeight: 100,
+                p: 1.5,
+                pt: 3,
+                background: 'linear-gradient(180deg,#E9C48B,#D4A461)',
+                clipPath: 'polygon(50% 0, 100% 22%, 100% 100%, 0 100%, 0 22%)',
+                color: '#3A2206',
+                fontSize: '0.95rem',
+                textAlign: 'center',
+              }}
+            >
+              <Box sx={{ width: 8, height: 8, mx: 'auto', mb: 0.5, borderRadius: '50%', bgcolor: '#8B1A1A' }} />
+              {w.text}
+              <Typography sx={{ fontSize: '0.75rem', mt: 0.5, opacity: 0.7 }}>{w.date}</Typography>
+            </Box>
+            <Box
+              component="button"
+              aria-label={tr('取下繪馬', 'Take down')}
+              onClick={() => update(wishes.filter((_, j) => j !== i))}
+              sx={{
+                position: 'absolute',
+                top: 18,
+                right: -6,
+                width: 26,
+                height: 26,
+                borderRadius: '50%',
+                border: 'none',
+                bgcolor: 'rgba(0,0,0,.55)',
+                color: '#fff',
+                fontSize: '1rem',
+                lineHeight: 1,
+                cursor: 'pointer',
+              }}
+            >
+              ×
+            </Box>
           </Box>
         ))}
       </Box>
