@@ -19,6 +19,19 @@ const onIncompletePaymentFound = (payment: any) => {
   console.warn('Incomplete Pi payment found:', payment?.identifier);
 };
 
+// Pi.authenticate() only resolves inside the Pi Browser. In any other browser it
+// never answers, so we stop waiting after a timeout instead of spinning forever.
+const PI_AUTH_TIMEOUT_MS = 8000;
+const NOT_PI_BROWSER_MSG = '請在 Pi Browser 中開啟此網站以登入 (Please open this site in the Pi Browser to log in)';
+
+const authenticateWithTimeout = (): Promise<any> =>
+  Promise.race([
+    window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(NOT_PI_BROWSER_MSG)), PI_AUTH_TIMEOUT_MS)
+    ),
+  ]);
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -40,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
 
           // Pi.authenticate() will prompt user if not logged in
           // Returns: { user: { uid, username }, accessToken, ... }
-          const authResult = await window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
+          const authResult = await authenticateWithTimeout();
 
           if (authResult && authResult.user) {
             const piUser: User = {
@@ -72,11 +85,8 @@ export const useAuthStore = create<AuthState>()(
             });
           }
         } catch (err: any) {
-          console.error('Auth initialization error:', err);
-          set({
-            error: err.message || 'Authentication failed',
-            isAuthenticated: false,
-          });
+          console.warn('Auth initialization:', err?.message);
+          set({ isAuthenticated: false });
         } finally {
           set({ isLoading: false });
         }
@@ -87,11 +97,11 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true, error: null });
 
           if (!window.Pi) {
-            throw new Error('Pi SDK not available');
+            throw new Error(NOT_PI_BROWSER_MSG);
           }
 
           // Trigger Pi authentication
-          const authResult = await window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
+          const authResult = await authenticateWithTimeout();
 
           if (!authResult?.user) {
             throw new Error('Authentication failed');
