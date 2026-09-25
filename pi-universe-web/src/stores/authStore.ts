@@ -15,8 +15,15 @@ declare global {
 }
 
 // Pi SDK callback: called if the user has an unfinished payment from a previous session
+// The backend finishes it (if the user already paid) or cancels it, so new payments aren't blocked.
 const onIncompletePaymentFound = (payment: any) => {
-  console.warn('Incomplete Pi payment found:', payment?.identifier);
+  const paymentId = payment?.identifier;
+  console.warn('Incomplete Pi payment found:', paymentId);
+  if (paymentId) {
+    apiClient.handleIncompletePayment(paymentId).catch((err) =>
+      console.error('Failed to resolve incomplete payment:', err)
+    );
+  }
 };
 
 // Pi.authenticate() only resolves inside the Pi Browser. In any other browser it

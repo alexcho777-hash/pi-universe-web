@@ -27,14 +27,14 @@ export default function SettingsPage() {
       </Typography>
 
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography>Notifications</Typography>
           <Switch
             checked={notificationsEnabled}
             onChange={(e) => setNotificationsEnabled(e.target.checked)}
           />
         </Box>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography>Sound Effects</Typography>
           <Switch
             checked={soundEnabled}

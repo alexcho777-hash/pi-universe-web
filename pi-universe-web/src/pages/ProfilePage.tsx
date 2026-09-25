@@ -22,7 +22,7 @@ export default function ProfilePage() {
         個人資訊
       </Typography>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
             <CardContent>
               <Typography color="textSecondary">Pi UID</Typography>
@@ -30,7 +30,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
             <CardContent>
               <Typography color="textSecondary">Member Since</Typography>

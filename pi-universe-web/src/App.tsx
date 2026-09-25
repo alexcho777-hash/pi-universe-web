@@ -28,6 +28,8 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: 'Roboto, sans-serif',
+    // Keep "π" and "Pi" as written (the default uppercase turns them into "Π" / "PI")
+    button: { textTransform: 'none' },
   },
 });
 
@@ -41,12 +43,7 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <CircularProgress />
       </Box>
     );
@@ -57,9 +54,9 @@ export default function App() {
       <CssBaseline />
       <Router>
         {isAuthenticated ? (
-          <Box display="flex" flexDirection="column" minHeight="100vh">
+          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             {/* Main content */}
-            <Box flex={1} overflow="auto" pb={8}>
+            <Box sx={{ flex: 1, overflow: 'auto', pb: 8 }}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/acknowledgments" element={<AcknowledgmentsPage />} />

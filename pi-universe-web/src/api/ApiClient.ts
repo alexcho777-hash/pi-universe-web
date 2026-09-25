@@ -16,7 +16,8 @@ class ApiClientClass {
 
     this.instance = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000,
+      // Render's free tier sleeps when idle; the first request can take ~30-60s to wake it.
+      timeout: 60000,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -65,7 +66,7 @@ class ApiClientClass {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || 'API request failed',
+        error: error.response?.data?.error || error.message || 'API request failed',
       };
     }
   }
@@ -78,7 +79,7 @@ class ApiClientClass {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || 'API request failed',
+        error: error.response?.data?.error || error.message || 'API request failed',
       };
     }
   }
@@ -93,32 +94,36 @@ class ApiClientClass {
     return this.get('/api/acknowledgments');
   }
 
-  // Daily check-in
+  // Daily check-in (once per day)
   async dailyCheckIn() {
-    return this.post('/api/daily-checkin', {});
+    return this.post('/api/practice/checkin', {});
   }
 
-  // Start meditation
-  async startMeditation(durationMinutes: number = 0) {
-    return this.post('/api/meditations', {
-      duration_minutes: durationMinutes,
-    });
+  // Record a meditation session
+  async logMeditation(durationMinutes: number) {
+    return this.post('/api/practice/meditation', { duration_minutes: durationMinutes });
   }
 
-  // Create Pi payment
-  async createPayment(amount: number, sanctuaryId: number, description: string) {
-    return this.post('/api/donations/create-payment', {
-      amount,
-      sanctuary_id: sanctuaryId,
-      description,
-    });
+  // Current user's practice & donation totals
+  async getPracticeSummary() {
+    return this.get('/api/practice/summary');
   }
 
-  // Complete Pi payment
-  async completePayment(paymentId: string) {
-    return this.post('/api/donations/complete-payment', {
-      payment_id: paymentId,
-    });
+  // ---- Pi payments (see src/hooks/usePiPayment.ts) ----
+  async approvePayment(paymentId: string) {
+    return this.post('/api/payments/approve', { paymentId });
+  }
+
+  async completePayment(paymentId: string, txid: string) {
+    return this.post('/api/payments/complete', { paymentId, txid });
+  }
+
+  async cancelPayment(paymentId: string) {
+    return this.post('/api/payments/cancel', { paymentId });
+  }
+
+  async handleIncompletePayment(paymentId: string) {
+    return this.post('/api/payments/incomplete', { paymentId });
   }
 
   // Get user profile

@@ -33,15 +33,17 @@ export default function LoginPage() {
   return (
     <Container maxWidth="sm">
       <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-        gap={2}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          gap: 2,
+        }}
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
-          <Box textAlign="center" mb={3}>
+          <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Typography variant="h3" component="h1" gutterBottom sx={{ color: '#2563EB' }}>
               π Universe
             </Typography>
@@ -56,7 +58,7 @@ export default function LoginPage() {
             </Alert>
           )}
 
-          <Box display="flex" flexDirection="column" gap={2}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
               variant="contained"
               size="large"
@@ -78,10 +80,16 @@ export default function LoginPage() {
               )}
             </Button>
 
-            <Typography variant="body2" color="textSecondary" textAlign="center" sx={{ mt: 2 }}>
+            <Typography variant="body2" color="textSecondary" sx={{ mt: 2, textAlign: 'center' }}>
               This app requires Pi Network authentication.
               <br />
               Click the button above to authenticate.
+            </Typography>
+
+            <Typography variant="caption" color="textSecondary" sx={{ textAlign: 'center' }}>
+              <a href="/privacy-policy.html">隱私權政策 Privacy</a>
+              {' · '}
+              <a href="/terms.html">服務條款 Terms</a>
             </Typography>
           </Box>
         </Paper>

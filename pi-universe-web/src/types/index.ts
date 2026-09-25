@@ -14,7 +14,9 @@ export interface Sanctuary {
   id: number;
   name: string;
   description: string;
-  religion: string;
+  religion_type: string;
+  icon?: string;
+  color?: string;
   image_url?: string;
 }
 
@@ -32,7 +34,7 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
   initialize: () => Promise<void>;
-  login: (piUid: string) => Promise<void>;
+  login: (piUid?: string) => Promise<void>;
   logout: () => Promise<void>;
   setError: (error: string | null) => void;
 }
