@@ -21,14 +21,17 @@ const onIncompletePaymentFound = (payment: any) => {
 
 // Pi.authenticate() only resolves inside the Pi Browser. In any other browser it
 // never answers, so we stop waiting after a timeout instead of spinning forever.
-const PI_AUTH_TIMEOUT_MS = 8000;
+// Short wait on page load (outside the Pi Browser nothing will answer), but a long
+// wait when the user taps Login, so there is time to read and approve Pi's consent dialog.
+const PI_AUTH_TIMEOUT_ON_LOAD_MS = 8000;
+const PI_AUTH_TIMEOUT_ON_LOGIN_MS = 60000;
 const NOT_PI_BROWSER_MSG = '請在 Pi Browser 中開啟此網站以登入 (Please open this site in the Pi Browser to log in)';
 
-const authenticateWithTimeout = (): Promise<any> =>
+const authenticateWithTimeout = (timeoutMs: number): Promise<any> =>
   Promise.race([
     window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound),
     new Promise((_, reject) =>
-      setTimeout(() => reject(new Error(NOT_PI_BROWSER_MSG)), PI_AUTH_TIMEOUT_MS)
+      setTimeout(() => reject(new Error(NOT_PI_BROWSER_MSG)), timeoutMs)
     ),
   ]);
 
@@ -53,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
 
           // Pi.authenticate() will prompt user if not logged in
           // Returns: { user: { uid, username }, accessToken, ... }
-          const authResult = await authenticateWithTimeout();
+          const authResult = await authenticateWithTimeout(PI_AUTH_TIMEOUT_ON_LOAD_MS);
 
           if (authResult && authResult.user) {
             const piUser: User = {
@@ -101,7 +104,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // Trigger Pi authentication
-          const authResult = await authenticateWithTimeout();
+          const authResult = await authenticateWithTimeout(PI_AUTH_TIMEOUT_ON_LOGIN_MS);
 
           if (!authResult?.user) {
             throw new Error('Authentication failed');
