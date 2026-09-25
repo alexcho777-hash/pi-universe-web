@@ -14,6 +14,8 @@ import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import SanctuaryPage from './pages/SanctuaryPage';
 import Navigation from './components/Navigation';
+import LanguageSwitch from './components/LanguageSwitch';
+import { useI18n } from './i18n/i18n';
 
 // The almanac engine is large, so the calendar page loads only when opened
 const CalendarPage = lazy(() => import('./pages/CalendarPage'));
@@ -48,6 +50,7 @@ const theme = createTheme({
 
 export default function App() {
   const { isAuthenticated, isLoading, initialize } = useAuthStore();
+  const { tr } = useI18n();
 
   useEffect(() => {
     // Initialize auth on app load
@@ -65,6 +68,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <LanguageSwitch />
       <Router>
         {isAuthenticated ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -100,8 +104,8 @@ export default function App() {
               path="/calendar"
               element={
                 <Box sx={{ minHeight: '100vh' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1.5 }}>
-                    <a href="/login" style={{ fontSize: '1.05rem' }}>登入 π Universe →</a>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-start', p: 1.5 }}>
+                    <a href="/login" style={{ fontSize: '1.05rem' }}>{tr('登入 π Universe →', 'Sign in to π Universe →')}</a>
                   </Box>
                   {calendarRoute}
                 </Box>

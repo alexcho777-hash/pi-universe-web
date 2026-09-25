@@ -31,12 +31,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import DonateDialog from '../components/DonateDialog';
+import { useI18n, Lang } from '../i18n/i18n';
+import { sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 import {
   RankRow,
   RecentRow,
   SanctuaryMerit,
   VisitCounts,
+  anonymousName,
   bookTitle,
+  donateVerb,
   giftWord,
   piAmount,
   shortDate,
@@ -63,7 +67,7 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 
 const medal = (rank: number) => (rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`);
 
-function RankList({ rows, empty }: { rows: RankRow[]; empty: string }) {
+function RankList({ rows, empty, lang }: { rows: RankRow[]; empty: string; lang: Lang }) {
   if (rows.length === 0) return <Typography sx={{ p: 2, color: 'text.secondary', fontSize: '1.05rem' }}>{empty}</Typography>;
   return (
     <List>
@@ -76,11 +80,11 @@ function RankList({ rows, empty }: { rows: RankRow[]; empty: string }) {
           <ListItemText
             primary={
               <Typography component="span" sx={{ fontSize: '1.15rem' }}>
-                {medal(r.rank)} {r.name}
-                {r.is_me ? '（我）' : ''}
+                {medal(r.rank)} {r.anonymous ? anonymousName(lang) : r.name}
+                {r.is_me ? (lang === 'en' ? ' (me)' : '（我）') : ''}
               </Typography>
             }
-            secondary={`${r.times} 次`}
+            secondary={lang === 'en' ? `${r.times} time${r.times === 1 ? '' : 's'}` : `${r.times} 次`}
           />
         </ListItem>
       ))}
@@ -88,8 +92,8 @@ function RankList({ rows, empty }: { rows: RankRow[]; empty: string }) {
   );
 }
 
-function RecentList({ rows, word }: { rows: RecentRow[]; word: string }) {
-  if (rows.length === 0) return <Typography sx={{ p: 2, color: 'text.secondary', fontSize: '1.05rem' }}>還沒有{word}紀錄</Typography>;
+function RecentList({ rows, empty, lang }: { rows: RecentRow[]; empty: string; lang: Lang }) {
+  if (rows.length === 0) return <Typography sx={{ p: 2, color: 'text.secondary', fontSize: '1.05rem' }}>{empty}</Typography>;
   return (
     <List>
       {rows.map((r, i) => (
@@ -99,7 +103,7 @@ function RecentList({ rows, word }: { rows: RecentRow[]; word: string }) {
           secondaryAction={<Typography sx={{ fontSize: '1.1rem' }}>{piAmount(r.amount)}</Typography>}
         >
           <ListItemText
-            primary={<Typography component="span" sx={{ fontSize: '1.1rem' }}>{r.name}{r.is_me ? '（我）' : ''}</Typography>}
+            primary={<Typography component="span" sx={{ fontSize: '1.1rem' }}>{r.anonymous ? anonymousName(lang) : r.name}{r.is_me ? (lang === 'en' ? ' (me)' : '（我）') : ''}</Typography>}
             secondary={shortDate(r.at)}
           />
         </ListItem>
@@ -113,6 +117,7 @@ export default function SanctuaryPage() {
   const sanctuaryId = parseInt(id || '', 10);
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { tr, lang } = useI18n();
 
   const [visit, setVisit] = useState<VisitResult | null>(null);
   const [merit, setMerit] = useState<SanctuaryMerit | null>(null);
@@ -125,7 +130,8 @@ export default function SanctuaryPage() {
   const loadMerit = useCallback(async () => {
     const r = await apiClient.getSanctuaryMerit(sanctuaryId);
     if (r.success) setMerit(r.data as SanctuaryMerit);
-    else setError(r.error || '讀取失敗');
+    else setError(r.error || tr('讀取失敗', 'Could not load'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sanctuaryId]);
 
   useEffect(() => {
@@ -146,20 +152,23 @@ export default function SanctuaryPage() {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 2 }}>
         <CircularProgress />
-        <Typography color="textSecondary">載入中…（伺服器喚醒可能需要數十秒）</Typography>
+        <Typography color="textSecondary">{tr('載入中…（伺服器喚醒可能需要數十秒）', 'Loading… (the server may take a few seconds to wake up)')}</Typography>
       </Box>
     );
   }
 
   const s = merit?.sanctuary;
   const word = giftWord(s?.religion_type);
+  const wordEn = giftWord(s?.religion_type, 'en');
+  const name = sanctuaryName(s, lang);
+  const description = sanctuaryDescription(s, lang);
   const visits = merit?.visits || visit?.visits;
   const color = s?.color && s.color !== '#FFFFFF' ? s.color : '#8B4513';
 
   return (
     <Container maxWidth="md" sx={{ py: 2 }}>
       <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')} sx={{ mb: 1, fontSize: '1.05rem' }}>
-        回首頁
+        {tr('回首頁', 'Home')}
       </Button>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -179,29 +188,29 @@ export default function SanctuaryPage() {
           >
             <Typography sx={{ fontSize: { xs: '3rem', sm: '3.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>
             <Typography sx={{ fontSize: { xs: '1.6rem', sm: '2rem' }, fontWeight: 700, color: '#5a3a1a', mt: 1 }}>
-              歡迎 {user?.username || '善信'} 蒞臨
+              {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}, to the`)}
             </Typography>
-            <Typography sx={{ fontSize: { xs: '2rem', sm: '2.5rem' }, fontWeight: 800, color: '#8B4513' }}>{s.name}</Typography>
+            <Typography sx={{ fontSize: { xs: '2rem', sm: '2.5rem' }, fontWeight: 800, color: '#8B4513' }}>{name}</Typography>
             {visit && (
               <Typography sx={{ fontSize: { xs: '1.35rem', sm: '1.6rem' }, mt: 1.5, color: '#333' }}>
-                您是今天第{' '}
+                {tr('您是今天第', 'You are visitor no.')}{' '}
                 <Box component="span" sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, fontWeight: 800, color: '#C62828' }}>
                   {visit.visitor_number}
                 </Box>{' '}
-                位參訪者
+                {tr('位參訪者', 'today')}
               </Typography>
             )}
-            {s.description && <Typography sx={{ mt: 1, color: 'text.secondary', fontSize: '1.05rem' }}>{s.description}</Typography>}
+            {description && <Typography sx={{ mt: 1, color: 'text.secondary', fontSize: '1.05rem' }}>{description}</Typography>}
           </Paper>
 
           {/* Visitor statistics */}
           {visits && (
             <>
-              <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, mb: 1 }}>參訪人數</Typography>
+              <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, mb: 1 }}>{tr('參訪人數', 'Visitors')}</Typography>
               <Grid container spacing={1.5} sx={{ mb: 2 }}>
-                <Stat label="今日" value={visits.today} />
-                <Stat label="本月" value={visits.month} />
-                <Stat label="累計人次" value={visits.total} />
+                <Stat label={tr('今日', 'Today')} value={visits.today} />
+                <Stat label={tr('本月', 'This month')} value={visits.month} />
+                <Stat label={tr('累計人次', 'All time')} value={visits.total} />
               </Grid>
             </>
           )}
@@ -223,7 +232,7 @@ export default function SanctuaryPage() {
                 boxShadow: '0 0 18px rgba(232,193,112,.5)',
               }}
             >
-              🎋 線上求籤・每日 3 次免費
+              {tr('🎋 線上求籤・每日 3 次免費', '🎋 Temple Oracle · 3 free draws a day')}
             </Button>
           )}
           <Button
@@ -233,37 +242,45 @@ export default function SanctuaryPage() {
             onClick={() => setDonating(true)}
             sx={{ backgroundColor: '#8B4513', fontSize: '1.25rem', py: 1.5, mb: 3 }}
           >
-            🙏 {word}護持 {s.name}
+            🙏 {tr(`${word}護持 ${name}`, `${donateVerb(s.religion_type, 'en')} to the ${name}`)}
           </Button>
 
           {/* Merit book */}
           {merit && (
             <>
-              <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, mb: 1 }}>{bookTitle(s.religion_type)}</Typography>
+              <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, mb: 1 }}>{bookTitle(s.religion_type, lang)}</Typography>
               <Grid container spacing={1.5} sx={{ mb: 2 }}>
-                <Stat label={`本月${word}`} value={piAmount(merit.totals.month_amount)} />
-                <Stat label={`累計${word}`} value={piAmount(merit.totals.total_amount)} />
-                <Stat label="護持人數" value={merit.totals.donor_count} />
+                <Stat label={tr(`本月${word}`, `This month`)} value={piAmount(merit.totals.month_amount)} />
+                <Stat label={tr(`累計${word}`, `All time`)} value={piAmount(merit.totals.total_amount)} />
+                <Stat label={tr('護持人數', 'Supporters')} value={merit.totals.donor_count} />
               </Grid>
 
               {merit.ranking_enabled ? (
                 <Paper>
                   <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth">
-                    <Tab label="本月前十" sx={{ fontSize: '1.05rem' }} />
-                    <Tab label="累計前五十" sx={{ fontSize: '1.05rem' }} />
-                    <Tab label="最新芳名" sx={{ fontSize: '1.05rem' }} />
+                    <Tab label={tr('本月前十', 'Top 10 this month')} sx={{ fontSize: '1.05rem' }} />
+                    <Tab label={tr('累計前五十', 'Top 50 all time')} sx={{ fontSize: '1.05rem' }} />
+                    <Tab label={tr('最新芳名', 'Latest')} sx={{ fontSize: '1.05rem' }} />
                   </Tabs>
-                  {tab === 0 && <RankList rows={merit.monthly_top} empty={`本月還沒有${word}，成為第一位護持者吧 🙏`} />}
-                  {tab === 1 && <RankList rows={merit.all_time_top} empty={`還沒有${word}紀錄`} />}
-                  {tab === 2 && <RecentList rows={merit.recent} word={word} />}
+                  {tab === 0 && (
+                    <RankList lang={lang} rows={merit.monthly_top} empty={tr(`本月還沒有${word}，成為第一位護持者吧 🙏`, `No ${wordEn} yet this month — be the first to give 🙏`)} />
+                  )}
+                  {tab === 1 && <RankList lang={lang} rows={merit.all_time_top} empty={tr(`還沒有${word}紀錄`, `No ${wordEn} yet`)} />}
+                  {tab === 2 && <RecentList lang={lang} rows={merit.recent} empty={tr(`還沒有${word}紀錄`, `No ${wordEn} yet`)} />}
                 </Paper>
               ) : (
                 <Alert severity="info" sx={{ fontSize: '1.05rem' }}>
-                  依本信仰的精神，{word}不公開個人排名，只顯示總數。您的紀錄可在「功德簿 → 我的紀錄」查看。
+                  {tr(
+                    `依本信仰的精神，${word}不公開個人排名，只顯示總數。您的紀錄可在「功德簿 → 我的紀錄」查看。`,
+                    `In keeping with this faith, individual ${wordEn} are not ranked; only totals are shown. You can see your own record under Merit → My record.`
+                  )}
                 </Alert>
               )}
               <Typography sx={{ mt: 1.5, fontSize: '0.95rem', color: 'text.secondary' }}>
-                ※ 參訪人數每人每天計一次，「今日」「本月」依您所在地的時間計算。勾選隱名的{word}只顯示「隱名善信」。
+                {tr(
+                  `※ 參訪人數每人每天計一次，「今日」「本月」依您所在地的時間計算。勾選隱名的${word}只顯示「隱名善信」。`,
+                  `※ Each person counts once per day; "today" and "this month" follow your local time. Anonymous ${wordEn} are shown as "${anonymousName('en')}".`
+                )}
               </Typography>
             </>
           )}

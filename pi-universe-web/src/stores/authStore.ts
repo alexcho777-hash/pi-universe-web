@@ -13,6 +13,7 @@ import { persist } from 'zustand/middleware';
 import { AuthState, User } from '../types';
 import { apiClient, AUTH_STORAGE_KEY } from '../api/ApiClient';
 import { isPiBrowser } from '../auth/piSignIn';
+import { trNow } from '../i18n/i18n';
 
 declare global {
   interface Window {
@@ -35,7 +36,7 @@ const onIncompletePaymentFound = (payment: any) => {
 // and longer when the user taps Login (time to read and approve Pi's consent dialog).
 const PI_AUTH_TIMEOUT_ON_LOAD_MS = 8000;
 const PI_AUTH_TIMEOUT_ON_LOGIN_MS = 60000;
-const NOT_PI_BROWSER_MSG = '請在 Pi Browser 中開啟此網站以登入 (Please open this site in the Pi Browser to log in)';
+const notPiBrowserMsg = () => trNow('請在 Pi Browser 中開啟此網站以登入', 'Please open this site in the Pi Browser to sign in');
 
 // Only ever run one Pi.authenticate() at a time: if the automatic attempt on page
 // load is still waiting, the Login button reuses it instead of starting a second one.
@@ -51,7 +52,7 @@ const authenticateWithTimeout = (timeoutMs: number): Promise<any> => {
   }
   return Promise.race([
     pendingAuth,
-    new Promise((_, reject) => setTimeout(() => reject(new Error(NOT_PI_BROWSER_MSG)), timeoutMs)),
+    new Promise((_, reject) => setTimeout(() => reject(new Error(notPiBrowserMsg())), timeoutMs)),
   ]);
 };
 
@@ -61,7 +62,7 @@ type LoginEndpoint = '/api/users/sync' | '/api/users/pi-signin';
 async function exchangePiToken(endpoint: LoginEndpoint, accessToken: string) {
   const response: any = await apiClient.post(endpoint, { accessToken });
   if (!response?.success || !response.data?.session_token) {
-    throw new Error(response?.error || 'Pi 登入失敗 (login failed)');
+    throw new Error(response?.error || trNow('Pi 登入失敗', 'Pi sign-in failed'));
   }
   const d = response.data;
   const user: User = {
@@ -115,10 +116,10 @@ export const useAuthStore = create<AuthState>()(
       login: async () => {
         try {
           set({ isLoading: true, error: null });
-          if (!window.Pi) throw new Error(NOT_PI_BROWSER_MSG);
+          if (!window.Pi) throw new Error(notPiBrowserMsg());
 
           const authResult = await authenticateWithTimeout(PI_AUTH_TIMEOUT_ON_LOGIN_MS);
-          if (!authResult?.accessToken) throw new Error('Pi 登入失敗 (authentication failed)');
+          if (!authResult?.accessToken) throw new Error(trNow('Pi 登入失敗', 'Pi sign-in failed'));
 
           const { user, sessionToken } = await exchangePiToken('/api/users/sync', authResult.accessToken);
           set({ user, sessionToken, isAuthenticated: true, error: null });

@@ -22,6 +22,8 @@ import { useAuthStore } from '../stores/authStore';
 import { apiClient } from '../api/ApiClient';
 import { Sanctuary } from '../types';
 import DonateDialog from '../components/DonateDialog';
+import { useI18n } from '../i18n/i18n';
+import { faithName, sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 
 const TodayAlmanacCard = lazy(() => import('../components/TodayAlmanacCard'));
 
@@ -34,19 +36,11 @@ interface PracticeSummary {
   donated: number;
 }
 
-const RELIGION_LABEL: Record<string, string> = {
-  buddhist: '佛教 Buddhist',
-  christian: '基督教 Christian',
-  catholic: '天主教 Catholic',
-  islamic: '伊斯蘭教 Islamic',
-  shinto: '神道 Shinto',
-  hindu: '印度教 Hindu',
-  taiwan_folk: '台灣民間信仰 Taiwanese Folk',
-};
 
 export default function HomePage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { tr, lang } = useI18n();
   const [sanctuaries, setSanctuaries] = useState<Sanctuary[]>([]);
   const [summary, setSummary] = useState<PracticeSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,10 +90,13 @@ export default function HomePage() {
     const r: any = await apiClient.dailyCheckIn();
     setCheckingIn(false);
     if (r.success) {
-      setToast({ msg: r.message || '簽到成功', severity: r.data?.already ? 'info' : 'success' });
+      setToast({
+        msg: r.data?.already ? tr('今天已經簽到過了', 'You already checked in today') : tr('簽到成功，願你今天平安喜樂', 'Checked in — may your day be peaceful'),
+        severity: r.data?.already ? 'info' : 'success',
+      });
       loadSummary();
     } else {
-      setToast({ msg: `簽到失敗：${r.error}`, severity: 'error' });
+      setToast({ msg: `${tr('簽到失敗', 'Check-in failed')}: ${r.error}`, severity: 'error' });
     }
   };
 
@@ -117,10 +114,10 @@ export default function HomePage() {
     setMeditationStart(null);
     const r: any = await apiClient.logMeditation(minutes);
     if (r.success) {
-      setToast({ msg: `已記錄 ${minutes} 分鐘靜坐 🙏`, severity: 'success' });
+      setToast({ msg: tr(`已記錄 ${minutes} 分鐘靜坐 🙏`, `Recorded ${minutes} min of meditation 🙏`), severity: 'success' });
       loadSummary();
     } else {
-      setToast({ msg: `記錄失敗：${r.error}`, severity: 'error' });
+      setToast({ msg: `${tr('記錄失敗', 'Could not save')}: ${r.error}`, severity: 'error' });
     }
   };
 
@@ -131,7 +128,7 @@ export default function HomePage() {
       <Container maxWidth="md">
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '60vh', gap: 2 }}>
           <CircularProgress />
-          <Typography variant="body2" color="textSecondary">載入中…（伺服器喚醒可能需要數十秒）</Typography>
+          <Typography variant="body2" color="textSecondary">{tr('載入中…（伺服器喚醒可能需要數十秒）', 'Loading… (the server may take a few seconds to wake up)')}</Typography>
         </Box>
       </Container>
     );
@@ -142,12 +139,15 @@ export default function HomePage() {
       {/* Welcome Section */}
       <Paper elevation={1} sx={{ p: 3, mb: 2, backgroundColor: '#F5E6D3' }}>
         <Typography sx={{ fontSize: { xs: '1.9rem', sm: '2.3rem' }, fontWeight: 800, color: '#8B4513', lineHeight: 1.3 }}>
-          歡迎 {user?.username || '善信'} 蒞臨
+          {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}`)}
         </Typography>
-        <Typography sx={{ fontSize: { xs: '1.4rem', sm: '1.6rem' }, fontWeight: 700, color: '#5a3a1a' }}>π Universe 心靈聖地</Typography>
+        <Typography sx={{ fontSize: { xs: '1.4rem', sm: '1.6rem' }, fontWeight: 700, color: '#5a3a1a' }}>{tr('π Universe 心靈聖地', 'to π Universe')}</Typography>
         {summary && (
           <Typography sx={{ mt: 1, color: '#5a3a1a', fontSize: '1.1rem' }}>
-            簽到 {summary.checkins} 次 · 靜坐 {summary.meditation_minutes} 分鐘 · 捐獻 {summary.donated} π
+            {tr(
+              `簽到 ${summary.checkins} 次 · 靜坐 ${summary.meditation_minutes} 分鐘 · 捐獻 ${summary.donated} π`,
+              `Check-ins ${summary.checkins} · Meditation ${summary.meditation_minutes} min · Donated ${summary.donated} π`
+            )}
           </Typography>
         )}
       </Paper>
@@ -157,7 +157,7 @@ export default function HomePage() {
       </Suspense>
 
       <Alert severity="warning" sx={{ mb: 2 }}>
-        測試版：目前使用 Pi Testnet 的 Test-Pi，不是真的 Pi。
+        {tr('測試版：目前使用 Pi Testnet 的 Test-Pi，不是真的 Pi。', 'Test version: payments use Test-Pi on the Pi Testnet, not real Pi.')}
       </Alert>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -165,7 +165,7 @@ export default function HomePage() {
       {/* Daily practice */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" gutterBottom sx={{ color: '#333', fontWeight: 600 }}>
-          每日修行
+          {tr('每日修行', 'Daily practice')}
         </Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -178,10 +178,10 @@ export default function HomePage() {
                   onClick={handleDailyCheckIn}
                   disabled={checkingIn || !!summary?.checked_in_today}
                 >
-                  {summary?.checked_in_today ? '今日已簽到 ✓' : '每日簽到 Daily Check-in'}
+                  {summary?.checked_in_today ? tr('今日已簽到 ✓', 'Checked in today ✓') : tr('每日簽到', 'Daily check-in')}
                 </Button>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                  敲響晨鐘，開始美好的一天
+                  {tr('敲響晨鐘，開始美好的一天', 'Ring the morning bell and start a good day')}
                 </Typography>
               </CardContent>
             </Card>
@@ -191,15 +191,17 @@ export default function HomePage() {
               <CardContent>
                 {meditationStart === null ? (
                   <Button variant="contained" fullWidth sx={{ backgroundColor: '#2563EB' }} onClick={startMeditation}>
-                    開始靜坐 Start Meditation
+                    {tr('開始靜坐', 'Start meditation')}
                   </Button>
                 ) : (
                   <Button variant="contained" fullWidth color="success" onClick={endMeditation}>
-                    結束靜坐 {mmss(elapsed)}
+                    {tr('結束靜坐', 'End meditation')} {mmss(elapsed)}
                   </Button>
                 )}
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                  {meditationStart === null ? '靜心片刻，結束時自動記錄' : '靜坐中…結束時按下按鈕'}
+                  {meditationStart === null
+                    ? tr('靜心片刻，結束時自動記錄', 'Sit quietly; the time is recorded when you finish')
+                    : tr('靜坐中…結束時按下按鈕', 'Meditating… press the button when you finish')}
                 </Typography>
               </CardContent>
             </Card>
@@ -210,7 +212,7 @@ export default function HomePage() {
       {/* Sanctuaries */}
       <Box>
         <Typography variant="h6" gutterBottom sx={{ color: '#333', fontWeight: 600 }}>
-          聖地一覽（{sanctuaries.length}）
+          {tr('聖地一覽', 'Sanctuaries')}（{sanctuaries.length}）
         </Typography>
         <Grid container spacing={2}>
           {sanctuaries.map((sanctuary) => (
@@ -218,13 +220,13 @@ export default function HomePage() {
               <Card elevation={1} sx={{ borderLeft: `6px solid ${sanctuary.color || '#D4AF37'}` }}>
                 <CardContent>
                   <Typography variant="h6">
-                    {sanctuary.icon} {sanctuary.name}
+                    {sanctuary.icon} {sanctuaryName(sanctuary, lang)}
                   </Typography>
                   <Typography variant="body2" color="textSecondary" gutterBottom>
-                    {RELIGION_LABEL[sanctuary.religion_type] || sanctuary.religion_type}
+                    {faithName(sanctuary.religion_type, lang)}
                   </Typography>
                   <Typography variant="body2" sx={{ my: 1 }}>
-                    {sanctuary.description}
+                    {sanctuaryDescription(sanctuary, lang)}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
                     <Button
@@ -232,10 +234,10 @@ export default function HomePage() {
                       sx={{ backgroundColor: '#2563EB', fontSize: '1.05rem' }}
                       onClick={() => navigate(`/sanctuary/${sanctuary.id}`)}
                     >
-                      進入參拜・功德簿
+                      {tr('進入參拜・功德簿', 'Enter · Merit book')}
                     </Button>
                     <Button variant="outlined" sx={{ color: '#8B4513', borderColor: '#8B4513', fontSize: '1.05rem' }} onClick={() => setDonateTo(sanctuary)}>
-                      捐獻 Pi
+                      {tr('捐獻 Pi', 'Donate Pi')}
                     </Button>
                   </Box>
                 </CardContent>

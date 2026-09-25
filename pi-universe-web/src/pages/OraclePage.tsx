@@ -32,28 +32,77 @@ import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import { LIUSHI_JIAZI, Lot } from '../oracle/liushiJiazi';
 import { LotCylinder, MoonBlocks, SacredGlow, ThrowResult } from '../oracle/OracleArt';
+import { useI18n, Lang } from '../i18n/i18n';
 
 type Step = 'loading' | 'age' | 'ask' | 'pray' | 'permit' | 'shake' | 'verify' | 'poem' | 'limit';
 
-const STEPS: { key: Step; label: string }[] = [
-  { key: 'ask', label: '虔誠求問' },
-  { key: 'pray', label: '默唸稟報' },
-  { key: 'permit', label: '請示神明' },
-  { key: 'shake', label: '搖籤求籤' },
-  { key: 'verify', label: '擲筊驗籤' },
-  { key: 'poem', label: '籤詩' },
+const STEPS: { key: Step; label: [string, string] }[] = [
+  { key: 'ask', label: ['虔誠求問', 'Ask'] },
+  { key: 'pray', label: ['默唸稟報', 'Pray'] },
+  { key: 'permit', label: ['請示神明', 'Permission'] },
+  { key: 'shake', label: ['搖籤求籤', 'Shake'] },
+  { key: 'verify', label: ['擲筊驗籤', 'Confirm'] },
+  { key: 'poem', label: ['籤詩', 'Poem'] },
 ];
 
-const TOPICS = ['事業工作', '財運', '感情姻緣', '健康', '家庭家運', '學業考試', '出行搬遷', '官司是非', '其他'];
-const SHICHEN = ['不知道', '子時 23-1', '丑時 1-3', '寅時 3-5', '卯時 5-7', '辰時 7-9', '巳時 9-11', '午時 11-13', '未時 13-15', '申時 15-17', '酉時 17-19', '戌時 19-21', '亥時 21-23'];
+const TOPICS: [string, string][] = [
+  ['事業工作', 'Career & work'],
+  ['財運', 'Money'],
+  ['感情姻緣', 'Love & marriage'],
+  ['健康', 'Health'],
+  ['家庭家運', 'Family'],
+  ['學業考試', 'Studies & exams'],
+  ['出行搬遷', 'Travel & moving'],
+  ['官司是非', 'Disputes & legal matters'],
+  ['其他', 'Something else'],
+];
+// Chinese double-hours (時辰); index 0 = unknown
+const SHICHEN: [string, string][] = [
+  ['不知道', "I don't know"],
+  ['子時 23-1', '11 pm – 1 am (Zi)'],
+  ['丑時 1-3', '1 – 3 am (Chou)'],
+  ['寅時 3-5', '3 – 5 am (Yin)'],
+  ['卯時 5-7', '5 – 7 am (Mao)'],
+  ['辰時 7-9', '7 – 9 am (Chen)'],
+  ['巳時 9-11', '9 – 11 am (Si)'],
+  ['午時 11-13', '11 am – 1 pm (Wu)'],
+  ['未時 13-15', '1 – 3 pm (Wei)'],
+  ['申時 15-17', '3 – 5 pm (Shen)'],
+  ['酉時 17-19', '5 – 7 pm (You)'],
+  ['戌時 19-21', '7 – 9 pm (Xu)'],
+  ['亥時 21-23', '9 – 11 pm (Hai)'],
+];
 const DEITY = '天上聖母 媽祖';
+
+// Pinyin for the stem-branch (干支) names of the lots
+const PINYIN: Record<string, string> = {
+  甲: 'Jia', 乙: 'Yi', 丙: 'Bing', 丁: 'Ding', 戊: 'Wu', 己: 'Ji', 庚: 'Geng', 辛: 'Xin', 壬: 'Ren', 癸: 'Gui',
+  子: 'Zi', 丑: 'Chou', 寅: 'Yin', 卯: 'Mao', 辰: 'Chen', 巳: 'Si', 午: 'Wu', 未: 'Wei', 申: 'Shen', 酉: 'You', 戌: 'Xu', 亥: 'Hai',
+};
+const ganzhiPinyin = (gz: string) => Array.from(gz).map((c) => PINYIN[c] || c).join('-');
 const PRAY_SECONDS = 20;
 
-const THROW_INFO: Record<ThrowResult, { name: string; meaning: string }> = {
-  sheng: { name: '聖筊', meaning: '一正一反，神明應允。' },
-  xiao: { name: '笑筊', meaning: '兩面皆平，神明笑而未答，可能問題不夠清楚。請再稟報清楚後重新擲筊。' },
-  yin: { name: '陰筊', meaning: '兩面皆凸，神明暫不同意或時機未到。請靜心再稟報一次後重新擲筊。' },
+const THROW_INFO: Record<ThrowResult, { name: [string, string]; meaning: [string, string] }> = {
+  sheng: {
+    name: ['聖筊', 'Holy answer (Sheng Jiao)'],
+    meaning: ['一正一反，神明應允。', 'One flat side up and one round side up: the goddess says yes.'],
+  },
+  xiao: {
+    name: ['笑筊', 'Laughing answer (Xiao Jiao)'],
+    meaning: [
+      '兩面皆平，神明笑而未答，可能問題不夠清楚。請再稟報清楚後重新擲筊。',
+      'Both flat sides up: the goddess smiles without answering — perhaps the question was unclear. Pray again more clearly, then cast again.',
+    ],
+  },
+  yin: {
+    name: ['陰筊', 'No answer (Yin Jiao)'],
+    meaning: [
+      '兩面皆凸，神明暫不同意或時機未到。請靜心再稟報一次後重新擲筊。',
+      'Both round sides up: not yet, or not this way. Calm your mind, pray once more, then cast again.',
+    ],
+  },
 };
+const pick = (pair: [string, string], lang: Lang) => (lang === 'en' ? pair[1] : pair[0]);
 
 function randomThrow(): ThrowResult {
   const a = new Uint8Array(1);
@@ -62,7 +111,10 @@ function randomThrow(): ThrowResult {
   return r < 2 ? 'sheng' : r === 2 ? 'xiao' : 'yin';
 }
 
-const lotLabel = (lot: Lot) => `第${lot.no}籤 ${lot.ganzhi}`;
+/** Label printed on the bamboo stick (always Chinese, like a real one) */
+const stickLabel = (lot: Lot) => `第${lot.no}籤 ${lot.ganzhi}`;
+const lotLabel = (lot: Lot, lang: Lang) =>
+  lang === 'en' ? `Lot ${lot.no} · ${ganzhiPinyin(lot.ganzhi)} ${lot.ganzhi}` : `第${lot.no}籤 ${lot.ganzhi}`;
 const findLot = (no: number) => LIUSHI_JIAZI.find((l) => l.no === no)!;
 
 // Colors of the red-and-gold temple theme
@@ -91,7 +143,7 @@ const fieldSx = {
   '& .MuiInputLabel-root': { color: '#5a2a1a' },
 };
 
-function Stepper({ step }: { step: Step }) {
+function Stepper({ step, lang }: { step: Step; lang: Lang }) {
   const idx = STEPS.findIndex((s) => s.key === step);
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 0.5, my: 2 }}>
@@ -115,7 +167,7 @@ function Stepper({ step }: { step: Step }) {
           >
             {i + 1}
           </Box>
-          <Typography sx={{ fontSize: { xs: '0.72rem', sm: '0.9rem' }, mt: 0.5, color: i <= idx ? GOLD : '#b99' }}>{s.label}</Typography>
+          <Typography sx={{ fontSize: { xs: '0.72rem', sm: '0.9rem' }, mt: 0.5, color: i <= idx ? GOLD : '#b99' }}>{pick(s.label, lang)}</Typography>
         </Box>
       ))}
     </Box>
@@ -139,11 +191,16 @@ function Panel({ children }: { children: React.ReactNode }) {
   );
 }
 
-const Title = ({ children }: { children: React.ReactNode }) => (
-  <Typography sx={{ fontSize: { xs: '1.6rem', sm: '1.9rem' }, fontWeight: 800, color: GOLD, textAlign: 'center', mb: 1.5, letterSpacing: '0.1em' }}>
-    {children}
-  </Typography>
-);
+function Title({ children }: { children: React.ReactNode }) {
+  const { lang } = useI18n();
+  return (
+    <Typography
+      sx={{ fontSize: { xs: '1.6rem', sm: '1.9rem' }, fontWeight: 800, color: GOLD, textAlign: 'center', mb: 1.5, letterSpacing: lang === 'en' ? 0 : '0.1em' }}
+    >
+      {children}
+    </Typography>
+  );
+}
 
 const Big = ({ children }: { children: React.ReactNode }) => (
   <Typography sx={{ fontSize: '1.15rem', lineHeight: 1.9, textAlign: 'center' }}>{children}</Typography>
@@ -189,6 +246,7 @@ export default function OraclePage() {
   const [params] = useSearchParams();
   const sanctuaryId = parseInt(params.get('sanctuary') || '', 10) || undefined;
   const { user } = useAuthStore();
+  const { tr, lang } = useI18n();
 
   const [step, setStep] = useState<Step>('loading');
   const [error, setError] = useState<string | null>(null);
@@ -200,7 +258,7 @@ export default function OraclePage() {
   const [topic, setTopic] = useState('');
   const [name, setName] = useState('');
   const [birth, setBirth] = useState('');
-  const [shichen, setShichen] = useState(SHICHEN[0]);
+  const [shichen, setShichen] = useState(SHICHEN[0][0]);
   const [address, setAddress] = useState('');
   const [question, setQuestion] = useState('');
 
@@ -222,7 +280,7 @@ export default function OraclePage() {
   const loadStatus = async () => {
     const r: any = await apiClient.getOracleStatus();
     if (!r.success) {
-      setError(r.error || '讀取失敗');
+      setError(r.error || tr('讀取失敗', 'Could not load'));
       setStep('ask');
       return;
     }
@@ -244,15 +302,25 @@ export default function OraclePage() {
   }, []);
 
   const petition = useMemo(() => {
-    const who = mode === 'form' && name.trim() ? name.trim() : user?.username || '信眾';
+    const form = mode === 'form';
+    const topicPair = TOPICS.find((t) => t[0] === topic);
+    if (lang === 'en') {
+      const who = form && name.trim() ? name.trim() : user?.username || 'your devotee';
+      const born = form && birth ? `, born on ${birth}${shichen !== SHICHEN[0][0] ? ` at ${SHICHEN.find((h) => h[0] === shichen)?.[1]}` : ''}` : '';
+      const home = form && address.trim() ? `, living in ${address.trim()}` : '';
+      const matter = form && question.trim() ? question.trim() : topicPair ? topicPair[1].toLowerCase() : 'the question in my heart';
+      const asked = form && question.trim() ? `to ask: "${matter}"${/[.?!]$/.test(matter) ? '' : '.'}` : `to ask about ${matter}.`;
+      return `Holy Mother Mazu, Empress of Heaven: I, ${who}${born}${home}, come today with a sincere heart ${asked} In your compassion, please guide me and grant me a sacred lot.`;
+    }
+    const who = form && name.trim() ? name.trim() : user?.username || '信眾';
     const born =
-      mode === 'form' && birth
-        ? `，${birth.split('-').map(Number).map((v, i) => `${v} ${'年月日'[i]}`).join(' ')}${shichen !== SHICHEN[0] ? ` ${shichen.split(' ')[0]}` : ''}生`
+      form && birth
+        ? `，${birth.split('-').map(Number).map((v, i) => `${v} ${'年月日'[i]}`).join(' ')}${shichen !== SHICHEN[0][0] ? ` ${shichen.split(' ')[0]}` : ''}生`
         : '';
-    const home = mode === 'form' && address.trim() ? `，現居 ${address.trim()}` : '';
-    const matter = mode === 'form' && question.trim() ? question.trim() : topic || '心中所問之事';
+    const home = form && address.trim() ? `，現居 ${address.trim()}` : '';
+    const matter = form && question.trim() ? question.trim() : topic || '心中所問之事';
     return `${DEITY}在上，弟子 ${who}${born}${home}。今日誠心祈求，為「${matter}」之事，懇請聖母慈悲指點迷津，賜予靈籤。`;
-  }, [mode, name, birth, shichen, address, question, topic, user]);
+  }, [mode, name, birth, shichen, address, question, topic, user, lang]);
 
   const canAsk = mode === 'quick' ? !!topic : !!name.trim() && !!question.trim();
 
@@ -273,8 +341,8 @@ export default function OraclePage() {
     if (!synth) return;
     synth.cancel();
     const u = new SpeechSynthesisUtterance(petition);
-    u.lang = 'zh-TW';
-    u.rate = 0.85;
+    u.lang = lang === 'en' ? 'en-US' : 'zh-TW';
+    u.rate = lang === 'en' ? 0.95 : 0.85;
     synth.speak(u);
   };
 
@@ -305,8 +373,10 @@ export default function OraclePage() {
         setStep('limit');
       } else if (r.code === 'AGE_REQUIRED') {
         setStep('age');
+      } else if (r.code === 'DRAW_LIMIT') {
+        setError(tr('今天搖籤次數已達上限，請明天再來', 'You have shaken the cylinder many times today. Please come back tomorrow.'));
       } else {
-        setError(r.error || '搖籤失敗');
+        setError(lang === 'en' ? 'Could not draw a lot. Please try again.' : r.error || '搖籤失敗');
       }
     }, wait);
   };
@@ -323,7 +393,11 @@ export default function OraclePage() {
     window.setTimeout(() => {
       setTossing(false);
       if (!r.success) {
-        setError(r.error || '擲筊失敗');
+        setError(
+          r.code === 'NOT_PENDING'
+            ? tr('這支籤已經驗過了，請重新搖籤', 'This lot was already checked. Please shake again.')
+            : lang === 'en' ? 'The blocks could not be cast. Please shake again.' : r.error || '擲筊失敗'
+        );
         setStep('shake');
         setDraw(null);
         return;
@@ -337,7 +411,8 @@ export default function OraclePage() {
           setStep('poem');
         }, 1400);
       } else {
-        setVerifyMsg(`${THROW_INFO[r.data.throw as ThrowResult].name}：聖母示意不是這支籤，請再搖一次。`);
+        const nm = pick(THROW_INFO[r.data.throw as ThrowResult].name, lang);
+        setVerifyMsg(tr(`${nm}：聖母示意不是這支籤，請再搖一次。`, `${nm}: the goddess says this is not your lot. Please shake again.`));
       }
     }, wait);
   };
@@ -355,9 +430,21 @@ export default function OraclePage() {
     <Box sx={{ position: 'relative', textAlign: 'center', pt: 2, pb: 1 }}>
       <SacredGlow size={200} />
       <Typography sx={{ position: 'relative', fontSize: '2.8rem' }}>🏮</Typography>
-      <Typography sx={{ position: 'relative', fontSize: { xs: '2rem', sm: '2.4rem' }, fontWeight: 900, color: GOLD, letterSpacing: '0.2em' }}>線上求籤</Typography>
-      <Typography sx={{ position: 'relative', fontSize: '1.05rem', color: '#F3D9A4' }}>天上聖母 · 六十甲子籤</Typography>
-      <Typography sx={{ position: 'relative', mt: 1, fontSize: '1.1rem', fontWeight: 700 }}>全程約 3 分鐘，共 6 步驟　·　今日還可求 {remaining} 支</Typography>
+      <Typography sx={{ position: 'relative', fontSize: { xs: '2rem', sm: '2.4rem' }, fontWeight: 900, color: GOLD, letterSpacing: lang === 'en' ? '0.04em' : '0.2em' }}>
+        {tr('線上求籤', 'Temple Oracle')}
+      </Typography>
+      <Typography sx={{ position: 'relative', fontSize: '1.05rem', color: '#F3D9A4' }}>
+        {tr('天上聖母 · 六十甲子籤', 'Mazu, Empress of Heaven · 60 Jiazi Oracle Lots')}
+      </Typography>
+      <Typography sx={{ position: 'relative', mt: 1, fontSize: '1.1rem', fontWeight: 700 }}>
+        {tr(`全程約 3 分鐘，共 6 步驟　·　今日還可求 ${remaining} 支`, `About 3 minutes, 6 steps  ·  ${remaining} draw${remaining === 1 ? '' : 's'} left today`)}
+      </Typography>
+      {lang === 'en' && (
+        <Typography sx={{ position: 'relative', mt: 1.5, fontSize: '1rem', color: '#EBD7B0', lineHeight: 1.6 }}>
+          Known as <i>Kau Cim</i>, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon
+          blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.
+        </Typography>
+      )}
     </Box>
   );
 
@@ -365,10 +452,10 @@ export default function OraclePage() {
     <Box sx={pageSx}>
       <Container maxWidth="sm" sx={{ pt: 1 }}>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(sanctuaryId ? `/sanctuary/${sanctuaryId}` : '/')} sx={{ color: GOLD, fontSize: '1.05rem' }}>
-          返回
+          {tr('返回', 'Back')}
         </Button>
         {header}
-        {['ask', 'pray', 'permit', 'shake', 'verify', 'poem'].includes(step) && <Stepper step={step} />}
+        {['ask', 'pray', 'permit', 'shake', 'verify', 'poem'].includes(step) && <Stepper step={step} lang={lang} />}
         {error && <Alert severity="error" sx={{ mb: 2, fontSize: '1.05rem' }}>{error}</Alert>}
 
         {step === 'loading' && (
@@ -379,13 +466,13 @@ export default function OraclePage() {
 
         {step === 'age' && (
           <Panel>
-            <Title>求籤須知</Title>
+            <Title>{tr('求籤須知', 'Before you begin')}</Title>
             <Big>
-              線上求籤免費，每人每天可求 3 支籤。
+              {tr('線上求籤免費，每人每天可求 3 支籤。', 'The oracle is free: up to 3 lots per person per day.')}
               <br />
-              籤詩與解說僅供參考，重大決定請審慎評估。
+              {tr('籤詩與解說僅供參考，重大決定請審慎評估。', 'Poems and interpretations are for reference only; think carefully before big decisions.')}
               <br />
-              本服務僅供 <b>年滿 20 歲</b> 者使用。
+              {tr('本服務僅供年滿 20 歲者使用。', 'This service is for adults aged 20 and over.')}
             </Big>
             <Box sx={{ textAlign: 'center', mt: 3 }}>
               <Button
@@ -393,10 +480,10 @@ export default function OraclePage() {
                 onClick={async () => {
                   const r = await apiClient.confirmAdult();
                   if (r.success) setStep(remaining > 0 ? 'ask' : 'limit');
-                  else setError(r.error || '確認失敗');
+                  else setError(r.error || tr('確認失敗', 'Could not confirm'));
                 }}
               >
-                我已年滿 20 歲
+                {tr('我已年滿 20 歲', 'I am 20 or older')}
               </Button>
             </Box>
           </Panel>
@@ -404,8 +491,8 @@ export default function OraclePage() {
 
         {step === 'ask' && (
           <Panel>
-            <Title>一、虔誠求問</Title>
-            <Big>請先靜心，想清楚要請示聖母的事情。</Big>
+            <Title>{tr('一、虔誠求問', '1. Ask with a sincere heart')}</Title>
+            <Big>{tr('請先靜心，想清楚要請示聖母的事情。', 'Calm your mind and think clearly about what you want to ask the goddess.')}</Big>
             <ToggleButtonGroup
               exclusive
               fullWidth
@@ -413,16 +500,16 @@ export default function OraclePage() {
               onChange={(_, v) => v && setMode(v)}
               sx={{ my: 2, '& .MuiToggleButton-root': { color: '#F3D9A4', borderColor: GOLD, fontSize: '1.05rem' }, '& .Mui-selected': { backgroundColor: 'rgba(232,193,112,.25) !important', color: `${GOLD} !important` } }}
             >
-              <ToggleButton value="quick">快速選擇</ToggleButton>
-              <ToggleButton value="form">填表稟報</ToggleButton>
+              <ToggleButton value="quick">{tr('快速選擇', 'Choose a topic')}</ToggleButton>
+              <ToggleButton value="form">{tr('填表稟報', 'Write my question')}</ToggleButton>
             </ToggleButtonGroup>
 
             {mode === 'quick' ? (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-                {TOPICS.map((t) => (
+                {TOPICS.map(([t, en]) => (
                   <Chip
                     key={t}
-                    label={t}
+                    label={lang === 'en' ? en : t}
                     onClick={() => setTopic(t)}
                     sx={{
                       fontSize: '1.1rem',
@@ -438,25 +525,27 @@ export default function OraclePage() {
               </Box>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <TextField label="姓名" value={name} onChange={(e) => setName(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 20 } }} />
+                <TextField label={tr('姓名', 'Name')} value={name} onChange={(e) => setName(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 20 } }} />
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  <TextField label="生辰（國曆）" type="date" value={birth} onChange={(e) => setBirth(e.target.value)} sx={{ ...fieldSx, flex: 1 }} slotProps={{ inputLabel: { shrink: true } }} />
-                  <TextField select label="時辰" value={shichen} onChange={(e) => setShichen(e.target.value)} sx={{ ...fieldSx, width: 140 }}>
-                    {SHICHEN.map((s) => (
-                      <MenuItem key={s} value={s}>
-                        {s}
+                  <TextField label={tr('生辰（國曆）', 'Date of birth')} type="date" value={birth} onChange={(e) => setBirth(e.target.value)} sx={{ ...fieldSx, flex: 1 }} slotProps={{ inputLabel: { shrink: true } }} />
+                  <TextField select label={tr('時辰', 'Hour of birth')} value={shichen} onChange={(e) => setShichen(e.target.value)} sx={{ ...fieldSx, width: lang === 'en' ? 170 : 140 }}>
+                    {SHICHEN.map(([zh, en]) => (
+                      <MenuItem key={zh} value={zh}>
+                        {lang === 'en' ? en : zh}
                       </MenuItem>
                     ))}
                   </TextField>
                 </Box>
-                <TextField label="現居地（選填，例如：台中市）" value={address} onChange={(e) => setAddress(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 30 } }} />
-                <TextField label="所問之事" value={question} onChange={(e) => setQuestion(e.target.value)} multiline minRows={2} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 80 } }} />
-                <Typography sx={{ fontSize: '0.95rem', color: '#d9b98a' }}>※ 這些資料只用來組成稟報內容，不會儲存。</Typography>
+                <TextField label={tr('現居地（選填，例如：台中市）', 'Where you live (optional, e.g. Taipei)')} value={address} onChange={(e) => setAddress(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 30 } }} />
+                <TextField label={tr('所問之事', 'Your question')} value={question} onChange={(e) => setQuestion(e.target.value)} multiline minRows={2} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 80 } }} />
+                <Typography sx={{ fontSize: '0.95rem', color: '#d9b98a' }}>
+                  {tr('※ 這些資料只用來組成稟報內容，不會儲存。', '※ These details are only used to write your prayer and are not saved.')}
+                </Typography>
               </Box>
             )}
             <Box sx={{ textAlign: 'center', mt: 3 }}>
               <Button sx={goldButton} disabled={!canAsk} onClick={startPrayer}>
-                下一步：默唸稟報
+                {tr('下一步：默唸稟報', 'Next: pray')}
               </Button>
             </Box>
           </Panel>
@@ -464,20 +553,20 @@ export default function OraclePage() {
 
         {step === 'pray' && (
           <Panel>
-            <Title>二、默唸稟報</Title>
-            <Big>請雙手合十，在心中默唸以下內容：</Big>
+            <Title>{tr('二、默唸稟報', '2. Pray silently')}</Title>
+            <Big>{tr('請雙手合十，在心中默唸以下內容：', 'Put your palms together and silently say this prayer:')}</Big>
             <Box sx={{ my: 2, p: 2.5, backgroundColor: PAPER, color: '#3A1A0A', borderRadius: 1, border: '2px solid #9A6B2F' }}>
               <Typography sx={{ fontFamily: '"Noto Serif TC", serif', fontSize: '1.3rem', lineHeight: 2, fontWeight: 700 }}>{petition}</Typography>
             </Box>
             <Box sx={{ textAlign: 'center' }}>
               {'speechSynthesis' in window && (
                 <Button onClick={readAloud} sx={{ color: GOLD, fontSize: '1.05rem', mb: 1 }}>
-                  🔊 代為稟報（唸出來）
+                  {tr('🔊 代為稟報（唸出來）', '🔊 Read it aloud for me')}
                 </Button>
               )}
-              <Typography sx={{ fontSize: '1.3rem', my: 1 }}>{prayLeft > 0 ? `靜心默唸… ${prayLeft} 秒` : '稟報完成 🙏'}</Typography>
+              <Typography sx={{ fontSize: '1.3rem', my: 1 }}>{prayLeft > 0 ? tr(`靜心默唸… ${prayLeft} 秒`, `Praying… ${prayLeft} s`) : tr('稟報完成 🙏', 'Prayer complete 🙏')}</Typography>
               <Button sx={goldButton} disabled={prayLeft > PRAY_SECONDS - 8} onClick={() => { window.speechSynthesis?.cancel(); setThrowResult(null); setStep('permit'); }}>
-                稟報完畢，請示聖母
+                {tr('稟報完畢，請示聖母', "I'm done — ask the goddess")}
               </Button>
             </Box>
           </Panel>
@@ -485,28 +574,34 @@ export default function OraclePage() {
 
         {step === 'permit' && (
           <Panel>
-            <Title>三、請示神明</Title>
-            <Big>擲筊請問聖母：是否允許求籤？<br />需擲出「聖筊」（一正一反）。</Big>
+            <Title>{tr('三、請示神明', '3. Ask permission')}</Title>
+            <Big>
+              {tr('擲筊請問聖母：是否允許求籤？', 'Cast the moon blocks to ask Mazu if you may draw a lot.')}
+              <br />
+              {tr('需擲出「聖筊」（一正一反）。', 'You need a holy answer: one flat side and one round side up.')}
+            </Big>
             <Box sx={{ my: 3 }}>
               <MoonBlocks result={throwResult} tossing={tossing} />
             </Box>
             {throwResult && !tossing && (
               <Box sx={{ textAlign: 'center', mb: 2 }}>
-                <Typography sx={{ fontSize: '2rem', fontWeight: 900, color: throwResult === 'sheng' ? GOLD : '#F3D9A4' }}>{THROW_INFO[throwResult].name}</Typography>
-                <Typography sx={{ fontSize: '1.1rem' }}>{THROW_INFO[throwResult].meaning}</Typography>
+                <Typography sx={{ fontSize: '2rem', fontWeight: 900, color: throwResult === 'sheng' ? GOLD : '#F3D9A4' }}>{pick(THROW_INFO[throwResult].name, lang)}</Typography>
+                <Typography sx={{ fontSize: '1.1rem' }}>{pick(THROW_INFO[throwResult].meaning, lang)}</Typography>
                 {throwResult !== 'sheng' && failedPermits >= 3 && (
-                  <Typography sx={{ fontSize: '1rem', color: '#d9b98a', mt: 1 }}>若多次未獲聖筊，可以換個方式詢問，或改日再來。</Typography>
+                  <Typography sx={{ fontSize: '1rem', color: '#d9b98a', mt: 1 }}>
+                    {tr('若多次未獲聖筊，可以換個方式詢問，或改日再來。', 'If the answer keeps being no, try asking in a different way, or come back another day.')}
+                  </Typography>
                 )}
               </Box>
             )}
             <Box sx={{ textAlign: 'center' }}>
               {throwResult === 'sheng' && !tossing ? (
                 <Button sx={goldButton} onClick={() => { setDraw(null); setStep('shake'); }}>
-                  聖母應允，前往搖籤
+                  {tr('聖母應允，前往搖籤', 'Permission granted — shake the lots')}
                 </Button>
               ) : (
                 <Button sx={goldButton} disabled={tossing} onClick={permitThrow}>
-                  {throwResult ? '再擲一次' : '擲筊'}
+                  {throwResult ? tr('再擲一次', 'Cast again') : tr('擲筊', 'Cast the blocks')}
                 </Button>
               )}
             </Box>
@@ -515,23 +610,23 @@ export default function OraclePage() {
 
         {step === 'shake' && (
           <Panel>
-            <Title>四、搖籤求籤</Title>
-            <Big>心中默念所問之事，搖動籤筒，直到一支籤跳出。</Big>
+            <Title>{tr('四、搖籤求籤', '4. Shake the lots')}</Title>
+            <Big>{tr('心中默念所問之事，搖動籤筒，直到一支籤跳出。', 'Keep your question in mind and shake the cylinder until one stick falls out.')}</Big>
             {verifyMsg && <Alert severity="info" sx={{ mt: 2, fontSize: '1.05rem' }}>{verifyMsg}</Alert>}
             <Box sx={{ my: 3, position: 'relative' }}>
-              <LotCylinder shaking={shaking} lotLabel={draw ? lotLabel(draw.lot) : null} />
+              <LotCylinder shaking={shaking} lotLabel={draw ? stickLabel(draw.lot) : null} />
             </Box>
             <Box sx={{ textAlign: 'center' }}>
               {draw ? (
                 <>
-                  <Typography sx={{ fontSize: '1.6rem', fontWeight: 900, color: GOLD, mb: 1 }}>{lotLabel(draw.lot)}</Typography>
+                  <Typography sx={{ fontSize: '1.6rem', fontWeight: 900, color: GOLD, mb: 1 }}>{lotLabel(draw.lot, lang)}</Typography>
                   <Button sx={goldButton} onClick={verifyLot}>
-                    擲筊驗籤
+                    {tr('擲筊驗籤', 'Confirm with the blocks')}
                   </Button>
                 </>
               ) : (
                 <Button sx={goldButton} disabled={shaking} onClick={shakeLot}>
-                  {shaking ? '搖籤中…' : '搖籤'}
+                  {shaking ? tr('搖籤中…', 'Shaking…') : tr('搖籤', 'Shake')}
                 </Button>
               )}
             </Box>
@@ -540,21 +635,23 @@ export default function OraclePage() {
 
         {step === 'verify' && draw && (
           <Panel>
-            <Title>五、擲筊驗籤</Title>
-            <Big>請問聖母：是否就是「{lotLabel(draw.lot)}」？</Big>
+            <Title>{tr('五、擲筊驗籤', '5. Confirm your lot')}</Title>
+            <Big>{tr(`請問聖母：是否就是「${lotLabel(draw.lot, 'zh')}」？`, `Ask Mazu: is ${lotLabel(draw.lot, 'en')} the right lot?`)}</Big>
             <Box sx={{ my: 3 }}>
               <MoonBlocks result={throwResult} tossing={tossing} />
             </Box>
             {throwResult && !tossing && (
               <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ fontSize: '2rem', fontWeight: 900, color: GOLD }}>{THROW_INFO[throwResult].name}</Typography>
+                <Typography sx={{ fontSize: '2rem', fontWeight: 900, color: GOLD }}>{pick(THROW_INFO[throwResult].name, lang)}</Typography>
                 {throwResult === 'sheng' ? (
-                  <Typography sx={{ fontSize: '1.15rem' }}>聖母應允，就是這支籤 🙏</Typography>
+                  <Typography sx={{ fontSize: '1.15rem' }}>{tr('聖母應允，就是這支籤 🙏', 'Yes — this is your lot 🙏')}</Typography>
                 ) : (
                   <>
-                    <Typography sx={{ fontSize: '1.1rem', mb: 2 }}>聖母示意不是這支籤，請重新搖籤。</Typography>
+                    <Typography sx={{ fontSize: '1.1rem', mb: 2 }}>
+                      {tr('聖母示意不是這支籤，請重新搖籤。', 'The goddess says this is not your lot. Please shake again.')}
+                    </Typography>
                     <Button sx={goldButton} onClick={() => { setDraw(null); setThrowResult(null); setStep('shake'); }}>
-                      重新搖籤
+                      {tr('重新搖籤', 'Shake again')}
                     </Button>
                   </>
                 )}
@@ -565,23 +662,52 @@ export default function OraclePage() {
 
         {step === 'poem' && result && (
           <Panel>
-            <Title>六、籤詩</Title>
+            <Title>{tr('六、籤詩', '6. Your poem')}</Title>
+            {lang === 'en' && (
+              <Typography sx={{ textAlign: 'center', fontSize: '1.3rem', fontWeight: 800, color: GOLD, mb: 1.5 }}>{lotLabel(result, 'en')}</Typography>
+            )}
             <PoemSlip lot={result} />
-            <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: 'rgba(255,240,210,.08)', border: '1px solid rgba(232,193,112,.4)' }}>
-              <Typography sx={{ fontSize: '1.2rem', fontWeight: 800, color: GOLD, mb: 1 }}>白話解說（僅供參考）</Typography>
-              <Typography sx={{ fontSize: '1.15rem', lineHeight: 1.9 }}>{result.explain_zh}</Typography>
-              <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: GOLD, mt: 2 }}>English interpretation (for reference only)</Typography>
-              <Typography sx={{ fontSize: '1rem', lineHeight: 1.7, color: '#EBD7B0' }}>{result.explain_en}</Typography>
-            </Box>
-            <Typography sx={{ mt: 2, fontSize: '0.95rem', color: '#d9b98a' }}>
-              ※ 籤詩原文依台灣宮廟通行的六十甲子籤；解說為平台整理的白話參考，詳細解籤可請教宮廟的解籤老師。
-            </Typography>
+            {lang === 'en' ? (
+              <>
+                <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: 'rgba(255,240,210,.08)', border: '1px solid rgba(232,193,112,.4)' }}>
+                  <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: GOLD, mb: 1 }}>English translation</Typography>
+                  {result.poem_en.map((line, i) => (
+                    <Typography key={i} sx={{ fontSize: '1.12rem', lineHeight: 1.7, fontStyle: 'italic' }}>
+                      {line}
+                    </Typography>
+                  ))}
+                  {result.note_en && (
+                    <Typography sx={{ mt: 1.2, fontSize: '0.98rem', color: '#EBD7B0' }}>Note: {result.note_en}</Typography>
+                  )}
+                </Box>
+                <Box sx={{ mt: 2, p: 2, borderRadius: 2, backgroundColor: 'rgba(255,240,210,.08)', border: '1px solid rgba(232,193,112,.4)' }}>
+                  <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: GOLD, mb: 1 }}>What it means (for reference only)</Typography>
+                  <Typography sx={{ fontSize: '1.12rem', lineHeight: 1.8 }}>{result.explain_en}</Typography>
+                </Box>
+                <Typography sx={{ mt: 2, fontSize: '0.95rem', color: '#d9b98a' }}>
+                  ※ The poem is the traditional 60 Jiazi oracle used in Taiwanese temples. Read it top to bottom, right to left. The translation
+                  and interpretation are our own and for reference only; a temple's oracle interpreter can explain it in depth.
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: 'rgba(255,240,210,.08)', border: '1px solid rgba(232,193,112,.4)' }}>
+                  <Typography sx={{ fontSize: '1.2rem', fontWeight: 800, color: GOLD, mb: 1 }}>白話解說（僅供參考）</Typography>
+                  <Typography sx={{ fontSize: '1.15rem', lineHeight: 1.9 }}>{result.explain_zh}</Typography>
+                </Box>
+                <Typography sx={{ mt: 2, fontSize: '0.95rem', color: '#d9b98a' }}>
+                  ※ 籤詩原文依台灣宮廟通行的六十甲子籤；解說為平台整理的白話參考，詳細解籤可請教宮廟的解籤老師。
+                </Typography>
+              </>
+            )}
             <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center', mt: 3, flexWrap: 'wrap' }}>
               <Button sx={goldButton} disabled={remaining <= 0} onClick={again}>
-                {remaining > 0 ? `再求一籤（今日還有 ${remaining} 支）` : '今日 3 支籤已求完'}
+                {remaining > 0
+                  ? tr(`再求一籤（今日還有 ${remaining} 支）`, `Draw another (${remaining} left today)`)
+                  : tr('今日 3 支籤已求完', 'All 3 lots drawn today')}
               </Button>
               <Button onClick={() => navigate(sanctuaryId ? `/sanctuary/${sanctuaryId}` : '/')} sx={{ color: GOLD, fontSize: '1.1rem' }}>
-                返回聖地
+                {tr('返回聖地', 'Back to the sanctuary')}
               </Button>
             </Box>
           </Panel>
@@ -589,16 +715,16 @@ export default function OraclePage() {
 
         {step === 'limit' && (
           <Panel>
-            <Title>今日已求 3 支籤</Title>
-            <Big>感恩聖母指引 🙏 每人每天可求 3 支籤，請明天再來。</Big>
+            <Title>{tr('今日已求 3 支籤', 'You have drawn 3 lots today')}</Title>
+            <Big>{tr('感恩聖母指引 🙏 每人每天可求 3 支籤，請明天再來。', 'Thank you for visiting Mazu 🙏 Each person may draw 3 lots a day — please come back tomorrow.')}</Big>
             {todayLots.length > 0 && (
               <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Typography sx={{ fontSize: '1.05rem', mb: 1 }}>今天求得的籤（點選可再看一次）：</Typography>
+                <Typography sx={{ fontSize: '1.05rem', mb: 1 }}>{tr('今天求得的籤（點選可再看一次）：', "Today's lots (tap to read again):")}</Typography>
                 <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
                   {todayLots.map((n, i) => (
                     <Chip
                       key={i}
-                      label={lotLabel(findLot(n))}
+                      label={lotLabel(findLot(n), lang)}
                       onClick={() => { setResult(findLot(n)); setStep('poem'); }}
                       sx={{ fontSize: '1.05rem', color: '#4A0A0A', backgroundColor: GOLD }}
                     />

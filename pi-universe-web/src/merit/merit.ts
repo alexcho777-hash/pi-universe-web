@@ -56,43 +56,32 @@ export interface MyMerit {
   visits: { total: number; sanctuaries: number };
 }
 
-/** Each faith's own word for giving */
-export function giftWord(religionType?: string): string {
-  switch (religionType) {
-    case 'christian':
-    case 'catholic':
-      return '奉獻';
-    case 'islamic':
-      return '樂捐';
-    default:
-      return '功德';
-  }
+type Lang = 'zh' | 'en';
+const kind = (religionType?: string) =>
+  religionType === 'christian' || religionType === 'catholic' ? 'offering' : religionType === 'islamic' ? 'sadaqah' : 'merit';
+
+/** Each faith's own word for giving (noun), e.g. 本月功德 / This month's donations */
+export function giftWord(religionType?: string, lang: Lang = 'zh'): string {
+  const k = kind(religionType);
+  if (lang === 'en') return k === 'offering' ? 'offerings' : k === 'sadaqah' ? 'sadaqah' : 'donations';
+  return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '功德';
 }
 
 /** The verb used on donate buttons */
-export function donateVerb(religionType?: string): string {
-  switch (religionType) {
-    case 'christian':
-    case 'catholic':
-      return '奉獻';
-    case 'islamic':
-      return '樂捐';
-    default:
-      return '捐獻';
-  }
+export function donateVerb(religionType?: string, lang: Lang = 'zh'): string {
+  const k = kind(religionType);
+  if (lang === 'en') return k === 'offering' ? 'Give an offering' : k === 'sadaqah' ? 'Give sadaqah' : 'Donate';
+  return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '捐獻';
 }
 
-export function bookTitle(religionType?: string): string {
-  switch (religionType) {
-    case 'christian':
-    case 'catholic':
-      return '奉獻紀錄';
-    case 'islamic':
-      return '樂捐紀錄 (Sadaqah)';
-    default:
-      return '功德簿';
-  }
+export function bookTitle(religionType?: string, lang: Lang = 'zh'): string {
+  const k = kind(religionType);
+  if (lang === 'en') return k === 'offering' ? 'Offerings' : k === 'sadaqah' ? 'Sadaqah record' : 'Merit Book';
+  return k === 'offering' ? '奉獻紀錄' : k === 'sadaqah' ? '樂捐紀錄 (Sadaqah)' : '功德簿';
 }
+
+/** Name shown for anonymous donors (the server sends 隱名善信) */
+export const anonymousName = (lang: Lang) => (lang === 'en' ? 'Anonymous donor' : '隱名善信');
 
 export const piAmount = (v: number | string) => `${Math.round(Number(v || 0) * 100) / 100} π`;
 

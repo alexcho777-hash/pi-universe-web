@@ -6,6 +6,8 @@ import { Paper, Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { taiwanDay } from '../calendar/almanac';
 import CalendarHealth from './CalendarHealth';
+import { useI18n } from '../i18n/i18n';
+import { OBSERVANCE_EN, chongEn, lunarDateEn, yijiEn } from '../calendar/almanacEn';
 
 const lunarMonthName = (m: string) => (m === '冬' ? '十一' : m === '臘' ? '十二' : m);
 
@@ -14,6 +16,41 @@ export default function TodayAlmanacCard() {
   const now = new Date();
   const d = taiwanDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const color = d.huangDao ? '#2E7D32' : '#C62828';
+  const { lang } = useI18n();
+  if (lang === 'en') {
+    return (
+      <>
+        <CalendarHealth date={now} lang="en" />
+        <Paper sx={{ p: 2.5, mb: 2, borderLeft: `6px solid ${color}` }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1, flexWrap: 'wrap' }}>
+            <Typography sx={{ fontSize: '1.3rem', fontWeight: 800 }}>Today's almanac</Typography>
+            <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color }}>{d.huangDao ? 'Auspicious day' : 'Inauspicious day'}</Typography>
+          </Box>
+          <Typography sx={{ fontSize: '1.15rem', color: '#8B4513', fontWeight: 700, mt: 0.5 }}>
+            {lunarDateEn(d)} · {chongEn(d)}
+          </Typography>
+          {d.observances.map((o) => {
+            const en = OBSERVANCE_EN[o.name];
+            return (
+              <Typography key={o.name} sx={{ fontSize: '1.05rem', mt: 0.5 }}>
+                🙏 {en?.name || o.name}
+                {en?.hint ? ` — ${en.hint}` : ''}
+              </Typography>
+            );
+          })}
+          <Typography sx={{ fontSize: '1.05rem', mt: 1 }}>
+            <b style={{ color: '#2E7D32' }}>Good for</b>　{d.yi.slice(0, 4).map(yijiEn).join(', ') || '—'}
+          </Typography>
+          <Typography sx={{ fontSize: '1.05rem' }}>
+            <b style={{ color: '#C62828' }}>Avoid</b>　{d.ji.slice(0, 4).map(yijiEn).join(', ') || '—'}
+          </Typography>
+          <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ mt: 1.5, fontSize: '1.05rem' }}>
+            Full almanac & good-day finder →
+          </Button>
+        </Paper>
+      </>
+    );
+  }
   return (
     <>
     <CalendarHealth date={now} />

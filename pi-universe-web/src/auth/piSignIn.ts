@@ -6,6 +6,8 @@
  * Pi Sign-In can only log people in; Pi payments still require the Pi Browser.
  */
 
+import { trNow } from '../i18n/i18n';
+
 export const PI_SIGNIN_CLIENT_ID =
   import.meta.env.VITE_PI_SIGNIN_CLIENT_ID || 'D7A9mJ-dSTDVnw6m0T6Xbe3W7V6WNqCpngnJcK62h3A';
 
@@ -50,7 +52,7 @@ export function readPiSignInResult(): { accessToken?: string; error?: string } {
   } catch {
     /* ignore */
   }
-  if (expected && state !== expected) return { error: '登入狀態不符，請重新登入 (state mismatch)' };
-  if (!accessToken) return { error: '沒有收到 Pi 登入憑證，請重新登入' };
+  if (expected && state !== expected) return { error: trNow('登入狀態不符，請重新登入', 'Sign-in could not be verified, please sign in again') };
+  if (!accessToken) return { error: trNow('沒有收到 Pi 登入憑證，請重新登入', 'No sign-in token was received from Pi, please try again') };
   return { accessToken };
 }

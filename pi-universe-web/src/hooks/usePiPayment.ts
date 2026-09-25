@@ -11,6 +11,7 @@
 import { useState, useCallback } from 'react';
 import { apiClient } from '../api/ApiClient';
 import { isPiBrowser } from '../auth/piSignIn';
+import { trNow } from '../i18n/i18n';
 
 declare global {
   interface Window {
@@ -34,7 +35,7 @@ export interface DonationResult {
 
 export class PaymentCancelledError extends Error {
   constructor() {
-    super('付款已取消');
+    super(trNow('付款已取消', 'Payment cancelled'));
   }
 }
 
@@ -65,7 +66,7 @@ export const usePiPayment = () => {
       };
 
       if (!isPiBrowser() || !window.Pi || typeof window.Pi.createPayment !== 'function') {
-        failWith(new Error('捐獻 Pi 需要在 Pi Browser 中進行，請用 Pi Browser 開啟 pi-universe-web.onrender.com'));
+        failWith(new Error(trNow('捐獻 Pi 需要在 Pi Browser 中進行，請用 Pi Browser 開啟 pi-universe-web.onrender.com', 'Donating Pi works in the Pi Browser. Please open pi-universe-web.onrender.com in the Pi Browser.')));
         return;
       }
 
@@ -79,14 +80,14 @@ export const usePiPayment = () => {
           {
             onReadyForServerApproval: async (paymentId: string) => {
               const r = await apiClient.approvePayment(paymentId);
-              if (!r.success) failWith(new Error(`核准付款失敗：${r.error || 'unknown error'}`));
+              if (!r.success) failWith(new Error(`${trNow('核准付款失敗', 'Payment approval failed')}: ${r.error || 'unknown error'}`));
             },
             onReadyForServerCompletion: async (paymentId: string, txid: string) => {
               const r = await apiClient.completePayment(paymentId, txid);
               if (r.success) {
                 succeed({ paymentId, txid, amount: config.amount });
               } else {
-                failWith(new Error(`完成付款失敗：${r.error || 'unknown error'}`));
+                failWith(new Error(`${trNow('完成付款失敗', 'Payment completion failed')}: ${r.error || 'unknown error'}`));
               }
             },
             onCancel: (paymentId: string) => {
@@ -95,12 +96,12 @@ export const usePiPayment = () => {
             },
             onError: (err: any, payment?: any) => {
               if (payment?.identifier) apiClient.cancelPayment(payment.identifier);
-              failWith(new Error(err?.message || String(err) || '付款發生錯誤'));
+              failWith(new Error(err?.message || String(err) || trNow('付款發生錯誤', 'Payment error')));
             },
           }
         );
       } catch (err: any) {
-        failWith(new Error(err?.message || '無法開啟 Pi 付款'));
+        failWith(new Error(err?.message || trNow('無法開啟 Pi 付款', 'Could not open the Pi payment')));
       }
     });
   }, []);

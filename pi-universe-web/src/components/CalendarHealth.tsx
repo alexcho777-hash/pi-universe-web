@@ -36,7 +36,7 @@ function serverClockOffset(): Promise<number | null> {
 
 interface Props {
   date: Date;
-  lang?: 'tw' | 'jp';
+  lang?: 'tw' | 'jp' | 'en';
   /** Also check the device clock (only meaningful when showing "today") */
   checkClock?: boolean;
 }
@@ -72,6 +72,7 @@ export default function CalendarHealth({ date, lang = 'tw', checkClock = true }:
 
   const hours = offsetMs === null ? 0 : Math.abs(offsetMs) / 3600000;
   const diffText = hours >= 24 ? `${Math.round(hours / 24)} 天` : hours >= 1 ? `${Math.round(hours)} 小時` : `${Math.round(hours * 60)} 分鐘`;
+  const diffTextEn = hours >= 24 ? `${Math.round(hours / 24)} day(s)` : hours >= 1 ? `${Math.round(hours)} hour(s)` : `${Math.round(hours * 60)} minutes`;
   const diffTextJp = hours >= 24 ? `${Math.round(hours / 24)}日` : hours >= 1 ? `${Math.round(hours)}時間` : `${Math.round(hours * 60)}分`;
 
   return (
@@ -80,6 +81,8 @@ export default function CalendarHealth({ date, lang = 'tw', checkClock = true }:
         <Alert severity="warning" sx={{ mb: 2, fontSize: '1.05rem' }}>
           {lang === 'jp'
             ? `この端末の時計が約${diffTextJp}ずれています。「今日」の暦が正しく表示されない可能性があります。端末の日付と時刻を確認してください。`
+            : lang === 'en'
+            ? `Your device clock is off by about ${diffTextEn}, so "today" in the almanac may be wrong. Please check your phone or computer's date and time.`
             : `您裝置的時間與標準時間相差約 ${diffText}，「今天」的農民曆可能不正確。請檢查手機或電腦的日期與時間設定。`}
         </Alert>
       )}
@@ -87,6 +90,8 @@ export default function CalendarHealth({ date, lang = 'tw', checkClock = true }:
         <Alert severity="error" sx={{ mb: 2, fontSize: '1.05rem' }}>
           {lang === 'jp'
             ? 'この日の暦データの自動照合で不一致が見つかりました。念のため市販の暦もご確認ください。'
+            : lang === 'en'
+            ? 'Our automatic check found a difference in the calendar data for this day. Please double-check with a printed almanac.'
             : '系統自動校驗發現這一天的曆法資料有差異，請再以紙本農民曆確認。'}
         </Alert>
       )}

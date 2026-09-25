@@ -10,6 +10,7 @@ import { Container, Paper, Box, Button, Typography, CircularProgress, Alert } fr
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { isPiBrowser, startPiSignIn } from '../auth/piSignIn';
+import { useI18n } from '../i18n/i18n';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [redirecting, setRedirecting] = useState(false);
   const inPiBrowser = isPiBrowser();
+  const { tr, lang } = useI18n();
 
   const handlePiBrowserLogin = async () => {
     try {
@@ -24,7 +26,7 @@ export default function LoginPage() {
       await login();
       navigate('/');
     } catch (err: any) {
-      setLoginError(err.message || 'Login failed');
+      setLoginError(err.message || tr('登入失敗', 'Sign-in failed'));
     }
   };
 
@@ -53,8 +55,8 @@ export default function LoginPage() {
             <Typography variant="h3" component="h1" gutterBottom sx={{ color: '#2563EB' }}>
               π Universe
             </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              Multi-Sanctuary Faith Platform
+            <Typography sx={{ fontSize: '1.1rem', color: 'text.secondary' }}>
+              {tr('多元信仰心靈聖地', 'A home for many faiths')}
             </Typography>
           </Box>
 
@@ -70,10 +72,10 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
-                    登入中… Logging in
+                    {tr('登入中…', 'Signing in…')}
                   </>
                 ) : (
-                  '用 Pi 帳號登入 Login with Pi'
+                  tr('用 Pi 帳號登入', 'Sign in with Pi')
                 )}
               </Button>
             ) : (
@@ -82,29 +84,29 @@ export default function LoginPage() {
                   {redirecting ? (
                     <>
                       <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
-                      前往 Pi 登入… Redirecting
+                      {tr('前往 Pi 登入…', 'Opening Pi sign-in…')}
                     </>
                   ) : (
-                    '用 Pi 帳號登入 Sign in with Pi'
+                    tr('用 Pi 帳號登入', 'Sign in with Pi')
                   )}
                 </Button>
-                <Alert severity="info">
-                  一般瀏覽器可以登入、簽到與靜坐；捐獻 Pi 請用 <b>Pi Browser</b> 開啟本網站。
-                  <br />
-                  In a regular browser you can sign in, check in and meditate; to donate Pi, open this site in the Pi
-                  Browser.
+                <Alert severity="info" sx={{ fontSize: '1rem' }}>
+                  {tr(
+                    '一般瀏覽器可以登入、參拜、求籤與靜坐；捐獻 Pi 請用 Pi Browser 開啟本網站。',
+                    'In a regular browser you can sign in, visit sanctuaries, draw oracle lots and meditate. To donate Pi, open this site in the Pi Browser.'
+                  )}
                 </Alert>
               </>
             )}
 
             <Button variant="outlined" size="large" href="/calendar" sx={{ fontSize: '1.05rem' }}>
-              📅 查看今日農民曆・擇日（免登入）
+              {tr('📅 查看今日農民曆・擇日（免登入）', "📅 Today's almanac & auspicious days (no sign-in)")}
             </Button>
 
             <Typography variant="caption" color="textSecondary" sx={{ textAlign: 'center', mt: 1 }}>
-              <a href="/privacy-policy.html">隱私權政策 Privacy</a>
+              <a href={`/privacy-policy.html?lang=${lang}`}>{tr('隱私權政策', 'Privacy Policy')}</a>
               {' · '}
-              <a href="/terms.html">服務條款 Terms</a>
+              <a href={`/terms.html?lang=${lang}`}>{tr('服務條款', 'Terms of Service')}</a>
             </Typography>
           </Box>
         </Paper>

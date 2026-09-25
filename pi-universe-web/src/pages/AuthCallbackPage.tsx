@@ -7,12 +7,14 @@ import { Container, Paper, Box, Button, Typography, CircularProgress, Alert } fr
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { readPiSignInResult } from '../auth/piSignIn';
+import { useI18n } from '../i18n/i18n';
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
   const signInWithPiToken = useAuthStore((s) => s.signInWithPiToken);
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
+  const { tr } = useI18n();
 
   useEffect(() => {
     if (started.current) return; // React StrictMode runs effects twice in development
@@ -23,12 +25,12 @@ export default function AuthCallbackPage() {
     window.history.replaceState(null, '', '/auth/callback');
 
     if (!result.accessToken) {
-      setError(result.error || '登入失敗');
+      setError(result.error || tr('登入失敗', 'Sign-in failed'));
       return;
     }
     signInWithPiToken(result.accessToken)
       .then(() => navigate('/', { replace: true }))
-      .catch((err: any) => setError(err?.message || '登入失敗'));
+      .catch((err: any) => setError(err?.message || tr('登入失敗', 'Sign-in failed')));
   }, [navigate, signInWithPiToken]);
 
   return (
@@ -41,15 +43,15 @@ export default function AuthCallbackPage() {
                 {error}
               </Alert>
               <Button variant="contained" onClick={() => navigate('/login', { replace: true })}>
-                回到登入頁 Back to login
+                {tr('回到登入頁', 'Back to sign-in')}
               </Button>
             </>
           ) : (
             <>
               <CircularProgress sx={{ mb: 2 }} />
-              <Typography>正在以 Pi 帳號登入…</Typography>
+              <Typography sx={{ fontSize: '1.1rem' }}>{tr('正在以 Pi 帳號登入…', 'Signing in with Pi…')}</Typography>
               <Typography variant="body2" color="textSecondary">
-                Signing in with Pi (the server may take a few seconds to wake up)
+                {tr('伺服器喚醒可能需要數十秒', 'The server may take a few seconds to wake up')}
               </Typography>
             </>
           )}
