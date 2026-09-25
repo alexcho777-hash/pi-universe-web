@@ -32,6 +32,13 @@ class ApiClientClass {
       if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
       }
+      // The visitor's own time zone, so "today" / "this month" follow where they are
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (tz) config.headers['X-Timezone'] = tz;
+      } catch {
+        /* older browsers: the server falls back to Taiwan time */
+      }
       return config;
     });
 
@@ -133,6 +140,25 @@ class ApiClientClass {
 
   async handleIncompletePayment(paymentId: string) {
     return this.post('/api/payments/incomplete', { paymentId });
+  }
+
+  // ---- Merit book & visitor statistics (功德簿・參訪統計) ----
+  // Record today's visit (once per person per day) -> "you are visitor #N today"
+  async visitSanctuary(sanctuaryId: number) {
+    return this.post(`/api/merit/visit/${sanctuaryId}`, {});
+  }
+
+  async getMeritOverview() {
+    return this.get('/api/merit/overview');
+  }
+
+  async getSanctuaryMerit(sanctuaryId: number) {
+    return this.get(`/api/merit/sanctuary/${sanctuaryId}`);
+  }
+
+  // The caller's own donations and rank (private)
+  async getMyMerit() {
+    return this.get('/api/merit/me');
   }
 
   // Get user profile

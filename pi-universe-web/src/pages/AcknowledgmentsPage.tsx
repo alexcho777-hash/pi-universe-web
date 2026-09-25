@@ -1,51 +1,47 @@
 /**
- * Acknowledgments Page - π Universe Web
- * Totals, per-sanctuary donations and top donors (from GET /api/acknowledgments).
+ * Merit Book Page (功德簿) - π Universe Web
+ *  - 各聖地: visitors and donations for every sanctuary (tap one for its full merit book)
+ *  - 我的紀錄: the user's own donations and rank (private; includes anonymous gifts)
  */
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Container,
-  Paper,
+  Alert,
   Box,
-  Typography,
-  CircularProgress,
-  Grid,
   Card,
+  CardActionArea,
   CardContent,
+  Chip,
+  CircularProgress,
+  Container,
+  Grid,
   List,
   ListItem,
   ListItemText,
-  Alert,
+  Paper,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material';
 import { apiClient } from '../api/ApiClient';
-
-interface AckData {
-  stats: {
-    total_users: number;
-    total_donations: number;
-    total_donated_amount: number;
-    total_donors: number;
-    total_activities: number;
-  };
-  sanctuaries: { id: number; name: string; icon: string; total_donations: string; donor_count: string }[];
-  topDonors: { username: string; donation_count: string; total_donated: string }[];
-  activeContributors: { username: string; activity_count: string }[];
-}
-
-const pi = (v: string | number) => `${Math.round(Number(v || 0) * 100) / 100} π`;
+import { MyMerit, OverviewRow, giftWord, piAmount, shortDate } from '../merit/merit';
 
 export default function AcknowledgmentsPage() {
-  const [data, setData] = useState<AckData | null>(null);
+  const navigate = useNavigate();
+  const [tab, setTab] = useState(0);
+  const [overview, setOverview] = useState<OverviewRow[] | null>(null);
+  const [mine, setMine] = useState<MyMerit | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await apiClient.getAcknowledgments();
-        if (response.success) setData(response.data as AckData);
-        else setError(response.error || '讀取失敗');
+        const [o, m] = await Promise.all([apiClient.getMeritOverview(), apiClient.getMyMerit()]);
+        if (o.success) setOverview(o.data as OverviewRow[]);
+        else setError(o.error || '讀取失敗');
+        if (m.success) setMine(m.data as MyMerit);
       } finally {
         setIsLoading(false);
       }
@@ -54,77 +50,120 @@ export default function AcknowledgmentsPage() {
 
   if (isLoading) {
     return (
-      <Container maxWidth="md">
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
-  const stat = (label: string, value: string | number) => (
-    <Grid size={{ xs: 4 }}>
-      <Card>
-        <CardContent sx={{ textAlign: 'center', px: 1 }}>
-          <Typography variant="h6">{value}</Typography>
-          <Typography variant="caption" color="textSecondary">
-            {label}
-          </Typography>
-        </CardContent>
-      </Card>
-    </Grid>
-  );
+  const totalAmount = (overview || []).reduce((a, r) => a + r.total_amount, 0);
+  const todayVisits = (overview || []).reduce((a, r) => a + r.visits_today, 0);
+  const myTotal = (mine?.sanctuaries || []).reduce((a, r) => a + r.total, 0);
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
-      <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#F5E6D3' }}>
-        <Typography variant="h4" sx={{ color: '#8B4513' }}>
-          感謝名單
+      <Paper elevation={1} sx={{ p: 3, mb: 2, backgroundColor: '#F5E6D3', textAlign: 'center' }}>
+        <Typography sx={{ fontSize: '2.2rem', fontWeight: 800, color: '#8B4513' }}>功德簿</Typography>
+        <Typography sx={{ fontSize: '1.15rem', color: '#5a3a1a' }}>
+          全站累計 {piAmount(totalAmount)}　·　今日參訪 {todayVisits} 人
         </Typography>
-        <Typography variant="subtitle1">Honoring our donors and practitioners</Typography>
       </Paper>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      {data && (
-        <>
-          <Grid container spacing={1.5} sx={{ mb: 3 }}>
-            {stat('總捐獻', pi(data.stats.total_donated_amount))}
-            {stat('捐獻者', data.stats.total_donors)}
-            {stat('修行者', data.stats.total_users)}
+      <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth" sx={{ mb: 2 }}>
+        <Tab label="各聖地" sx={{ fontSize: '1.15rem' }} />
+        <Tab label="我的紀錄" sx={{ fontSize: '1.15rem' }} />
+      </Tabs>
+
+      {tab === 0 && (
+        <Grid container spacing={1.5}>
+          {(overview || []).map((r) => (
+            <Grid size={12} key={r.id}>
+              <Card sx={{ borderLeft: `6px solid ${r.color && r.color !== '#FFFFFF' ? r.color : '#8B4513'}` }}>
+                <CardActionArea onClick={() => navigate(`/sanctuary/${r.id}`)}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1 }}>
+                      <Typography sx={{ fontSize: '1.3rem', fontWeight: 700 }}>
+                        {r.icon} {r.name}
+                      </Typography>
+                      <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#8B4513', whiteSpace: 'nowrap' }}>
+                        {piAmount(r.total_amount)}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ fontSize: '1.02rem', color: 'text.secondary', mt: 0.5 }}>
+                      今日參訪 {r.visits_today}・本月 {r.visits_month}・累計 {r.visits_total}
+                    </Typography>
+                    <Typography sx={{ fontSize: '1.02rem', color: 'text.secondary' }}>
+                      本月{giftWord(r.religion_type)} {piAmount(r.month_amount)}・護持 {r.donor_count} 人
+                      {!r.ranking_enabled && '（不公開排名）'}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
+          <Grid size={12}>
+            <Typography sx={{ fontSize: '0.95rem', color: 'text.secondary' }}>點選聖地可看本月前十、累計前五十與最新芳名。</Typography>
           </Grid>
+        </Grid>
+      )}
 
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-            各聖地功德
-          </Typography>
-          <Paper sx={{ mb: 3 }}>
-            <List dense>
-              {data.sanctuaries.map((s) => (
-                <ListItem key={s.id} secondaryAction={<Typography>{pi(s.total_donations)}</Typography>}>
-                  <ListItemText primary={`${s.icon} ${s.name}`} secondary={`${s.donor_count} 位捐獻者`} />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
+      {tab === 1 && (
+        <>
+          <Alert severity="info" sx={{ mb: 2, fontSize: '1.02rem' }}>
+            這一頁只有您自己看得到，包含隱名的紀錄。
+          </Alert>
+          {!mine || mine.history.length === 0 ? (
+            <Paper sx={{ p: 3, textAlign: 'center' }}>
+              <Typography sx={{ fontSize: '1.15rem' }}>您還沒有捐獻紀錄 🙏</Typography>
+              {mine && (
+                <Typography sx={{ mt: 1, color: 'text.secondary' }}>已參訪 {mine.visits.total} 次・{mine.visits.sanctuaries} 個聖地</Typography>
+              )}
+            </Paper>
+          ) : (
+            <>
+              <Paper sx={{ p: 2, mb: 2, textAlign: 'center' }}>
+                <Typography sx={{ fontSize: '1.2rem' }}>
+                  累計 <b>{piAmount(myTotal)}</b>・{mine.history.length} 筆
+                </Typography>
+                <Typography sx={{ color: 'text.secondary' }}>已參訪 {mine.visits.total} 次・{mine.visits.sanctuaries} 個聖地</Typography>
+              </Paper>
 
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-            功德榜
-          </Typography>
-          <Paper>
-            {data.topDonors.length === 0 ? (
-              <Typography sx={{ p: 2 }} color="textSecondary">
-                還沒有捐獻，成為第一位護持者吧 🙏
-              </Typography>
-            ) : (
-              <List dense>
-                {data.topDonors.map((d, i) => (
-                  <ListItem key={d.username} secondaryAction={<Typography>{pi(d.total_donated)}</Typography>}>
-                    <ListItemText primary={`${i + 1}. ${d.username}`} secondary={`${d.donation_count} 次捐獻`} />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </Paper>
+              <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, mb: 1 }}>各聖地</Typography>
+              <Paper sx={{ mb: 2 }}>
+                <List>
+                  {mine.sanctuaries.map((r) => (
+                    <ListItem key={r.sanctuary_id} secondaryAction={<Typography sx={{ fontSize: '1.1rem', fontWeight: 600 }}>{piAmount(r.total)}</Typography>}>
+                      <ListItemText
+                        primary={<Typography component="span" sx={{ fontSize: '1.15rem' }}>{r.icon} {r.name}</Typography>}
+                        secondary={r.rank ? `${r.times} 次・累計排名第 ${r.rank} 名` : `${r.times} 次`}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Paper>
+
+              <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, mb: 1 }}>明細</Typography>
+              <Paper>
+                <List>
+                  {mine.history.map((h) => (
+                    <ListItem key={h.id} secondaryAction={<Typography sx={{ fontSize: '1.1rem' }}>{piAmount(h.amount)}</Typography>}>
+                      <ListItemText
+                        primary={
+                          <Typography component="span" sx={{ fontSize: '1.1rem' }}>
+                            {h.icon} {h.name}{' '}
+                            {h.is_anonymous && <Chip label="隱名" size="small" sx={{ ml: 0.5 }} />}
+                          </Typography>
+                        }
+                        secondary={shortDate(h.created_at)}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Paper>
+            </>
+          )}
         </>
       )}
     </Container>

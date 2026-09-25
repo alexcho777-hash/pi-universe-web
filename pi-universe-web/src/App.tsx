@@ -12,6 +12,7 @@ import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import SanctuaryPage from './pages/SanctuaryPage';
 import Navigation from './components/Navigation';
 
 // The almanac engine is large, so the calendar page loads only when opened
@@ -74,6 +75,7 @@ export default function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/calendar" element={calendarRoute} />
+                <Route path="/sanctuary/:id" element={<SanctuaryPage />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Box>

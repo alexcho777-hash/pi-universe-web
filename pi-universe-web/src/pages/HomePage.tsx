@@ -15,19 +15,13 @@ import {
   CardContent,
   CircularProgress,
   Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Snackbar,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { apiClient } from '../api/ApiClient';
 import { Sanctuary } from '../types';
-import { usePiPayment, PaymentCancelledError } from '../hooks/usePiPayment';
+import DonateDialog from '../components/DonateDialog';
 
 const TodayAlmanacCard = lazy(() => import('../components/TodayAlmanacCard'));
 
@@ -49,10 +43,9 @@ const RELIGION_LABEL: Record<string, string> = {
   hindu: '印度教 Hindu',
 };
 
-const PRESET_AMOUNTS = [1, 3.14, 10];
-
 export default function HomePage() {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [sanctuaries, setSanctuaries] = useState<Sanctuary[]>([]);
   const [summary, setSummary] = useState<PracticeSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,8 +60,6 @@ export default function HomePage() {
 
   // Donation dialog
   const [donateTo, setDonateTo] = useState<Sanctuary | null>(null);
-  const [amount, setAmount] = useState<string>('1');
-  const { donate, isLoading: paying } = usePiPayment();
 
   useEffect(() => {
     loadAll();
@@ -132,31 +123,6 @@ export default function HomePage() {
     }
   };
 
-  const handleDonate = async () => {
-    if (!donateTo) return;
-    const value = Math.round(parseFloat(amount) * 1e7) / 1e7;
-    if (!(value > 0)) {
-      setToast({ msg: '請輸入正確的金額', severity: 'error' });
-      return;
-    }
-    try {
-      await donate({
-        amount: value,
-        sanctuaryId: donateTo.id,
-        memo: `Donation to ${donateTo.name} (π Universe)`,
-      });
-      setToast({ msg: `感謝您的功德！已向 ${donateTo.name} 捐獻 ${value} π`, severity: 'success' });
-      setDonateTo(null);
-      loadSummary();
-    } catch (err: any) {
-      if (err instanceof PaymentCancelledError) {
-        setToast({ msg: '已取消付款', severity: 'info' });
-      } else {
-        setToast({ msg: err.message || '付款失敗', severity: 'error' });
-      }
-    }
-  };
-
   const mmss = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
   if (isLoading) {
@@ -174,12 +140,12 @@ export default function HomePage() {
     <Container maxWidth="md" sx={{ py: 3 }}>
       {/* Welcome Section */}
       <Paper elevation={1} sx={{ p: 3, mb: 2, backgroundColor: '#F5E6D3' }}>
-        <Typography variant="h4" gutterBottom sx={{ color: '#8B4513' }}>
-          歡迎回到 π Universe
+        <Typography sx={{ fontSize: { xs: '1.9rem', sm: '2.3rem' }, fontWeight: 800, color: '#8B4513', lineHeight: 1.3 }}>
+          歡迎 {user?.username || '善信'} 蒞臨
         </Typography>
-        <Typography variant="subtitle1">Welcome back, {user?.username || 'Practitioner'}</Typography>
+        <Typography sx={{ fontSize: { xs: '1.4rem', sm: '1.6rem' }, fontWeight: 700, color: '#5a3a1a' }}>π Universe 心靈聖地</Typography>
         {summary && (
-          <Typography variant="body2" sx={{ mt: 1, color: '#5a3a1a' }}>
+          <Typography sx={{ mt: 1, color: '#5a3a1a', fontSize: '1.1rem' }}>
             簽到 {summary.checkins} 次 · 靜坐 {summary.meditation_minutes} 分鐘 · 捐獻 {summary.donated} π
           </Typography>
         )}
@@ -259,17 +225,18 @@ export default function HomePage() {
                   <Typography variant="body2" sx={{ my: 1 }}>
                     {sanctuary.description}
                   </Typography>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ mt: 1, backgroundColor: '#8B4513' }}
-                    onClick={() => {
-                      setAmount('1');
-                      setDonateTo(sanctuary);
-                    }}
-                  >
-                    捐獻 Pi
-                  </Button>
+                  <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                    <Button
+                      variant="contained"
+                      sx={{ backgroundColor: '#2563EB', fontSize: '1.05rem' }}
+                      onClick={() => navigate(`/sanctuary/${sanctuary.id}`)}
+                    >
+                      進入參拜・功德簿
+                    </Button>
+                    <Button variant="outlined" sx={{ color: '#8B4513', borderColor: '#8B4513', fontSize: '1.05rem' }} onClick={() => setDonateTo(sanctuary)}>
+                      捐獻 Pi
+                    </Button>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
@@ -278,45 +245,14 @@ export default function HomePage() {
       </Box>
 
       {/* Donation dialog */}
-      <Dialog open={!!donateTo} onClose={() => !paying && setDonateTo(null)} fullWidth maxWidth="xs">
-        <DialogTitle>
-          捐獻給 {donateTo?.icon} {donateTo?.name}
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-            自願隨喜，捐獻將記錄在感謝名單。
-          </Typography>
-          <ToggleButtonGroup
-            exclusive
-            fullWidth
-            value={PRESET_AMOUNTS.includes(parseFloat(amount)) ? parseFloat(amount) : null}
-            onChange={(_, v) => v !== null && setAmount(String(v))}
-            sx={{ mb: 2 }}
-          >
-            {PRESET_AMOUNTS.map((a) => (
-              <ToggleButton key={a} value={a}>
-                {a} π
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-          <TextField
-            label="金額 (π)"
-            type="number"
-            fullWidth
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            slotProps={{ htmlInput: { min: 0.01, step: 0.01, inputMode: 'decimal' } }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDonateTo(null)} disabled={paying}>
-            取消
-          </Button>
-          <Button variant="contained" onClick={handleDonate} disabled={paying} sx={{ backgroundColor: '#8B4513' }}>
-            {paying ? <CircularProgress size={20} sx={{ color: 'white' }} /> : `用 Pi 捐獻 ${amount || 0} π`}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DonateDialog
+        sanctuary={donateTo}
+        onClose={() => setDonateTo(null)}
+        onResult={(r) => {
+          setToast({ msg: r.message, severity: r.ok ? 'success' : r.cancelled ? 'info' : 'error' });
+          if (r.ok) loadSummary();
+        }}
+      />
 
       <Snackbar
         open={!!toast}

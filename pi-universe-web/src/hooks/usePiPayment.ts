@@ -22,6 +22,8 @@ export interface DonationConfig {
   amount: number;
   sanctuaryId: number;
   memo: string;
+  /** Show as 隱名善信 in the merit book */
+  anonymous?: boolean;
 }
 
 export interface DonationResult {
@@ -72,7 +74,7 @@ export const usePiPayment = () => {
           {
             amount: config.amount,
             memo: config.memo,
-            metadata: { sanctuary_id: config.sanctuaryId, kind: 'donation' },
+            metadata: { sanctuary_id: config.sanctuaryId, kind: 'donation', anonymous: !!config.anonymous },
           },
           {
             onReadyForServerApproval: async (paymentId: string) => {

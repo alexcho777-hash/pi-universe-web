@@ -12,9 +12,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const navItems = [
-  { path: '/', label: '禪修', icon: HomeIcon },
+  { path: '/', label: '首頁', icon: HomeIcon },
   { path: '/calendar', label: '農民曆', icon: CalendarMonthIcon },
-  { path: '/acknowledgments', label: '致謝', icon: StarIcon },
+  { path: '/acknowledgments', label: '功德簿', icon: StarIcon },
   { path: '/profile', label: '資料', icon: PersonIcon },
   { path: '/settings', label: '設置', icon: SettingsIcon },
 ];
