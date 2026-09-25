@@ -12,7 +12,7 @@ class ApiClientClass {
 
   constructor() {
     // Use existing π Universe backend
-    this.baseURL = process.env.REACT_APP_API_URL || 'https://pi-universe-api.onrender.com';
+    this.baseURL = import.meta.env.VITE_API_URL || 'https://pi-universe-api.onrender.com';
 
     this.instance = axios.create({
       baseURL: this.baseURL,
