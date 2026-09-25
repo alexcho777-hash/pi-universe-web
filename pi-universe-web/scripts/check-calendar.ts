@@ -10,6 +10,7 @@
  */
 import { taiwanDay, japanDay } from '../src/calendar/almanac';
 import { verifyDay, kyurekiFromIntl } from '../src/calendar/crossCheck';
+import { HINDU_TABLE_END, easter } from '../src/faith/festivals';
 
 const FROM = 2000;
 const TO = 2100;
@@ -61,6 +62,16 @@ for (let t = Date.UTC(2020, 0, 1); t <= Date.UTC(2040, 11, 31); t += 86400000) {
   const expected = ROKUYO[(icuJp.month + icuJp.day) % 6];
   const got = japanDay(y, m, d).rokuyo;
   if (got !== expected) fail(`${y}-${m}-${d} 六曜 ours ${got} vs expected ${expected}`);
+}
+
+// 4) Festival engine: Easter reference dates, and the Hindu table must not run out
+for (const [y, m, dd] of [[2025, 4, 20], [2026, 4, 5], [2027, 3, 28], [2028, 4, 16], [2030, 4, 21]]) {
+  const e = easter(y);
+  if (e.getMonth() + 1 !== m || e.getDate() !== dd) fail(`Easter ${y}: got ${e.getMonth() + 1}/${e.getDate()}`);
+}
+const hinduDaysLeft = (Date.parse(HINDU_TABLE_END) - Date.now()) / 86400000;
+if (hinduDaysLeft < 120) {
+  console.warn(`⚠ The Hindu festival table ends on ${HINDU_TABLE_END} (${Math.round(hinduDaysLeft)} days left). Add next year's dates in src/faith/festivals.ts.`);
 }
 
 if (edges.size) {

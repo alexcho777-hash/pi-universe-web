@@ -32,6 +32,7 @@ import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import DonateDialog from '../components/DonateDialog';
 import { SacredGlow } from '../oracle/OracleArt';
+import { FaithActivities, FestivalList } from '../components/faith/FaithActivities';
 import { useI18n, Lang } from '../i18n/i18n';
 import { sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 import {
@@ -253,6 +254,9 @@ export default function SanctuaryPage() {
           >
             🙏 {tr(`${word}護持 ${name}`, `${donateVerb(s.religion_type, 'en')} to the ${name}`)}
           </Button>
+
+          <FaithActivities religionType={s.religion_type} sanctuaryId={s.id} />
+          <FestivalList religionType={s.religion_type} />
 
           {/* Merit book */}
           {merit && (
