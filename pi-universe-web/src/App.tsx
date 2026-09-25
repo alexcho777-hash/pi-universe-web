@@ -11,6 +11,7 @@ import AcknowledgmentsPage from './pages/AcknowledgmentsPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import LoginPage from './pages/LoginPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 import Navigation from './components/Navigation';
 
 // Create Material-UI theme (replace React Native Paper colors)
@@ -72,6 +73,7 @@ export default function App() {
         ) : (
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         )}

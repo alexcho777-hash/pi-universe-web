@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState, User } from '../types';
 import { apiClient } from '../api/ApiClient';
+import { isPiBrowser } from '../auth/piSignIn';
 
 declare global {
   interface Window {
@@ -116,9 +117,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true });
 
-          // Check if Pi SDK is available
-          if (!window.Pi) {
-            console.warn('Pi SDK not loaded yet');
+          // Outside the Pi Browser, Pi.authenticate() never answers: skip it and keep any
+          // saved session (e.g. from Pi Sign-In) instead of making the visitor wait.
+          if (!window.Pi || !isPiBrowser()) {
+            note(isPiBrowser() ? 'Pi SDK not loaded' : 'not Pi Browser: skip auto-login');
             set({ isLoading: false });
             return;
           }
@@ -233,6 +235,27 @@ export const useAuthStore = create<AuthState>()(
         } finally {
           set({ isLoading: false });
         }
+      },
+
+      // Pi Sign-In (ordinary browsers): the backend verifies the token with Pi (GET /v2/me)
+      signInWithPiToken: async (accessToken: string) => {
+        set({ error: null });
+        const response: any = await apiClient.post('/api/users/pi-signin', { accessToken });
+        if (!response?.success || !response.data) {
+          throw new Error(response?.error || 'Pi 登入失敗');
+        }
+        const d = response.data;
+        set({
+          user: {
+            pi_uid: d.pi_uid,
+            username: d.username,
+            user_id: d.user_id,
+            sanctuary_id: d.sanctuary_id,
+            created_at: d.created_at,
+          },
+          isAuthenticated: true,
+          error: null,
+        });
       },
 
       setError: (error: string | null) => {

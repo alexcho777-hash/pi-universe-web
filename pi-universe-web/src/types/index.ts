@@ -35,6 +35,7 @@ export interface AuthState {
   error: string | null;
   initialize: () => Promise<void>;
   login: (piUid?: string) => Promise<void>;
+  signInWithPiToken: (accessToken: string) => Promise<void>;
   logout: () => Promise<void>;
   setError: (error: string | null) => void;
 }

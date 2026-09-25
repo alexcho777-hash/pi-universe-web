@@ -3,56 +3,96 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>π Universe 服務條款 Terms of Service</title>
+<title>π Universe 服務條款</title>
 <style>
   :root { color-scheme: light; }
   body { margin: 0; background: #f5f5f5; color: #222; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif; line-height: 1.7; }
-  main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; background: #fff; min-height: 100vh; box-sizing: border-box; }
-  h1 { color: #2563EB; font-size: 1.6rem; margin: 0 0 4px; }
+  main { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px; background: #fff; min-height: 100vh; box-sizing: border-box; }
+  .bar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 8px; }
+  .bar button { border: 1px solid #2563EB; background: #fff; color: #2563EB; border-radius: 16px; padding: 4px 14px; font-size: .9rem; cursor: pointer; }
+  .bar button[aria-pressed="true"] { background: #2563EB; color: #fff; }
+  h1 { color: #2563EB; font-size: 1.6rem; margin: 8px 0 4px; }
   h2 { font-size: 1.1rem; margin: 28px 0 8px; color: #8B4513; }
   .meta { color: #666; font-size: .9rem; margin-bottom: 24px; }
-  .en { color: #555; font-size: .95rem; }
   ul { padding-left: 1.2em; }
   a { color: #2563EB; }
+  [data-lang] { display: none; }
+  body.zh [data-lang="zh"], body.en [data-lang="en"] { display: block; }
 </style>
 </head>
-<body><main>
-
-<h1>服務條款 Terms of Service</h1>
-<p class="meta">π Universe · 最後更新 Last updated: 2026-09-25</p>
-
-<p>使用 π Universe（以下稱「本服務」）即表示您同意以下條款。<span class="en"> By using π Universe ("the Service") you agree to these terms.</span></p>
-
-<h2>1. 服務內容 The Service</h2>
+<body class="zh" data-title-zh="π Universe 服務條款" data-title-en="π Universe Terms of Service">
+<main>
+<div class="bar"><button type="button" data-set="zh" aria-pressed="true">中文</button><button type="button" data-set="en" aria-pressed="false">English</button></div>
+<section data-lang="zh">
+<h1>服務條款</h1>
+<p class="meta">π Universe · 最後更新：2026 年 9 月 25 日</p>
+<p>使用 π Universe（以下稱「本服務」）即表示您同意以下條款。</p>
+<h2>1. 服務內容</h2>
 <p>本服務提供多宗教虛擬聖地參訪、每日簽到、靜坐紀錄，以及以 Pi 自願捐獻給聖地的功能。本服務尊重各宗教傳統，不代表任何宗教組織。</p>
-<p class="en">The Service offers visits to virtual sanctuaries of several faiths, daily check-ins, meditation logs, and voluntary donations to sanctuaries with Pi. It respects all traditions and does not represent any religious organization.</p>
-
-<h2>2. 帳號 Accounts</h2>
+<h2>2. 帳號</h2>
 <p>本服務使用 Pi Network 登入。您須遵守 Pi Network 的使用條款，並對您帳號下的活動負責。</p>
-<p class="en">The Service uses Pi Network sign-in. You must follow Pi Network's terms and are responsible for activity under your account.</p>
-
-<h2>3. 捐獻 Donations</h2>
+<h2>3. 捐獻</h2>
 <ul>
-  <li>捐獻完全出於自願，不附帶任何回報、商品或服務。<span class="en"> Donations are entirely voluntary and do not come with any reward, goods or services.</span></li>
-  <li>捐獻經區塊鏈確認後無法撤回或退款。<span class="en"> Once confirmed on the blockchain, donations cannot be reversed or refunded.</span></li>
-  <li>付款由 Pi Network 處理，您須在 Pi 錢包中確認每一筆付款。<span class="en"> Payments are processed by Pi Network; you confirm each one in your Pi Wallet.</span></li>
+  <li>捐獻完全出於自願，不附帶任何回報、商品或服務。</li>
+  <li>捐獻經區塊鏈確認後無法撤回或退款。</li>
+  <li>付款由 Pi Network 處理，您須在 Pi 錢包中確認每一筆付款。</li>
 </ul>
-
-<h2>4. 使用規範 Acceptable use</h2>
-<p>請勿發布冒犯任何宗教或族群的內容，勿干擾本服務運作，或以不正當方式存取他人帳號。違者我們得停止其使用權。</p>
-<p class="en">Do not post content that offends any faith or group, interfere with the Service, or access others' accounts improperly. We may suspend access for violations.</p>
-
-<h2>5. 測試版 Testnet</h2>
-<p>測試期間使用 Test-Pi，沒有實際價值，功能與資料可能變動或重設。<span class="en"> During testing the Service uses Test-Pi, which has no real value; features and data may change or be reset.</span></p>
-
-<h2>6. 免責聲明 Disclaimer</h2>
+<h2>4. 使用規範</h2>
+<p>請勿發布冒犯任何宗教或族群的內容、干擾本服務運作，或以不正當方式存取他人帳號。違者我們得停止其使用權。</p>
+<h2>5. 測試版</h2>
+<p>測試期間使用 Test-Pi，沒有實際價值，功能與資料可能變動或重設。</p>
+<h2>6. 免責聲明</h2>
 <p>本服務依「現狀」提供，不保證不中斷或無錯誤。在法律允許的範圍內，我們不對使用本服務所生之間接損失負責。</p>
-<p class="en">The Service is provided "as is" without guarantees of uninterrupted or error-free operation. To the extent permitted by law, we are not liable for indirect losses from using the Service.</p>
-
-<h2>7. 條款變更 Changes</h2>
-<p>條款如有更新，將公布於此頁面。更新後繼續使用即表示同意新條款。<span class="en"> Updated terms will be posted here; continued use means you accept them.</span></p>
-
-<p class="meta">隱私權政策 Privacy Policy：<a href="/privacy-policy.html">/privacy-policy.html</a></p>
+<h2>7. 條款變更</h2>
+<p>條款如有更新，將公布於此頁面。更新後繼續使用即表示同意新條款。</p>
+<p class="meta">相關政策：<a href="/privacy-policy.html?lang=zh">隱私權政策</a></p>
 
 <p class="meta" style="margin-top:40px"><a href="/">← 回到 π Universe</a></p>
-</main></body></html>
+</section>
+<section data-lang="en">
+<h1>Terms of Service</h1>
+<p class="meta">π Universe · Last updated: September 25, 2026</p>
+<p>By using π Universe ("the Service") you agree to the following terms.</p>
+<h2>1. The Service</h2>
+<p>The Service offers visits to virtual sanctuaries of several faiths, daily check-ins, meditation logs, and voluntary donations to sanctuaries with Pi. It respects all traditions and does not represent any religious organization.</p>
+<h2>2. Accounts</h2>
+<p>The Service uses Pi Network sign-in. You must follow Pi Network's terms of use and are responsible for activity under your account.</p>
+<h2>3. Donations</h2>
+<ul>
+  <li>Donations are entirely voluntary and do not come with any reward, goods or services.</li>
+  <li>Once confirmed on the blockchain, donations cannot be reversed or refunded.</li>
+  <li>Payments are processed by Pi Network, and you confirm each one in your Pi Wallet.</li>
+</ul>
+<h2>4. Acceptable use</h2>
+<p>Do not post content that offends any faith or group, interfere with the Service, or access other people's accounts improperly. We may suspend access for violations.</p>
+<h2>5. Testnet</h2>
+<p>During testing the Service uses Test-Pi, which has no real value; features and data may change or be reset.</p>
+<h2>6. Disclaimer</h2>
+<p>The Service is provided "as is" without any guarantee of uninterrupted or error-free operation. To the extent permitted by law, we are not liable for indirect losses arising from use of the Service.</p>
+<h2>7. Changes</h2>
+<p>Updated terms will be posted on this page. Continuing to use the Service after an update means you accept the new terms.</p>
+<p class="meta">See also: <a href="/privacy-policy.html?lang=en">Privacy Policy</a></p>
+
+<p class="meta" style="margin-top:40px"><a href="/">← Back to π Universe</a></p>
+</section>
+</main>
+
+<script>
+(function () {
+  var q = new URLSearchParams(location.search).get('lang');
+  var lang = q === 'en' || q === 'zh' ? q : ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en');
+  function set(l) {
+    document.body.className = l;
+    document.documentElement.lang = l === 'zh' ? 'zh-Hant' : 'en';
+    document.title = document.body.getAttribute('data-title-' + l);
+    var bs = document.querySelectorAll('.bar button');
+    for (var i = 0; i < bs.length; i++) bs[i].setAttribute('aria-pressed', bs[i].getAttribute('data-set') === l ? 'true' : 'false');
+    try { history.replaceState(null, '', '?lang=' + l); } catch (e) {}
+  }
+  var bs = document.querySelectorAll('.bar button');
+  for (var i = 0; i < bs.length; i++) bs[i].addEventListener('click', function () { set(this.getAttribute('data-set')); });
+  set(lang);
+})();
+</script>
+</body>
+</html>

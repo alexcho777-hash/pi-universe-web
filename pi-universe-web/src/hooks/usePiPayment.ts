@@ -10,6 +10,7 @@
 
 import { useState, useCallback } from 'react';
 import { apiClient } from '../api/ApiClient';
+import { isPiBrowser } from '../auth/piSignIn';
 
 declare global {
   interface Window {
@@ -61,8 +62,8 @@ export const usePiPayment = () => {
         resolve(result);
       };
 
-      if (!window.Pi || typeof window.Pi.createPayment !== 'function') {
-        failWith(new Error('請在 Pi Browser 中開啟以使用 Pi 付款'));
+      if (!isPiBrowser() || !window.Pi || typeof window.Pi.createPayment !== 'function') {
+        failWith(new Error('捐獻 Pi 需要在 Pi Browser 中進行，請用 Pi Browser 開啟 pi-universe-web.onrender.com'));
         return;
       }
 
