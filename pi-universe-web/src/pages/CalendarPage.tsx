@@ -20,6 +20,7 @@ import {
   FormControlLabel,
   Divider,
 } from '@mui/material';
+import CalendarHealth from '../components/CalendarHealth';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {
@@ -94,6 +95,7 @@ export default function CalendarPage() {
         </IconButton>
       </Paper>
 
+      <CalendarHealth date={date} lang={mode} />
       {mode === 'tw' ? <TaiwanDayCard date={date} /> : <JapanDayCard date={date} />}
       <MonthGrid mode={mode} date={date} onPick={setDate} />
       {mode === 'tw' ? <TaiwanGoodDaySearch onPick={setDate} /> : <JapanLuckySearch onPick={setDate} />}

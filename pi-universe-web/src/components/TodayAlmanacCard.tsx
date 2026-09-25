@@ -5,6 +5,7 @@
 import { Paper, Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { taiwanDay } from '../calendar/almanac';
+import CalendarHealth from './CalendarHealth';
 
 const lunarMonthName = (m: string) => (m === '冬' ? '十一' : m === '臘' ? '十二' : m);
 
@@ -14,6 +15,8 @@ export default function TodayAlmanacCard() {
   const d = taiwanDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const color = d.huangDao ? '#2E7D32' : '#C62828';
   return (
+    <>
+    <CalendarHealth date={now} />
     <Paper sx={{ p: 2.5, mb: 2, borderLeft: `6px solid ${color}` }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1, flexWrap: 'wrap' }}>
         <Typography sx={{ fontSize: '1.3rem', fontWeight: 800 }}>今日農民曆</Typography>
@@ -38,5 +41,6 @@ export default function TodayAlmanacCard() {
         查看完整農民曆・擇日 →
       </Button>
     </Paper>
+    </>
   );
 }

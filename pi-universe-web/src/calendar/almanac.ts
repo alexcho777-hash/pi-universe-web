@@ -166,21 +166,110 @@ function japanMonthStart(month: any): number {
   return Math.floor(t + 1 / 24 + 0.5) + J2000; // same instant, counted in Japan time
 }
 
-/** 旧暦 month (negative = leap) and day, reckoned in Japan time. */
-export function kyureki(y: number, m: number, d: number): { month: number; day: number } {
-  const solar = Solar.fromYmd(y, m, d);
-  const jd = Math.floor(solar.getJulianDay() + 0.5);
-  const l = solar.getLunar();
+// Japanese months are numbered by the 中気 (principal solar term) they contain, reckoned in
+// Japan time; a month with no 中気 is a leap month (閏). Because the day boundary is one hour
+// later than in China, Japan's leap month sometimes differs from China's (e.g. 2012: 日本 閏3月,
+// 中国 閏4月; 2017: 日本 閏5月, 中国 閏6月), so we cannot reuse the Chinese month numbers.
+const CHUKI: Record<string, number> = {
+  雨水: 1, 春分: 2, 谷雨: 3, 小满: 4, 夏至: 5, 大暑: 6,
+  处暑: 7, 秋分: 8, 霜降: 9, 小雪: 10, 冬至: 11, 大寒: 12,
+};
+
+/** Japan-time day number of every 中気 near a given day */
+function chukiDaysAround(jd: number): { day: number; month: number }[] {
+  const out: { day: number; month: number }[] = [];
+  const seen = new Set<number>();
+  for (const probe of [jd - 40, jd + 40]) {
+    const table = Solar.fromJulianDay(probe).getLunar().getJieQiTable();
+    for (const name of Object.keys(table)) {
+      const month = CHUKI[name];
+      if (!month) continue;
+      const day = Math.floor(table[name].getJulianDay() + 1 / 24 + 0.5);
+      if (!seen.has(day)) {
+        seen.add(day);
+        out.push({ day, month });
+      }
+    }
+  }
+  return out;
+}
+
+/** Japan-time start days of consecutive months covering [from, to] */
+function japanMonthStartsBetween(from: number, to: number): number[] {
+  const l = Solar.fromJulianDay(from - 31).getLunar();
+  let month = LunarMonth.fromYm(l.getYear(), l.getMonth());
+  const starts: number[] = [];
+  while (true) {
+    const st = japanMonthStart(month);
+    if (starts.length === 0 || st > starts[starts.length - 1]) starts.push(st);
+    if (st > to + 31) break;
+    month = month.next(1);
+  }
+  return starts;
+}
+
+/** Japan-time days of every 中気 in [from, to] */
+function chukiDaysBetween(from: number, to: number): { day: number; month: number }[] {
+  const out = new Map<number, number>();
+  for (let probe = from; probe <= to + 60; probe += 60) {
+    for (const c of chukiDaysAround(probe)) out.set(c.day, c.month);
+  }
+  return [...out.entries()].map(([day, month]) => ({ day, month })).sort((x, y) => x.day - y.day);
+}
+
+/** The Japan-time month start for the month containing day `jd` */
+function japanMonthStartFor(jd: number): number {
+  const l = Solar.fromJulianDay(jd).getLunar();
   const cur = LunarMonth.fromYm(l.getYear(), l.getMonth());
   const start = japanMonthStart(cur);
-  if (jd < start) {
-    const prev = cur.next(-1);
-    return { month: prev.getMonth(), day: jd - japanMonthStart(prev) + 1 };
+  if (jd < start) return japanMonthStart(cur.next(-1));
+  const nextStart = japanMonthStart(cur.next(1));
+  return jd >= nextStart ? nextStart : start;
+}
+
+// month start day -> { month number, leap }; filled one 冬至-to-冬至 year at a time
+const MONTH_LABELS = new Map<number, { num: number; leap: boolean }>();
+
+function labelWinterYear(jd: number): void {
+  const starts = japanMonthStartsBetween(jd - 420, jd + 420);
+  const chuki = chukiDaysBetween(jd - 450, jd + 450);
+  const monthOf = (day: number) => {
+    for (let i = starts.length - 2; i >= 0; i--) if (day >= starts[i]) return i;
+    return -1;
+  };
+  const hasChuki = (i: number) => chuki.some((c) => c.day >= starts[i] && c.day < starts[i + 1]);
+  const target = monthOf(jd);
+  const winters = chuki.filter((c) => c.month === 11).map((c) => monthOf(c.day));
+  const p = Math.max(...winters.filter((w) => w <= target));
+  const q = Math.min(...winters.filter((w) => w > p));
+  const leapYear = q - p === 13;
+
+  let num = 11;
+  let leapUsed = false;
+  MONTH_LABELS.set(starts[p], { num, leap: false });
+  for (let i = p + 1; i < q; i++) {
+    if (leapYear && !leapUsed && !hasChuki(i)) {
+      leapUsed = true;
+      MONTH_LABELS.set(starts[i], { num, leap: true });
+    } else {
+      num = (num % 12) + 1;
+      MONTH_LABELS.set(starts[i], { num, leap: false });
+    }
   }
-  const next = cur.next(1);
-  const nextStart = japanMonthStart(next);
-  if (jd >= nextStart) return { month: next.getMonth(), day: jd - nextStart + 1 };
-  return { month: cur.getMonth(), day: jd - start + 1 };
+}
+
+/**
+ * 旧暦 month (negative = leap) and day, reckoned in Japan time.
+ * Months are counted from the month containing 冬至 (= 11月). When 13 months lie between two
+ * 冬至 months, the first month without a 中気 is the leap month; otherwise there is none.
+ * This also settles the "2033年問題" the way published calendars do (閏11月).
+ */
+export function kyureki(y: number, m: number, d: number): { month: number; day: number } {
+  const jd = Math.floor(Solar.fromYmd(y, m, d).getJulianDay() + 0.5);
+  const start = japanMonthStartFor(jd);
+  if (!MONTH_LABELS.has(start)) labelWinterYear(jd);
+  const label = MONTH_LABELS.get(start)!;
+  return { month: label.leap ? -label.num : label.num, day: jd - start + 1 };
 }
 
 const ROKUYO_ORDER: Rokuyo[] = ['大安', '赤口', '先勝', '友引', '先負', '仏滅'];
