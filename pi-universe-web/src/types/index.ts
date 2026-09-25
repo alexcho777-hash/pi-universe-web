@@ -53,5 +53,7 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
+  /** machine-readable error code from the server, e.g. 'DAILY_LIMIT' */
+  code?: string;
   message?: string;
 }

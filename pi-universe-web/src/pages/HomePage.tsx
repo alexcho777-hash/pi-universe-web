@@ -41,6 +41,7 @@ const RELIGION_LABEL: Record<string, string> = {
   islamic: '伊斯蘭教 Islamic',
   shinto: '神道 Shinto',
   hindu: '印度教 Hindu',
+  taiwan_folk: '台灣民間信仰 Taiwanese Folk',
 };
 
 export default function HomePage() {
@@ -209,7 +210,7 @@ export default function HomePage() {
       {/* Sanctuaries */}
       <Box>
         <Typography variant="h6" gutterBottom sx={{ color: '#333', fontWeight: 600 }}>
-          六大聖地
+          聖地一覽（{sanctuaries.length}）
         </Typography>
         <Grid container spacing={2}>
           {sanctuaries.map((sanctuary) => (

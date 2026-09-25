@@ -206,6 +206,26 @@ export default function SanctuaryPage() {
             </>
           )}
 
+          {s.religion_type === 'taiwan_folk' && (
+            <Button
+              variant="contained"
+              fullWidth
+              size="large"
+              onClick={() => navigate(`/oracle?sanctuary=${s.id}`)}
+              sx={{
+                background: 'linear-gradient(180deg,#B3261E,#6B0B0F)',
+                color: '#F5D98B',
+                border: '2px solid #E8C170',
+                fontSize: '1.3rem',
+                fontWeight: 800,
+                py: 1.6,
+                mb: 1.5,
+                boxShadow: '0 0 18px rgba(232,193,112,.5)',
+              }}
+            >
+              🎋 線上求籤・每日 3 次免費
+            </Button>
+          )}
           <Button
             variant="contained"
             fullWidth

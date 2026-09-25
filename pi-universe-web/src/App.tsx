@@ -17,6 +17,7 @@ import Navigation from './components/Navigation';
 
 // The almanac engine is large, so the calendar page loads only when opened
 const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+const OraclePage = lazy(() => import('./pages/OraclePage'));
 const calendarRoute = (
   <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>}>
     <CalendarPage />
@@ -76,6 +77,14 @@ export default function App() {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/calendar" element={calendarRoute} />
                 <Route path="/sanctuary/:id" element={<SanctuaryPage />} />
+                <Route
+                  path="/oracle"
+                  element={
+                    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>}>
+                      <OraclePage />
+                    </Suspense>
+                  }
+                />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Box>

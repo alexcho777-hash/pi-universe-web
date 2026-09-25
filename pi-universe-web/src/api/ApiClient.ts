@@ -83,6 +83,7 @@ class ApiClientClass {
       return {
         success: false,
         error: error.response?.data?.error || error.message || 'API request failed',
+        code: error.response?.data?.code,
       };
     }
   }
@@ -96,6 +97,7 @@ class ApiClientClass {
       return {
         success: false,
         error: error.response?.data?.error || error.message || 'API request failed',
+        code: error.response?.data?.code,
       };
     }
   }
@@ -159,6 +161,27 @@ class ApiClientClass {
   // The caller's own donations and rank (private)
   async getMyMerit() {
     return this.get('/api/merit/me');
+  }
+
+  // ---- Online oracle (線上求籤) ----
+  async getOracleStatus() {
+    return this.get('/api/oracle/status');
+  }
+
+  async confirmAdult() {
+    return this.post('/api/oracle/confirm-age', {});
+  }
+
+  async drawLot(sanctuaryId?: number) {
+    return this.post('/api/oracle/draw', { sanctuary_id: sanctuaryId });
+  }
+
+  async verifyLot(drawId: number) {
+    return this.post('/api/oracle/verify', { draw_id: drawId });
+  }
+
+  async getOracleHistory() {
+    return this.get('/api/oracle/history');
   }
 
   // Get user profile
