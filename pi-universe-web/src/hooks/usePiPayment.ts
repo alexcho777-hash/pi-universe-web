@@ -33,6 +33,14 @@ export interface DonationResult {
   amount: number;
 }
 
+export interface LampConfig {
+  amount: number;
+  sanctuaryId: number;
+  memo: string;
+  lampType: 'guangming' | 'taisui' | 'wenchang';
+  dedicateName?: string;
+}
+
 export class PaymentCancelledError extends Error {
   constructor() {
     super(trNow('付款已取消', 'Payment cancelled'));
@@ -43,7 +51,7 @@ export const usePiPayment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const donate = useCallback((config: DonationConfig): Promise<DonationResult> => {
+  const runPayment = useCallback((amount: number, memo: string, metadata: Record<string, any>): Promise<DonationResult> => {
     setIsLoading(true);
     setError(null);
 
@@ -72,11 +80,7 @@ export const usePiPayment = () => {
 
       try {
         window.Pi.createPayment(
-          {
-            amount: config.amount,
-            memo: config.memo,
-            metadata: { sanctuary_id: config.sanctuaryId, kind: 'donation', anonymous: !!config.anonymous },
-          },
+          { amount, memo, metadata },
           {
             onReadyForServerApproval: async (paymentId: string) => {
               const r = await apiClient.approvePayment(paymentId);
@@ -85,7 +89,7 @@ export const usePiPayment = () => {
             onReadyForServerCompletion: async (paymentId: string, txid: string) => {
               const r = await apiClient.completePayment(paymentId, txid);
               if (r.success) {
-                succeed({ paymentId, txid, amount: config.amount });
+                succeed({ paymentId, txid, amount });
               } else {
                 failWith(new Error(`${trNow('完成付款失敗', 'Payment completion failed')}: ${r.error || 'unknown error'}`));
               }
@@ -106,5 +110,22 @@ export const usePiPayment = () => {
     });
   }, []);
 
-  return { isLoading, error, donate };
+  const donate = useCallback(
+    (config: DonationConfig) =>
+      runPayment(config.amount, config.memo, { sanctuary_id: config.sanctuaryId, kind: 'donation', anonymous: !!config.anonymous }),
+    [runPayment]
+  );
+
+  const lightLamp = useCallback(
+    (config: LampConfig) =>
+      runPayment(config.amount, config.memo, {
+        sanctuary_id: config.sanctuaryId,
+        kind: 'lamp',
+        lamp_type: config.lampType,
+        dedicate_name: config.dedicateName || '',
+      }),
+    [runPayment]
+  );
+
+  return { isLoading, error, donate, lightLamp };
 };

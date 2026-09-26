@@ -256,7 +256,7 @@ export default function SanctuaryPage() {
             🙏 {tr(`${word}護持 ${name}`, `${donateVerb(s.religion_type, 'en')} to the ${name}`)}
           </Button>
 
-          <FaithActivities religionType={s.religion_type} sanctuaryId={s.id} />
+          <FaithActivities religionType={s.religion_type} sanctuaryId={s.id} sanctuaryName={name} />
           <FestivalList religionType={s.religion_type} />
           <BoardPanel religionType={s.religion_type} tr={tr} lang={lang} />
 

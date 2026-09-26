@@ -224,6 +224,28 @@ class ApiClientClass {
   async deleteBoardPost(id: number) {
     return this.delete(`/api/board/post/${id}`);
   }
+
+  // Online lamp lighting
+  async getSanctuaryLamps(sanctuaryId: number) {
+    return this.get(`/api/lamps/sanctuary/${sanctuaryId}`);
+  }
+
+  async getMyLamps() {
+    return this.get('/api/lamps/mine');
+  }
+
+  // Ancestor memorial-day reminders
+  async getMemorials() {
+    return this.get('/api/memorials');
+  }
+
+  async addMemorial(data: { name: string; calendar_type: 'lunar' | 'solar'; month: number; day: number; note?: string }) {
+    return this.post('/api/memorials', data);
+  }
+
+  async deleteMemorial(id: number) {
+    return this.delete(`/api/memorials/${id}`);
+  }
 }
 
 export const apiClient = new ApiClientClass();

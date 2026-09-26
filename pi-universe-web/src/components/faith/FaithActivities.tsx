@@ -21,6 +21,16 @@ import {
   ShrinePanel,
   VersePanel,
 } from './FaithTools';
+import {
+  DiJiZhuPanel,
+  FortuneVaultPanel,
+  IncensePanel,
+  JossPaperPanel,
+  MemorialPanel,
+  OfferingsPanel,
+  ShuoyiPanel,
+} from './HomeAltar';
+import { LampPanel } from './LampPanel';
 
 interface Activity {
   key: string;
@@ -32,15 +42,28 @@ interface Activity {
   soon?: boolean;
 }
 
+const HOME_ALTAR: Activity[] = [
+  { key: 'incense', icon: '🪔', title: ['上香', 'Light incense'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+  { key: 'offerings', icon: '🍊', title: ['供品', 'Offerings'], minutes: ['約 1 分鐘', 'About 1 min'] },
+  { key: 'jossPaper', icon: '🏺', title: ['金爐燒金紙', 'Joss-paper furnace'], minutes: ['約 2 分鐘', 'About 2 min'] },
+  { key: 'dijizhu', icon: '🏠', title: ['地基主提醒', '地基主 reminder'], minutes: ['自動倒數', 'Auto countdown'] },
+  { key: 'shuoyi', icon: '🌕', title: ['初一十五提醒', '1st/15th reminder'], minutes: ['自動倒數', 'Auto countdown'] },
+  { key: 'fortune', icon: '💰', title: ['補財庫', 'Fortune vault'], minutes: ['約 2 分鐘', 'About 2 min'] },
+  { key: 'memorial', icon: '🕊️', title: ['忌日提醒', 'Memorial days'], minutes: ['跨裝置同步', 'Synced to your account'] },
+];
+const LAMP_ACTIVITY: Activity = { key: 'lamp', icon: '🏮', title: ['線上點燈', 'Light a lamp online'], minutes: ['3.14 π／一年', '3.14 π / year'] };
+
 const ACTIVITIES: Record<string, Activity[]> = {
   buddhist: [
     { key: 'beads', icon: '📿', title: ['念佛計數', 'Recite the Buddha’s name'], minutes: ['約 5–10 分鐘', '5–10 min'] },
-    { key: 'lamp', icon: '🪔', title: ['點光明燈', 'Light a blessing lamp'], minutes: ['即將推出', 'Coming soon'], soon: true },
+    LAMP_ACTIVITY,
+    ...HOME_ALTAR,
   ],
   taiwan_folk: [
     { key: 'oracle', icon: '🎋', title: ['線上求籤', 'Temple oracle'], minutes: ['約 3 分鐘', 'About 3 min'], href: '/oracle' },
     { key: 'jiao', icon: '🌙', title: ['擲筊問事', 'Ask with moon blocks'], minutes: ['約 1 分鐘', 'About 1 min'] },
-    { key: 'lamp', icon: '🏮', title: ['點光明燈', 'Light a blessing lamp'], minutes: ['即將推出', 'Coming soon'], soon: true },
+    LAMP_ACTIVITY,
+    ...HOME_ALTAR,
   ],
   christian: [
     { key: 'verse', icon: '📖', title: ['每日經文', 'Verse of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
@@ -66,7 +89,15 @@ const ACTIVITIES: Record<string, Activity[]> = {
   ],
 };
 
-export function FaithActivities({ religionType, sanctuaryId }: { religionType: string; sanctuaryId: number }) {
+export function FaithActivities({
+  religionType,
+  sanctuaryId,
+  sanctuaryName,
+}: {
+  religionType: string;
+  sanctuaryId: number;
+  sanctuaryName: string;
+}) {
   const { tr, lang } = useI18n();
   const navigate = useNavigate();
   const [open, setOpen] = useState<Activity | null>(null);
@@ -97,6 +128,22 @@ export function FaithActivities({ religionType, sanctuaryId }: { religionType: s
         return <AartiPanel tr={tr} />;
       case 'jiao':
         return <JiaoPanel tr={tr} />;
+      case 'lamp':
+        return <LampPanel sanctuaryId={sanctuaryId} sanctuaryName={sanctuaryName} tr={tr} />;
+      case 'incense':
+        return <IncensePanel tr={tr} />;
+      case 'offerings':
+        return <OfferingsPanel tr={tr} />;
+      case 'jossPaper':
+        return <JossPaperPanel tr={tr} lang={lang} />;
+      case 'dijizhu':
+        return <DiJiZhuPanel tr={tr} />;
+      case 'shuoyi':
+        return <ShuoyiPanel tr={tr} />;
+      case 'fortune':
+        return <FortuneVaultPanel tr={tr} />;
+      case 'memorial':
+        return <MemorialPanel tr={tr} />;
       default:
         return null;
     }
