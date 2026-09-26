@@ -84,10 +84,10 @@ function RankList({ rows, empty, lang }: { rows: RankRow[]; empty: string; lang:
             primary={
               <Typography component="span" sx={{ fontSize: '1.15rem' }}>
                 {medal(r.rank)} {r.anonymous ? anonymousName(lang) : r.name}
-                {r.is_me ? (lang === 'en' ? ' (me)' : '（我）') : ''}
+                {r.is_me ? (lang === 'zh' ? '（我）' : ' (me)') : ''}
               </Typography>
             }
-            secondary={lang === 'en' ? `${r.times} time${r.times === 1 ? '' : 's'}` : `${r.times} 次`}
+            secondary={lang === 'zh' ? `${r.times} 次` : `${r.times} time${r.times === 1 ? '' : 's'}`}
           />
         </ListItem>
       ))}
@@ -106,7 +106,7 @@ function RecentList({ rows, empty, lang }: { rows: RecentRow[]; empty: string; l
           secondaryAction={<Typography sx={{ fontSize: '1.1rem' }}>{piAmount(r.amount)}</Typography>}
         >
           <ListItemText
-            primary={<Typography component="span" sx={{ fontSize: '1.1rem' }}>{r.anonymous ? anonymousName(lang) : r.name}{r.is_me ? (lang === 'en' ? ' (me)' : '（我）') : ''}</Typography>}
+            primary={<Typography component="span" sx={{ fontSize: '1.1rem' }}>{r.anonymous ? anonymousName(lang) : r.name}{r.is_me ? (lang === 'zh' ? '（我）' : ' (me)') : ''}</Typography>}
             secondary={shortDate(r.at)}
           />
         </ListItem>

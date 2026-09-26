@@ -116,6 +116,20 @@ class ApiClientClass {
     }
   }
 
+  // Generic PATCH
+  async patch<T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    try {
+      const response = await this.instance.patch<ApiResponse<T>>(endpoint, data, config);
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'API request failed',
+        code: error.response?.data?.code,
+      };
+    }
+  }
+
   // Get sanctuaries
   async getSanctuaries() {
     return this.get('/api/sanctuaries');
@@ -245,6 +259,23 @@ class ApiClientClass {
 
   async deleteMemorial(id: number) {
     return this.delete(`/api/memorials/${id}`);
+  }
+
+  // Four-Faced Buddha wishes (許願還願)
+  async getWishes() {
+    return this.get('/api/wishes');
+  }
+
+  async createWish(data: { sanctuary_id: number; category: string; wish_text?: string }) {
+    return this.post('/api/wishes', data);
+  }
+
+  async fulfilWish(id: number, note?: string) {
+    return this.patch(`/api/wishes/${id}/fulfil`, { note });
+  }
+
+  async deleteWish(id: number) {
+    return this.delete(`/api/wishes/${id}`);
   }
 }
 

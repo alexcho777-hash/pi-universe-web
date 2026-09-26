@@ -11,7 +11,7 @@ import { CITIES, hhmm, prayerTimes, qiblaBearing } from '../../faith/prayerTimes
 import { MoonBlocks, ThrowResult } from '../../oracle/OracleArt';
 
 type TR = (zh: string, en: string) => string;
-const pick = (pair: [string, string], lang: Lang) => (lang === 'en' ? pair[1] : pair[0]);
+const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : pair[1]);
 const today = () => {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;

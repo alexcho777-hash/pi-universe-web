@@ -31,6 +31,8 @@ import {
   ShuoyiPanel,
 } from './HomeAltar';
 import { LampPanel } from './LampPanel';
+import { WishVowPanel } from './WishVowPanel';
+import { ThanTaiInfoPanel, ThanTaiDayPanel } from './VietnameseFolk';
 
 interface Activity {
   key: string;
@@ -53,6 +55,14 @@ const HOME_ALTAR: Activity[] = [
 ];
 const LAMP_ACTIVITY: Activity = { key: 'lamp', icon: '🏮', title: ['線上點燈', 'Light a lamp online'], minutes: ['3.14 π／一年', '3.14 π / year'] };
 
+const VIETNAMESE_ALTAR: Activity[] = [
+  { key: 'incense', icon: '🪔', title: ['上香', 'Light incense'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+  { key: 'thantaiOfferings', icon: '🍊', title: ['供品', 'Offerings'], minutes: ['約 1 分鐘', 'About 1 min'] },
+  { key: 'thantaiInfo', icon: '🪙', title: ['認識財神爺', 'About Thần Tài'], minutes: ['約 2 分鐘', 'About 2 min'] },
+  { key: 'thantaiDay', icon: '📅', title: ['財神爺聖誕倒數', "Thần Tài's Day countdown"], minutes: ['自動倒數', 'Auto countdown'] },
+  { key: 'shuoyi', icon: '🌕', title: ['初一十五提醒', '1st/15th reminder'], minutes: ['自動倒數', 'Auto countdown'] },
+];
+
 const ACTIVITIES: Record<string, Activity[]> = {
   buddhist: [
     { key: 'beads', icon: '📿', title: ['念佛計數', 'Recite the Buddha’s name'], minutes: ['約 5–10 分鐘', '5–10 min'] },
@@ -65,6 +75,10 @@ const ACTIVITIES: Record<string, Activity[]> = {
     LAMP_ACTIVITY,
     ...HOME_ALTAR,
   ],
+  thai_four_face: [
+    { key: 'wishvow', icon: '🛕', title: ['許願還願', 'Wish & fulfil'], minutes: ['免費許願', 'Free to wish'] },
+  ],
+  vietnamese_folk: VIETNAMESE_ALTAR,
   christian: [
     { key: 'verse', icon: '📖', title: ['每日經文', 'Verse of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
     { key: 'prayer', icon: '🙏', title: ['主禱文與默禱', "Lord's Prayer & quiet prayer"], minutes: ['約 4 分鐘', 'About 4 min'] },
@@ -144,6 +158,14 @@ export function FaithActivities({
         return <FortuneVaultPanel tr={tr} />;
       case 'memorial':
         return <MemorialPanel tr={tr} />;
+      case 'wishvow':
+        return <WishVowPanel sanctuaryId={sanctuaryId} sanctuaryName={sanctuaryName} />;
+      case 'thantaiOfferings':
+        return <OfferingsPanel tr={tr} />;
+      case 'thantaiInfo':
+        return <ThanTaiInfoPanel />;
+      case 'thantaiDay':
+        return <ThanTaiDayPanel />;
       default:
         return null;
     }
@@ -202,9 +224,9 @@ export function FestivalList({ religionType }: { religionType: string }) {
         {shown.map((f, i) => {
           const n = daysUntil(f.date);
           const dateText =
-            lang === 'en'
-              ? f.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
-              : `${f.date.getFullYear()}年${f.date.getMonth() + 1}月${f.date.getDate()}日（${'日一二三四五六'[f.date.getDay()]}）`;
+            lang === 'zh'
+              ? `${f.date.getFullYear()}年${f.date.getMonth() + 1}月${f.date.getDate()}日（${'日一二三四五六'[f.date.getDay()]}）`
+              : f.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
           return (
             <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.6, borderTop: i ? '1px solid #eee' : 'none', bgcolor: n === 0 ? '#FFF6DD' : undefined }}>
               <Box sx={{ flex: 1 }}>

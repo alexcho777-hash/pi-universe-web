@@ -41,6 +41,15 @@ export interface LampConfig {
   dedicateName?: string;
 }
 
+export interface VowOfferingConfig {
+  amount: number;
+  sanctuaryId: number;
+  memo: string;
+  offeringType: 'garland' | 'elephant';
+  /** Link this offering to a wish, marking it fulfilled automatically */
+  wishId?: number;
+}
+
 export class PaymentCancelledError extends Error {
   constructor() {
     super(trNow('付款已取消', 'Payment cancelled'));
@@ -127,5 +136,16 @@ export const usePiPayment = () => {
     [runPayment]
   );
 
-  return { isLoading, error, donate, lightLamp };
+  const makeVowOffering = useCallback(
+    (config: VowOfferingConfig) =>
+      runPayment(config.amount, config.memo, {
+        sanctuary_id: config.sanctuaryId,
+        kind: 'vow',
+        offering_type: config.offeringType,
+        wish_id: config.wishId || '',
+      }),
+    [runPayment]
+  );
+
+  return { isLoading, error, donate, lightLamp, makeVowOffering };
 };

@@ -102,7 +102,7 @@ const THROW_INFO: Record<ThrowResult, { name: [string, string]; meaning: [string
     ],
   },
 };
-const pick = (pair: [string, string], lang: Lang) => (lang === 'en' ? pair[1] : pair[0]);
+const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : pair[1]);
 
 function randomThrow(): ThrowResult {
   const a = new Uint8Array(1);

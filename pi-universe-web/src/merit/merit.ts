@@ -56,32 +56,32 @@ export interface MyMerit {
   visits: { total: number; sanctuaries: number };
 }
 
-type Lang = 'zh' | 'en';
+type Lang = 'zh' | 'en' | 'vi' | 'th';
 const kind = (religionType?: string) =>
   religionType === 'christian' || religionType === 'catholic' ? 'offering' : religionType === 'islamic' ? 'sadaqah' : 'merit';
 
 /** Each faith's own word for giving (noun), e.g. 本月功德 / This month's donations */
 export function giftWord(religionType?: string, lang: Lang = 'zh'): string {
   const k = kind(religionType);
-  if (lang === 'en') return k === 'offering' ? 'offerings' : k === 'sadaqah' ? 'sadaqah' : 'donations';
-  return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '功德';
+  if (lang === 'zh') return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '功德';
+  return k === 'offering' ? 'offerings' : k === 'sadaqah' ? 'sadaqah' : 'donations';
 }
 
 /** The verb used on donate buttons */
 export function donateVerb(religionType?: string, lang: Lang = 'zh'): string {
   const k = kind(religionType);
-  if (lang === 'en') return k === 'offering' ? 'Give an offering' : k === 'sadaqah' ? 'Give sadaqah' : 'Donate';
-  return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '捐獻';
+  if (lang === 'zh') return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '捐獻';
+  return k === 'offering' ? 'Give an offering' : k === 'sadaqah' ? 'Give sadaqah' : 'Donate';
 }
 
 export function bookTitle(religionType?: string, lang: Lang = 'zh'): string {
   const k = kind(religionType);
-  if (lang === 'en') return k === 'offering' ? 'Offerings' : k === 'sadaqah' ? 'Sadaqah record' : 'Merit Book';
-  return k === 'offering' ? '奉獻紀錄' : k === 'sadaqah' ? '樂捐紀錄 (Sadaqah)' : '功德簿';
+  if (lang === 'zh') return k === 'offering' ? '奉獻紀錄' : k === 'sadaqah' ? '樂捐紀錄 (Sadaqah)' : '功德簿';
+  return k === 'offering' ? 'Offerings' : k === 'sadaqah' ? 'Sadaqah record' : 'Merit Book';
 }
 
 /** Name shown for anonymous donors (the server sends 隱名善信) */
-export const anonymousName = (lang: Lang) => (lang === 'en' ? 'Anonymous donor' : '隱名善信');
+export const anonymousName = (lang: Lang) => (lang === 'zh' ? '隱名善信' : 'Anonymous donor');
 
 export const piAmount = (v: number | string) => `${Math.round(Number(v || 0) * 100) / 100} π`;
 

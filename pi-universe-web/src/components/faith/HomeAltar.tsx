@@ -23,7 +23,7 @@ import { Lang } from '../../i18n/i18n';
 import { JOSS_PAPER, daysBetween, nextAnniversary, nextLunarDay } from '../../faith/homeAltar';
 
 type TR = (zh: string, en: string) => string;
-const pick = (pair: [string, string], lang: Lang) => (lang === 'en' ? pair[1] : pair[0]);
+const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : pair[1]);
 
 const today = () => {
   const d = new Date();
