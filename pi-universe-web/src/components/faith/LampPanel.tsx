@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Alert, Box, Button, CircularProgress, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, CardActionArea, CircularProgress, Grid, Paper, TextField, Typography } from '@mui/material';
 import { apiClient } from '../../api/ApiClient';
 import { usePiPayment, PaymentCancelledError } from '../../hooks/usePiPayment';
 
@@ -63,17 +63,29 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
         {tr(`為 ${name} 點一盞燈，${LAMP_PRICE} π，效期一年（不開立收據）。`, `Light a lamp for the ${name} — ${LAMP_PRICE} π, lasts one year (no receipt is issued).`)}
       </Typography>
 
-      <ToggleButtonGroup exclusive fullWidth value={lampType} onChange={(_, v) => v && setLampType(v)} sx={{ mb: 2 }}>
+      <Grid container spacing={1} sx={{ mb: 2 }}>
         {LAMP_TYPES.map((l) => (
-          <ToggleButton key={l.key} value={l.key} sx={{ display: 'flex', flexDirection: 'column', py: 1.5 }}>
-            <Typography sx={{ fontSize: '1.6rem' }}>{l.icon}</Typography>
-            <Typography sx={{ fontSize: '0.95rem', fontWeight: 700 }}>{tr(l.label[0], l.label[1])}</Typography>
-            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary' }}>
-              {tr('目前', 'Now')} {counts[l.key] || 0}
-            </Typography>
-          </ToggleButton>
+          <Grid size={4} key={l.key}>
+            <Card
+              variant="outlined"
+              sx={{
+                height: '100%',
+                borderColor: lampType === l.key ? '#8B4513' : undefined,
+                borderWidth: lampType === l.key ? 2 : 1,
+                bgcolor: lampType === l.key ? '#FBF6EC' : undefined,
+              }}
+            >
+              <CardActionArea onClick={() => setLampType(l.key)} sx={{ height: '100%', py: 1.5, display: 'flex', flexDirection: 'column' }}>
+                <Typography sx={{ fontSize: '1.6rem' }}>{l.icon}</Typography>
+                <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, textAlign: 'center' }}>{tr(l.label[0], l.label[1])}</Typography>
+                <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary' }}>
+                  {tr('目前', 'Now')} {counts[l.key] || 0}
+                </Typography>
+              </CardActionArea>
+            </Card>
+          </Grid>
         ))}
-      </ToggleButtonGroup>
+      </Grid>
 
       <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: '#FBF6EC' }}>
         <Typography sx={{ fontWeight: 700 }}>

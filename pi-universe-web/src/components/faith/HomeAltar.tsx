@@ -94,7 +94,7 @@ const OFFERINGS: [string, string][] = [
   ['三牲', 'Meat offerings'],
 ];
 
-/** 供品：勾選今天供奉了什麼，純粹記錄用途。 */
+/** 供品：勾選今天供奉了什麼，純粹是給自己看的記錄，不會通知神明或送出任何東西。 */
 export function OfferingsPanel({ tr }: { tr: TR }) {
   const key = `pu-offerings-${today()}`;
   const [chosen, setChosen] = useState<string[]>(() => load(key, []));
@@ -105,7 +105,15 @@ export function OfferingsPanel({ tr }: { tr: TR }) {
   };
   return (
     <Box sx={{ py: 1 }}>
-      <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{tr('今天供奉了什麼？', "What are you offering today?")}</Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 0.5 }}>
+        {tr('點選你今天準備了哪些供品，方便自己記錄。', 'Tap what you are offering today, as a personal record.')}
+      </Typography>
+      <Typography sx={{ color: 'text.secondary', mb: 1.5, fontSize: '0.9rem' }}>
+        {tr(
+          '這只是您自己的清單，不會通知神明、不會送出任何東西，也不用另外按確認 — 點選之後就算記錄完成，隨時可以增減。',
+          "This is only your own checklist — it doesn't notify anyone or send anything. There's no separate confirm step; tapping is enough, and you can change it anytime."
+        )}
+      </Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
         {OFFERINGS.map(([zh, en]) => (
           <Chip
@@ -119,46 +127,73 @@ export function OfferingsPanel({ tr }: { tr: TR }) {
         ))}
       </Box>
       {chosen.length > 0 && (
-        <Typography sx={{ mt: 2, color: '#5B2A93', fontWeight: 700 }}>
-          🙏 {tr('心誠則靈，感謝您的供養', 'A sincere heart is what matters — thank you for your offering')}
-        </Typography>
+        <Alert severity="success" sx={{ mt: 2 }}>
+          🙏 {tr(
+            `已記錄今天供奉：${chosen.join('、')}。心誠則靈，感謝您的供養。`,
+            `Recorded today's offerings: ${chosen.join(', ')}. A sincere heart is what matters.`
+          )}
+        </Alert>
       )}
     </Box>
   );
 }
 
-/** 金爐：依照拜的對象挑金紙，按下去有燃燒動畫（純粹是個記錄+小儀式感）。 */
+/** 金爐：先選要燒哪種金紙，再按下去有燃燒動畫（純粹是個記錄+小儀式感）。 */
 export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
   const key = `pu-jossburn-${today()}`;
-  const [burned, setBurned] = useState<number>(() => load(key, 0));
+  const [picked, setPicked] = useState(0);
+  const [burnedLog, setBurnedLog] = useState<string[]>(() => load(key, []));
   const [burning, setBurning] = useState(false);
   const burn = () => {
     setBurning(true);
     setTimeout(() => {
       setBurning(false);
-      const next = burned + 1;
-      setBurned(next);
+      const next = [...burnedLog, JOSS_PAPER[picked].name[0]];
+      setBurnedLog(next);
       save(key, next);
     }, 900);
   };
   return (
     <Box sx={{ py: 1 }}>
-      <Typography sx={{ fontWeight: 700, mb: 1 }}>{tr('金紙怎麼配？', 'Which joss paper for which offering?')}</Typography>
+      <Typography sx={{ fontWeight: 700, mb: 1 }}>{tr('先選要燒哪一種金紙', 'Choose which joss paper to burn')}</Typography>
       <Paper variant="outlined" sx={{ mb: 2 }}>
         {JOSS_PAPER.map((p, i) => (
-          <Box key={i} sx={{ display: 'flex', gap: 1.5, p: 1.2, borderTop: i ? '1px solid #eee' : 'none' }}>
-            <Chip label={pick(p.name, lang)} size="small" sx={{ fontWeight: 700 }} />
-            <Typography sx={{ fontSize: '0.95rem', color: 'text.secondary' }}>{pick(p.use, lang)}</Typography>
+          <Box
+            key={i}
+            onClick={() => setPicked(i)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              p: 1.2,
+              borderTop: i ? '1px solid #eee' : 'none',
+              cursor: 'pointer',
+              bgcolor: picked === i ? '#FBF6EC' : undefined,
+            }}
+          >
+            <Chip
+              label={pick(p.name, lang)}
+              size="small"
+              color={picked === i ? 'primary' : 'default'}
+              variant={picked === i ? 'filled' : 'outlined'}
+              sx={{ fontWeight: 700 }}
+            />
+            <Typography sx={{ fontSize: '0.95rem', color: 'text.secondary', flex: 1 }}>{pick(p.use, lang)}</Typography>
+            {picked === i && <Typography sx={{ color: '#5B2A93', fontWeight: 700 }}>✓</Typography>}
           </Box>
         ))}
       </Paper>
       <Box sx={{ textAlign: 'center' }}>
         <Typography sx={{ fontSize: '3rem' }}>{burning ? '🔥' : '🏺'}</Typography>
         <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
-          {tr(`今天已在金爐焚化 ${burned} 次`, `Burned ${burned} time(s) at the furnace today`)}
+          {burnedLog.length > 0
+            ? tr(`今天已焚化：${burnedLog.join('、')}`, `Burned today: ${burnedLog.join(', ')}`)
+            : tr('今天還沒有焚化金紙', 'No joss paper burned yet today')}
         </Typography>
         <Button variant="contained" onClick={burn} disabled={burning} sx={{ backgroundColor: '#8B4513' }}>
-          {burning ? tr('焚化中…', 'Burning…') : tr('焚燒金紙', 'Burn joss paper')}
+          {burning
+            ? tr('焚化中…', 'Burning…')
+            : tr(`焚燒「${pick(JOSS_PAPER[picked].name, lang)}」`, `Burn "${pick(JOSS_PAPER[picked].name, lang)}"`)}
         </Button>
       </Box>
     </Box>
