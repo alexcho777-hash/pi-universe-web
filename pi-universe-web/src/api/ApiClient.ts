@@ -102,6 +102,20 @@ class ApiClientClass {
     }
   }
 
+  // Generic DELETE
+  async delete<T>(endpoint: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    try {
+      const response = await this.instance.delete<ApiResponse<T>>(endpoint, config);
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message || 'API request failed',
+        code: error.response?.data?.code,
+      };
+    }
+  }
+
   // Get sanctuaries
   async getSanctuaries() {
     return this.get('/api/sanctuaries');
@@ -192,6 +206,23 @@ class ApiClientClass {
   // Update user profile
   async updateUserProfile(data: any) {
     return this.post('/api/users/profile', data);
+  }
+
+  // Announcement board / message wall
+  async getBoard(religionType: string) {
+    return this.get(`/api/board/${religionType}`);
+  }
+
+  async postBoardMessage(religionType: string, content: string) {
+    return this.post(`/api/board/${religionType}`, { content });
+  }
+
+  async reportBoardPost(id: number) {
+    return this.post(`/api/board/post/${id}/report`, {});
+  }
+
+  async deleteBoardPost(id: number) {
+    return this.delete(`/api/board/post/${id}`);
   }
 }
 
