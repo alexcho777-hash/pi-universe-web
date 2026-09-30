@@ -5,17 +5,21 @@
  * The choice is remembered per browser; the first visit follows the device language
  * (Chinese devices get 中文, Vietnamese/Thai devices get their own language, everything
  * else English).
- * Oracle poems stay in Chinese in every language (a translation is shown under them).
+ * Oracle poems and scripture stay in their original language (a translation is shown
+ * under oracle poems).
  *
- * `tr(zh, en)` only ever carries two strings (every existing call site in the app), so
- * for Vietnamese/Thai it falls back to the English string — the interface chrome that
- * specifically needs a Vietnamese or Thai wording (nav, language switch, and the two
- * country-specific sanctuaries) is written with `tr4(zh, en, vi, th)` instead.
+ * Vietnamese and Thai: `tr(zh, en)` looks the English text up in dict/vi.ts or
+ * dict/th.ts. A key may contain {0}, {1}… for the parts that were filled in at run time
+ * (e.g. "{0} day(s) left"). Anything missing from the dictionary is shown in English, so
+ * a new string never breaks the page — it just stays English until it is added.
+ * The two country-specific sanctuaries use `tr4(zh, en, vi, th)` directly.
  */
 
 import { useEffect } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { VI } from './dict/vi';
+import { TH } from './dict/th';
 
 export type Lang = 'zh' | 'en' | 'vi' | 'th';
 
@@ -46,9 +50,60 @@ export const useLangStore = create<LangState>()(
   )
 );
 
+// ---- Vietnamese / Thai dictionary lookup ----
+
+type Dict = Record<string, string>;
+interface Pattern {
+  re: RegExp;
+  to: string;
+}
+
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function compilePatterns(dict: Dict): Pattern[] {
+  const literalLength = (k: string) => k.replace(/\{\d\}/g, '').length;
+  return Object.keys(dict)
+    .filter((k) => /\{\d\}/.test(k))
+    // The most specific keys (most fixed text) are tried first.
+    .sort((a, b) => literalLength(b) - literalLength(a))
+    .map((k) => ({
+      // A filled-in part may be empty (e.g. the plural "s" in "{0} gift{1}").
+      re: new RegExp('^' + escapeRe(k).replace(/\\\{(\d)\\\}/g, '([\\s\\S]*?)') + '$'),
+      to: dict[k],
+    }));
+}
+
+const TABLES: Record<'vi' | 'th', { dict: Dict; patterns: Pattern[] }> = {
+  vi: { dict: VI, patterns: compilePatterns(VI) },
+  th: { dict: TH, patterns: compilePatterns(TH) },
+};
+
+/** English text → Vietnamese/Thai (English itself for 'en'/'zh' callers, or when missing). */
+export function tx(en: string, lang: Lang, depth = 0): string {
+  if (lang !== 'vi' && lang !== 'th') return en;
+  const t = TABLES[lang];
+  const hit = t.dict[en];
+  if (hit !== undefined) return hit;
+  if (depth > 1) return en;
+  for (const p of t.patterns) {
+    const m = en.match(p.re);
+    if (m) {
+      // Filled-in parts that are themselves translatable (e.g. "Donate") are translated too.
+      return p.to.replace(/\{(\d)\}/g, (_, i) => tx(m[Number(i) + 1] ?? '', lang, depth + 1));
+    }
+  }
+  return en;
+}
+
+/** Locale for dates and numbers */
+export const localeOf = (lang: Lang) => ({ zh: 'zh-TW', en: 'en-US', vi: 'vi-VN', th: 'th-TH' }[lang]);
+
 /** Current language, outside React (e.g. in hooks' error messages) */
 export const currentLang = (): Lang => useLangStore.getState().lang;
-export const trNow = (zh: string, en: string) => (currentLang() === 'zh' ? zh : en);
+export const trNow = (zh: string, en: string) => {
+  const lang = currentLang();
+  return lang === 'zh' ? zh : tx(en, lang);
+};
 
 const LANG_TAGS: Record<Lang, string> = { zh: 'zh-Hant-TW', en: 'en', vi: 'vi', th: 'th' };
 
@@ -58,9 +113,9 @@ export function useI18n() {
   useEffect(() => {
     document.documentElement.lang = LANG_TAGS[lang];
   }, [lang]);
-  /** Two-language text (every existing call site). Vietnamese/Thai fall back to English. */
-  const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
-  /** Four-language text, for chrome that has a real Vietnamese/Thai wording. */
+  /** Chinese / English text; Vietnamese and Thai come from the dictionaries. */
+  const tr = (zh: string, en: string) => (lang === 'zh' ? zh : tx(en, lang));
+  /** Four-language text, written out in full (the two country-specific sanctuaries). */
   const tr4 = (zh: string, en: string, vi: string, th: string) =>
     lang === 'zh' ? zh : lang === 'vi' ? vi : lang === 'th' ? th : en;
   return { lang, setLang, tr, tr4, isEn: lang === 'en' };

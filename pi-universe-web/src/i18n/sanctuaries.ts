@@ -1,9 +1,6 @@
 /**
  * English/Vietnamese/Thai names for sanctuaries (the database stores the Chinese ones).
- * A religion type not listed in VI/TH simply falls back to the English wording — that
- * covers the seven sanctuaries a Vietnamese/Thai visitor is not the primary audience for;
- * the two country-specific sanctuaries (thai_four_face, vietnamese_folk) are listed in
- * their own language too.
+ * A religion type missing from VI/TH falls back to the English wording.
  */
 import { Lang } from './i18n';
 
@@ -32,6 +29,17 @@ const EN: Record<string, { name: string; description: string; faith: string }> =
 };
 
 const VI: Record<string, { name: string; description: string; faith: string }> = {
+  buddhist: { name: 'Thiền đường Phật giáo', description: 'Thánh địa Phật giáo Trung Hoa để tu thiền', faith: 'Phật giáo' },
+  christian: { name: 'Nhà nguyện Tin Lành', description: 'Cộng đoàn đức tin Cơ Đốc', faith: 'Tin Lành' },
+  catholic: { name: 'Nhà thờ Công giáo', description: 'Thánh đường cầu nguyện Công giáo', faith: 'Công giáo' },
+  islamic: { name: 'Thánh đường Hồi giáo', description: 'Trung tâm đức tin Hồi giáo', faith: 'Hồi giáo' },
+  shinto: { name: 'Đền Thần đạo', description: 'Đền thờ truyền thống Nhật Bản', faith: 'Thần đạo' },
+  hindu: { name: 'Đền Ấn Độ giáo', description: 'Điện thờ Ấn Độ giáo', faith: 'Ấn Độ giáo' },
+  taiwan_folk: {
+    name: 'Miếu Đài Loan',
+    description: 'Mazu, Quan Công, Thổ Địa và Nguyệt Lão — tín ngưỡng dân gian Đài Loan',
+    faith: 'Tín ngưỡng dân gian Đài Loan',
+  },
   thai_four_face: {
     name: 'Tứ Diện Phật Thái Lan',
     description: 'Phra Phrom (theo phong cách đền Erawan) — cầu nguyện rồi quay lại tạ lễ',
@@ -45,6 +53,22 @@ const VI: Record<string, { name: string; description: string; faith: string }> =
 };
 
 const TH: Record<string, { name: string; description: string; faith: string }> = {
+  buddhist: { name: 'หอปฏิบัติธรรมพุทธ', description: 'ศาสนสถานพุทธแบบจีนสำหรับการเจริญสมาธิ', faith: 'พระพุทธศาสนา' },
+  christian: { name: 'โบสถ์คริสเตียน', description: 'ชุมชนแห่งความเชื่อคริสเตียน', faith: 'ศาสนาคริสต์' },
+  catholic: { name: 'โบสถ์คาทอลิก', description: 'ศาสนสถานแห่งการภาวนาคาทอลิก', faith: 'คาทอลิก' },
+  islamic: { name: 'มัสยิด', description: 'ศูนย์กลางแห่งศรัทธาอิสลาม', faith: 'ศาสนาอิสลาม' },
+  shinto: { name: 'ศาลเจ้าชินโต', description: 'ศาลเจ้าญี่ปุ่นแบบดั้งเดิม', faith: 'ชินโต' },
+  hindu: { name: 'เทวาลัยฮินดู', description: 'ศาสนสถานสำหรับบูชาของศาสนาฮินดู', faith: 'ศาสนาฮินดู' },
+  taiwan_folk: {
+    name: 'ศาลเจ้าไต้หวัน',
+    description: 'เจ้าแม่หม่าโจ้ว เทพเจ้ากวนอู เจ้าที่ และเทพแห่งความรัก (เยว่เหล่า) — ความเชื่อพื้นบ้านไต้หวัน',
+    faith: 'ความเชื่อพื้นบ้านไต้หวัน',
+  },
+  vietnamese_folk: {
+    name: 'ความเชื่อพื้นบ้านเวียดนาม',
+    description: 'ทานไท่ — เทพเจ้าแห่งโชคลาภ บูชาทุกวันที่โต๊ะบูชาในบ้าน',
+    faith: 'ความเชื่อพื้นบ้านเวียดนาม',
+  },
   thai_four_face: {
     name: 'ท้าวมหาพรหม (พระพรหมสี่หน้า)',
     description: 'ศาลพระพรหมแบบเอราวัณ — อธิษฐานขอพร แล้วกลับมาแก้บน',
