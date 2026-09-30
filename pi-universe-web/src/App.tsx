@@ -73,7 +73,7 @@ export default function App() {
         {isAuthenticated ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             {/* Main content */}
-            <Box sx={{ flex: 1, overflow: 'auto', pb: 8 }}>
+            <Box sx={{ flex: 1, overflow: 'auto', pb: 11 }}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/acknowledgments" element={<AcknowledgmentsPage />} />
