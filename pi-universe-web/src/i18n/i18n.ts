@@ -1,18 +1,19 @@
 /**
- * Language (中文 / English / Tiếng Việt / ภาษาไทย) for the whole site.
+ * Language (中文 / English / Tiếng Việt / ภาษาไทย / 日本語 / हिन्दी) for the whole site.
  *
  * Texts are written side by side where they are used: tr('中文', 'English').
  * The choice is remembered per browser; the first visit follows the device language
- * (Chinese devices get 中文, Vietnamese/Thai devices get their own language, everything
+ * (Chinese devices get 中文, Vietnamese/Thai/Japanese/Hindi devices get their own language, everything
  * else English).
  * Oracle poems and scripture stay in their original language (a translation is shown
  * under oracle poems).
  *
- * Vietnamese and Thai: `tr(zh, en)` looks the English text up in dict/vi.ts or
- * dict/th.ts. A key may contain {0}, {1}… for the parts that were filled in at run time
+ * Vietnamese, Thai, Japanese and Hindi: `tr(zh, en)` looks the English text up in
+ * dict/vi.ts, th.ts, ja.ts or hi.ts. A key may contain {0}, {1}… for the parts that were filled in at run time
  * (e.g. "{0} day(s) left"). Anything missing from the dictionary is shown in English, so
  * a new string never breaks the page — it just stays English until it is added.
- * The two country-specific sanctuaries use `tr4(zh, en, vi, th)` directly.
+ * The two country-specific sanctuaries use `tr4(zh, en, vi, th)`: Vietnamese and Thai are
+ * written out there, Japanese and Hindi come from the dictionaries like everything else.
  */
 
 import { useEffect } from 'react';
@@ -20,8 +21,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { VI } from './dict/vi';
 import { TH } from './dict/th';
+import { JA } from './dict/ja';
+import { HI } from './dict/hi';
 
-export type Lang = 'zh' | 'en' | 'vi' | 'th';
+export type Lang = 'zh' | 'en' | 'vi' | 'th' | 'ja' | 'hi';
+/** Languages whose wording comes from a dictionary keyed by the English text */
+type DictLang = 'vi' | 'th' | 'ja' | 'hi';
 
 function detectLang(): Lang {
   try {
@@ -29,6 +34,8 @@ function detectLang(): Lang {
     if (l.startsWith('zh')) return 'zh';
     if (l.startsWith('vi')) return 'vi';
     if (l.startsWith('th')) return 'th';
+    if (l.startsWith('ja')) return 'ja';
+    if (l.startsWith('hi')) return 'hi';
     return 'en';
   } catch {
     return 'zh';
@@ -73,14 +80,16 @@ function compilePatterns(dict: Dict): Pattern[] {
     }));
 }
 
-const TABLES: Record<'vi' | 'th', { dict: Dict; patterns: Pattern[] }> = {
+const TABLES: Record<DictLang, { dict: Dict; patterns: Pattern[] }> = {
   vi: { dict: VI, patterns: compilePatterns(VI) },
   th: { dict: TH, patterns: compilePatterns(TH) },
+  ja: { dict: JA, patterns: compilePatterns(JA) },
+  hi: { dict: HI, patterns: compilePatterns(HI) },
 };
 
 /** English text → Vietnamese/Thai (English itself for 'en'/'zh' callers, or when missing). */
 export function tx(en: string, lang: Lang, depth = 0): string {
-  if (lang !== 'vi' && lang !== 'th') return en;
+  if (lang === 'zh' || lang === 'en') return en;
   const t = TABLES[lang];
   const hit = t.dict[en];
   if (hit !== undefined) return hit;
@@ -96,7 +105,7 @@ export function tx(en: string, lang: Lang, depth = 0): string {
 }
 
 /** Locale for dates and numbers */
-export const localeOf = (lang: Lang) => ({ zh: 'zh-TW', en: 'en-US', vi: 'vi-VN', th: 'th-TH' }[lang]);
+export const localeOf = (lang: Lang) => ({ zh: 'zh-TW', en: 'en-US', vi: 'vi-VN', th: 'th-TH', ja: 'ja-JP', hi: 'hi-IN' }[lang]);
 
 /** Current language, outside React (e.g. in hooks' error messages) */
 export const currentLang = (): Lang => useLangStore.getState().lang;
@@ -105,7 +114,7 @@ export const trNow = (zh: string, en: string) => {
   return lang === 'zh' ? zh : tx(en, lang);
 };
 
-const LANG_TAGS: Record<Lang, string> = { zh: 'zh-Hant-TW', en: 'en', vi: 'vi', th: 'th' };
+const LANG_TAGS: Record<Lang, string> = { zh: 'zh-Hant-TW', en: 'en', vi: 'vi', th: 'th', ja: 'ja', hi: 'hi' };
 
 export function useI18n() {
   const lang = useLangStore((s) => s.lang);
@@ -117,6 +126,6 @@ export function useI18n() {
   const tr = (zh: string, en: string) => (lang === 'zh' ? zh : tx(en, lang));
   /** Four-language text, written out in full (the two country-specific sanctuaries). */
   const tr4 = (zh: string, en: string, vi: string, th: string) =>
-    lang === 'zh' ? zh : lang === 'vi' ? vi : lang === 'th' ? th : en;
+    lang === 'zh' ? zh : lang === 'vi' ? vi : lang === 'th' ? th : tx(en, lang);
   return { lang, setLang, tr, tr4, isEn: lang === 'en' };
 }

@@ -88,9 +88,59 @@ const ZH_FAITH: Record<string, string> = {
   vietnamese_folk: '越南民間信仰',
 };
 
+const JA: Record<string, { name: string; description: string; faith: string }> = {
+  buddhist: { name: '仏教禅堂', description: '禅の修行のための中国仏教の聖地', faith: '仏教' },
+  christian: { name: 'キリスト教礼拝堂', description: 'キリスト教の信仰共同体', faith: 'キリスト教（プロテスタント）' },
+  catholic: { name: 'カトリック聖堂', description: 'カトリックの祈りの聖堂', faith: 'カトリック' },
+  islamic: { name: 'モスク', description: 'イスラームの信仰の中心', faith: 'イスラーム' },
+  shinto: { name: '神社', description: '日本の伝統的な神社', faith: '神道' },
+  hindu: { name: 'ヒンドゥー寺院', description: 'ヒンドゥー教の礼拝堂', faith: 'ヒンドゥー教' },
+  taiwan_folk: {
+    name: '台湾の廟',
+    description: '媽祖・関帝・土地公・月下老人 — 台湾の民間信仰',
+    faith: '台湾の民間信仰',
+  },
+  thai_four_face: {
+    name: 'タイの四面仏（プラ・プロム）',
+    description: 'エラワン廟のようなブラフマー像 — 願をかけ、叶ったらお礼参りを',
+    faith: 'タイの民間信仰',
+  },
+  vietnamese_folk: {
+    name: 'ベトナムの民間信仰',
+    description: 'タンタイ（財神）— 家の祭壇で毎日祀る福の神',
+    faith: 'ベトナムの民間信仰',
+  },
+};
+
+const HI: Record<string, { name: string; description: string; faith: string }> = {
+  buddhist: { name: 'बौद्ध ध्यान कक्ष', description: 'ध्यान के लिए चीनी बौद्ध पवित्र स्थल', faith: 'बौद्ध धर्म' },
+  christian: { name: 'ईसाई प्रार्थनालय', description: 'ईसाई आस्था का समुदाय', faith: 'ईसाई धर्म' },
+  catholic: { name: 'कैथोलिक चर्च', description: 'कैथोलिक प्रार्थना का पवित्र स्थान', faith: 'कैथोलिक' },
+  islamic: { name: 'मस्जिद', description: 'इस्लामी आस्था का केंद्र', faith: 'इस्लाम' },
+  shinto: { name: 'शिंतो मंदिर', description: 'पारंपरिक जापानी मंदिर', faith: 'शिंतो' },
+  hindu: { name: 'हिंदू मंदिर', description: 'हिंदू पूजा का मंदिर', faith: 'हिंदू धर्म' },
+  taiwan_folk: {
+    name: 'ताइवानी मंदिर',
+    description: 'माज़ू, गुआन गोंग, भूमि देवता और प्रेम-विवाह के देवता — ताइवानी लोक आस्था',
+    faith: 'ताइवानी लोक आस्था',
+  },
+  thai_four_face: {
+    name: 'थाई चतुर्मुख ब्रह्मा (फ्रा फ्रॉम)',
+    description: 'एरावन मंदिर शैली — मन्नत माँगें, पूरी होने पर लौटकर धन्यवाद चढ़ाएँ',
+    faith: 'थाई लोक आस्था',
+  },
+  vietnamese_folk: {
+    name: 'वियतनामी लोक आस्था',
+    description: 'थान ताई — धन के देवता, घर की वेदी पर प्रतिदिन पूजे जाते हैं',
+    faith: 'वियतनामी लोक आस्था',
+  },
+};
+
 function dict(lang: Lang): Record<string, { name: string; description: string; faith: string }> {
   if (lang === 'vi') return VI;
   if (lang === 'th') return TH;
+  if (lang === 'ja') return JA;
+  if (lang === 'hi') return HI;
   return {};
 }
 
