@@ -672,4 +672,23 @@ export const VI: Record<string, string> = {
   "{0} of {1} done": "Đã xong {0}/{1}",
   "Play ambient sound": "Bật âm thanh không gian",
   "Turn off ambient sound": "Tắt âm thanh không gian",
+  "Buddha's Birthday (Bathing the Buddha)": "Lễ Phật Đản (tắm Phật)",
+  "Bathe the Buddha statue and pray for blessings": "Tắm tượng Phật và cầu phúc",
+  "Ullambana (Ghost Festival)": "Lễ Vu Lan",
+  "Offerings to monks and prayers for ancestors": "Cúng dường chư tăng và cầu nguyện cho tổ tiên",
+  "Buddha's Enlightenment Day (Laba)": "Ngày Đức Phật thành đạo (mùng 8 tháng Chạp)",
+  "Eat Laba porridge": "Ăn cháo Lạp Bát",
+  "Birthday of Mazu": "Vía Thiên Hậu Mazu",
+  "Temple processions and pilgrimages": "Rước kiệu và hành hương đền miếu",
+  "Ghost Festival (Zhongyuan)": "Lễ Trung Nguyên (Xá tội vong nhân)",
+  "Offerings for wandering spirits": "Cúng cô hồn",
+  "Mid-Autumn Festival": "Tết Trung Thu",
+  "Honor the Earth God and the Matchmaker God": "Cúng Thổ Địa và Nguyệt Lão",
+  "Ramadan begins": "Bắt đầu tháng Ramadan",
+  "A month of fasting from dawn to sunset": "Một tháng nhịn ăn từ bình minh đến hoàng hôn",
+  "地基主 reminder": "Nhắc cúng Địa Cơ Chủ",
+  "日本の暦 (Japan)": "Lịch Nhật Bản (日本の暦)",
+  "friend": "bạn",
+
+
 };

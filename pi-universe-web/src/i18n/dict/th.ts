@@ -672,4 +672,23 @@ export const TH: Record<string, string> = {
   "{0} of {1} done": "เสร็จแล้ว {0} จาก {1}",
   "Play ambient sound": "เปิดเสียงบรรยากาศ",
   "Turn off ambient sound": "ปิดเสียงบรรยากาศ",
+  "Buddha's Birthday (Bathing the Buddha)": "วันประสูติพระพุทธเจ้า (สรงน้ำพระ)",
+  "Bathe the Buddha statue and pray for blessings": "สรงน้ำพระพุทธรูปและขอพร",
+  "Ullambana (Ghost Festival)": "สารทจีน (อุลลัมพนะ)",
+  "Offerings to monks and prayers for ancestors": "ถวายภัตตาหารแด่พระสงฆ์และอุทิศแก่บรรพบุรุษ",
+  "Buddha's Enlightenment Day (Laba)": "วันพระพุทธเจ้าตรัสรู้ (ล่าปา)",
+  "Eat Laba porridge": "กินโจ๊กล่าปา",
+  "Birthday of Mazu": "วันประสูติเจ้าแม่หม่าโจ้ว",
+  "Temple processions and pilgrimages": "ขบวนแห่และการจาริกแสวงบุญ",
+  "Ghost Festival (Zhongyuan)": "เทศกาลสารทจีน (จงหยวน)",
+  "Offerings for wandering spirits": "เซ่นไหว้วิญญาณเร่ร่อน",
+  "Mid-Autumn Festival": "เทศกาลไหว้พระจันทร์",
+  "Honor the Earth God and the Matchmaker God": "บูชาเจ้าที่และเทพเยว่เหล่า",
+  "Ramadan begins": "เริ่มเดือนรอมฎอน",
+  "A month of fasting from dawn to sunset": "หนึ่งเดือนแห่งการถือศีลอดตั้งแต่รุ่งอรุณถึงตะวันตก",
+  "地基主 reminder": "เตือนไหว้เจ้าที่ (ตี่จู้)",
+  "日本の暦 (Japan)": "ปฏิทินญี่ปุ่น (日本の暦)",
+  "friend": "เพื่อน",
+
+
 };
