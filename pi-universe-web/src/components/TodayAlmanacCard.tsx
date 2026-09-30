@@ -17,7 +17,8 @@ export default function TodayAlmanacCard() {
   const d = taiwanDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const color = d.huangDao ? '#2E7D32' : '#C62828';
   const { lang } = useI18n();
-  if (lang !== 'zh') {
+  // Chinese and Japanese readers get the almanac in its own characters; others get the English wording
+  if (lang !== 'zh' && lang !== 'ja') {
     return (
       <>
         <CalendarHealth date={now} lang="en" />
@@ -56,8 +57,10 @@ export default function TodayAlmanacCard() {
     <CalendarHealth date={now} />
     <Paper sx={{ p: 2.5, mb: 2, borderLeft: `6px solid ${color}` }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1, flexWrap: 'wrap' }}>
-        <Typography sx={{ fontSize: '1.3rem', fontWeight: 800 }}>今日農民曆</Typography>
-        <Typography sx={{ fontSize: '1.15rem', fontWeight: 700, color }}>{d.huangDao ? '黃道吉日' : '黑道日'}</Typography>
+        <Typography sx={{ fontSize: '1.3rem', fontWeight: 800 }}>{lang === 'ja' ? tx("Today's almanac", lang) : '今日農民曆'}</Typography>
+        <Typography sx={{ fontSize: '1.15rem', fontWeight: 700, color }}>
+          {lang === 'ja' ? tx(d.huangDao ? 'Auspicious day' : 'Inauspicious day', lang) : d.huangDao ? '黃道吉日' : '黑道日'}
+        </Typography>
       </Box>
       <Typography sx={{ fontSize: '1.2rem', color: '#8B4513', fontWeight: 700, mt: 0.5 }}>
         農曆{lunarMonthName(d.lunarMonth)}月{d.lunarDay}　{d.chong}
@@ -75,7 +78,7 @@ export default function TodayAlmanacCard() {
         <b style={{ color: '#C62828' }}>忌</b>　{d.ji.slice(0, 6).join('、') || '—'}
       </Typography>
       <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ mt: 1.5, fontSize: '1.05rem' }}>
-        查看完整農民曆・擇日 →
+        {lang === 'ja' ? tx('Full almanac & good-day finder →', lang) : '查看完整農民曆・擇日 →'}
       </Button>
     </Paper>
     </>

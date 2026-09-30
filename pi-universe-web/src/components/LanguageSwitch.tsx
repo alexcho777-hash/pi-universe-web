@@ -1,6 +1,6 @@
 /**
  * Language picker pinned to the top-right corner of every page: a small button showing
- * the current language, which opens a menu of 中文 / English / Tiếng Việt / ภาษาไทย.
+ * the current language, which opens a menu of 中文 / English / Tiếng Việt / ภาษาไทย / 日本語 / हिन्दी.
  */
 import { useState } from 'react';
 import { ButtonBase, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
@@ -14,6 +14,8 @@ const LANGS: { value: Lang; short: string; label: string }[] = [
   { value: 'en', short: 'EN', label: 'English' },
   { value: 'vi', short: 'Việt', label: 'Tiếng Việt' },
   { value: 'th', short: 'ไทย', label: 'ภาษาไทย' },
+  { value: 'ja', short: '日本語', label: '日本語' },
+  { value: 'hi', short: 'हिन्दी', label: 'हिन्दी' },
 ];
 
 export default function LanguageSwitch() {

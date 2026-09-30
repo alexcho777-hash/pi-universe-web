@@ -37,11 +37,13 @@ export default function Navigation() {
         bottom: 0,
         left: 0,
         right: 0,
+        // Above page content (the home globe's floating labels), below dialogs and menus
+        zIndex: 1100,
         boxShadow: '0 -1px 3px rgba(0,0,0,0.1)',
       }}
       elevation={3}
     >
-      <BottomNavigation value={currentPath} onChange={handleChange} showLabels>
+      <BottomNavigation value={currentPath} onChange={handleChange} showLabels sx={{ height: 'auto', minHeight: 64 }}>
         {navItems.map((item) => (
           <BottomNavigationAction
             key={item.path}
@@ -49,10 +51,17 @@ export default function Navigation() {
             value={item.path}
             icon={<item.icon />}
             sx={{
-              color: currentPath === item.path ? '#5B2A93' : '#999',
+              // Dark enough to read easily (older eyes, bright screens); the current page is purple and bold
+              color: currentPath === item.path ? '#5B2A93' : '#3d3d3d',
+              minWidth: 0,
+              px: 0.25,
+              py: 0.8,
+              '& .MuiSvgIcon-root': { fontSize: '1.75rem' },
+              '& .MuiBottomNavigationAction-label': { fontSize: '0.9rem', fontWeight: 600, mt: 0.2, lineHeight: 1.15, textAlign: 'center', wordBreak: 'keep-all' },
               '&.Mui-selected': {
                 color: '#5B2A93',
               },
+              '&.Mui-selected .MuiBottomNavigationAction-label': { fontSize: '0.95rem', fontWeight: 800 },
             }}
           />
         ))}
