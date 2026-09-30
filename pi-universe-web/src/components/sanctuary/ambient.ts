@@ -1,8 +1,8 @@
 /**
  * Background sound for each sanctuary, synthesized in the browser with the Web Audio API
- * (no audio files): temple bells and a singing bowl, a church organ, wind and flowing
- * water for the mosque (no instruments), wind and suzu bells for the shrine, a tanpura
- * drone for the mandir. It only starts when the visitor taps the speaker button.
+ * (no audio files): temple bells and a singing bowl, a church organ, a courtyard fountain
+ * and birds for the mosque (no instruments), birds and suzu bells for the shrine, a tanpura
+ * drone for the mandir. Only clean tones are used — no filtered noise, which sounds like hiss. It only starts when the visitor taps the speaker button.
  */
 import { AmbientKind } from './sceneConfig';
 
@@ -119,39 +119,56 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
     });
   };
 
-  /** Filtered noise: wind (low) or running water (high, fluttering) */
-  const noise = (type: 'wind' | 'water' | 'leaves', gain: number) => {
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-    const filt = ctx.createBiquadFilter();
-    filt.type = type === 'wind' ? 'lowpass' : 'bandpass';
-    filt.frequency.value = type === 'wind' ? 380 : type === 'water' ? 1800 : 4200;
-    filt.Q.value = type === 'water' ? 0.8 : 0.5;
-    const g = ctx.createGain();
-    g.gain.value = gain;
-    const lfo = ctx.createOscillator();
-    lfo.frequency.value = type === 'water' ? 6 : 0.08;
-    const lg = ctx.createGain();
-    lg.gain.value = type === 'water' ? gain * 0.35 : gain * 0.6;
-    lfo.connect(lg);
-    lg.connect(g.gain);
-    const lfo2 = ctx.createOscillator();
-    lfo2.frequency.value = 0.06;
-    const lg2 = ctx.createGain();
-    lg2.gain.value = type === 'wind' ? 180 : 500;
-    lfo2.connect(lg2);
-    lg2.connect(filt.frequency);
-    src.connect(filt);
-    filt.connect(g);
-    g.connect(bus);
-    src.start();
-    lfo.start();
-    lfo2.start();
-    nodes.push(src, lfo, lfo2);
+  /** Fountain droplets: tiny rising "plip" tones (tonal, so no hiss) */
+  const drips = (gain: number) => {
+    const drop = () => {
+      const t = ctx.currentTime + 0.02;
+      const f = 700 + Math.random() * 900;
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(f, t);
+      o.frequency.exponentialRampToValueAtTime(f * 1.7, t + 0.045);
+      const g = ctx.createGain();
+      const peak = gain * (0.4 + Math.random() * 0.6);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+      o.connect(g);
+      g.connect(bus);
+      o.start(t);
+      o.stop(t + 0.12);
+    };
+    every(0.18, 0.7, drop, 0.5);
+  };
+
+  /** Birdsong: short phrases of pure chirps */
+  const birds = (gain: number) => {
+    const phrase = () => {
+      const n = 2 + Math.floor(Math.random() * 4);
+      const base = 2400 + Math.random() * 1400;
+      const up = Math.random() < 0.5;
+      for (let k = 0; k < n; k++) {
+        timers.push(
+          window.setTimeout(() => {
+            const t = ctx.currentTime + 0.01;
+            const o = ctx.createOscillator();
+            o.type = 'sine';
+            const f0 = base * (1 + (Math.random() - 0.5) * 0.08);
+            o.frequency.setValueAtTime(up ? f0 * 0.8 : f0 * 1.15, t);
+            o.frequency.exponentialRampToValueAtTime(up ? f0 * 1.2 : f0 * 0.75, t + 0.09);
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(gain, t + 0.015);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+            o.connect(g);
+            g.connect(bus);
+            o.start(t);
+            o.stop(t + 0.14);
+          }, k * (110 + Math.random() * 60))
+        );
+      }
+    };
+    every(3, 8, phrase, 1.5);
   };
 
   /** Pipe-organ chord pad, changing chord every few seconds */
@@ -198,28 +215,29 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
     }
   };
 
-  /** Tanpura: Pa – Sa' – Sa' – Sa, plucked and left to ring */
+  /** Tanpura: Pa – Sa' – Sa' – Sa, plucked and left to ring (soft additive tone, no filter sweep) */
   const tanpura = (gain: number) => {
     const notes = [55, 60, 60, 48].map(midi);
+    const partials = [1, 2, 3, 4, 5, 6];
+    const amps = [1, 0.55, 0.38, 0.22, 0.14, 0.08];
     let i = 0;
-    every(1.25, 1.25, () => {
+    every(1.6, 1.6, () => {
       const t = ctx.currentTime + 0.02;
-      const o = ctx.createOscillator();
-      o.type = 'sawtooth';
-      o.frequency.value = notes[i % 4];
-      const lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.setValueAtTime(400, t);
-      lp.frequency.linearRampToValueAtTime(1400, t + 1.5);
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(gain, t + 0.03);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 4.5);
-      o.connect(lp);
-      lp.connect(g);
-      g.connect(bus);
-      o.start(t);
-      o.stop(t + 4.6);
+      const f = notes[i % 4];
+      partials.forEach((h, k) => {
+        const o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = f * h * (1 + (k % 2 ? 0.0015 : -0.001)); // slight shimmer
+        const g = ctx.createGain();
+        const peak = (gain * amps[k]) / 2;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(peak, t + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 5.5 / Math.sqrt(h));
+        o.connect(g);
+        g.connect(bus);
+        o.start(t);
+        o.stop(t + 5.6);
+      });
       i++;
     });
   };
@@ -258,17 +276,17 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
       every(28, 40, () => bell(147, 0.2, 10, [1, 2.0, 2.4, 3.0], [1, 0.5, 0.4, 0.2]), 12);
       break;
     case 'mosque':
-      noise('wind', 0.05);
-      noise('water', 0.025);
+      // No instruments: a courtyard fountain and birds
+      drips(0.08);
+      birds(0.045);
       break;
     case 'shrine':
-      noise('wind', 0.06);
-      noise('leaves', 0.012);
+      birds(0.04);
       every(14, 24, () => jingle(0.05), 3);
       break;
     case 'mandir':
-      tanpura(0.05);
-      drone([65.4], 0.03, 'sawtooth');
+      tanpura(0.06);
+      drone([65.4, 98], 0.03);
       every(12, 18, () => bell(660, 0.12, 5, [1, 2.1, 3.3, 4.8], [1, 0.5, 0.3, 0.15]), 4);
       break;
   }
