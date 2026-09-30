@@ -166,6 +166,9 @@ export function renderScene(ctx: CanvasRenderingContext2D, w: number, h: number,
   }
   ctx.globalAlpha = 1;
 
+  // --- the far landmark (a one-off silhouette shaped after this religion's own architecture)
+  drawLandmark(ctx, P, cfg, cam.z);
+
   // --- repeated elements, far to near
   const sp = cfg.spacing;
   const first = Math.floor(zn / sp);
@@ -282,6 +285,43 @@ function drawBay(ctx: CanvasRenderingContext2D, P: Proj, z: number, cfg: SceneCo
       const c = P(-HALF_W, HEIGHT - 0.3, z);
       const d = P(HALF_W, HEIGHT - 0.35, z);
       ctx.fillRect(c.x, c.y, d.x - c.x, Math.max(1, d.y - c.y));
+    }
+    // roofline silhouette above the beam — this is what tells the "temple trio" apart at a
+    // glance, since they otherwise share the same pillars-and-beam bay shape.
+    const style = cfg.beamStyle;
+    if (style && style !== 'flat') {
+      const tipRise = style === 'swallowtail' ? 0.48 : style === 'upturned' ? 0.3 : 0.16;
+      const midRise = style === 'swallowtail' ? 0.62 : style === 'upturned' ? 0.35 : 0.2;
+      const baseL = P(-HALF_W, HEIGHT - 0.05, z);
+      const baseR = P(HALF_W, HEIGHT - 0.05, z);
+      const leftTip = P(-HALF_W * 0.92, HEIGHT + tipRise, z);
+      const rightTip = P(HALF_W * 0.92, HEIGHT + tipRise, z);
+      const mid = P(0, HEIGHT + midRise, z);
+      const belowL = P(-HALF_W, HEIGHT - 0.05 + 0.3, z);
+      const belowR = P(HALF_W, HEIGHT - 0.05 + 0.3, z);
+      const capColor = pil?.cap || cfg.beam;
+      ctx.beginPath();
+      ctx.moveTo(baseL.x, baseL.y);
+      ctx.quadraticCurveTo(leftTip.x, leftTip.y, mid.x, mid.y);
+      ctx.quadraticCurveTo(rightTip.x, rightTip.y, baseR.x, baseR.y);
+      ctx.lineTo(belowR.x, belowR.y);
+      ctx.lineTo(belowL.x, belowL.y);
+      ctx.closePath();
+      ctx.fillStyle = capColor;
+      ctx.fill();
+      if (style === 'swallowtail') {
+        // twin ridge spikes near the centre, typical of Minnan-style roofs
+        for (const side of [-1, 1]) {
+          const spikeBase = P(side * 0.32, HEIGHT + midRise - 0.05, z);
+          const spikeTip = P(side * 0.32, HEIGHT + midRise + 0.3, z);
+          ctx.beginPath();
+          ctx.moveTo(spikeBase.x - 3, spikeBase.y);
+          ctx.lineTo(spikeTip.x, spikeTip.y);
+          ctx.lineTo(spikeBase.x + 3, spikeBase.y);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
     }
   }
 
@@ -411,6 +451,136 @@ function drawBay(ctx: CanvasRenderingContext2D, P: Proj, z: number, cfg: SceneCo
       }
     }
   }
+}
+
+/**
+ * A one-off silhouette near the light at the far end of the hall, shaped after this
+ * religion's own landmark architecture (pagoda, gopuram, minarets…) so every hall reads
+ * as visibly different from the moment you step in, not just differently coloured.
+ */
+function drawLandmark(ctx: CanvasRenderingContext2D, P: Proj, cfg: SceneConfig, camZ: number) {
+  const kind = cfg.landmark;
+  if (!kind) return;
+  const z = camZ + FAR - 1.2;
+  const dark = cfg.wall;
+  const at = (x: number, y: number) => P(x, y, z);
+  const poly = (pts: { x: number; y: number }[], fill: string) => {
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+  };
+
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+
+  if (kind === 'pagoda' || kind === 'shrine_roof') {
+    const tiers = kind === 'pagoda' ? 3 : 1;
+    const baseW = kind === 'pagoda' ? 1.5 : 2.1;
+    const roofColor = cfg.pillar?.color || dark;
+    let y = 0;
+    for (let i = 0; i < tiers; i++) {
+      const w = baseW * (1 - i * 0.28);
+      const bodyH = 0.85;
+      const eaveW = w * 1.3;
+      poly([at(-w * 0.7, y), at(-w * 0.7, y + bodyH), at(w * 0.7, y + bodyH), at(w * 0.7, y)], dark);
+      const roofY = y + bodyH;
+      poly(
+        [at(-eaveW, roofY + 0.05), at(-eaveW * 0.55, roofY + 0.42), at(0, roofY + 0.5), at(eaveW * 0.55, roofY + 0.42), at(eaveW, roofY + 0.05), at(0, roofY - 0.05)],
+        roofColor
+      );
+      y = roofY + 0.2;
+    }
+    poly([at(-0.06, y), at(0, y + 0.7), at(0.06, y)], cfg.pillar?.cap || dark);
+  } else if (kind === 'tam_quan') {
+    const w = 2.0;
+    poly([at(-w, 0), at(-w, 0.9), at(w, 0.9), at(w, 0)], dark);
+    const roofY = 0.9;
+    poly(
+      [at(-w * 1.25, roofY + 0.05), at(-w * 0.6, roofY + 0.45), at(0, roofY + 0.55), at(w * 0.6, roofY + 0.45), at(w * 1.25, roofY + 0.05), at(0, roofY - 0.05)],
+      cfg.pillar?.color || dark
+    );
+  } else if (kind === 'stupa') {
+    poly([at(-0.9, 0), at(-0.55, 0.75), at(0.55, 0.75), at(0.9, 0)], dark);
+    for (let i = 0; i < 5; i++) {
+      const y0 = 0.9 + i * 0.22;
+      const w0 = 0.22 - i * 0.03;
+      poly([at(-w0, y0), at(-w0, y0 + 0.16), at(w0, y0 + 0.16), at(w0, y0)], cfg.pillar?.cap || dark);
+    }
+  } else if (kind === 'steeple') {
+    poly([at(-0.5, 0), at(-0.5, 1.0), at(0.5, 1.0), at(0.5, 0)], dark);
+    poly([at(-0.5, 1.0), at(0, 1.9), at(0.5, 1.0)], dark);
+    const c = at(0, 2.05);
+    ctx.strokeStyle = dark;
+    ctx.lineWidth = Math.max(1, 0.03 * c.s);
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y - 0.18 * c.s);
+    ctx.lineTo(c.x, c.y + 0.1 * c.s);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(c.x - 0.12 * c.s, c.y - 0.06 * c.s);
+    ctx.lineTo(c.x + 0.12 * c.s, c.y - 0.06 * c.s);
+    ctx.stroke();
+  } else if (kind === 'cathedral_facade') {
+    for (const side of [-1, 1]) {
+      poly([at(side * 1.3 - 0.28, 0), at(side * 1.3 - 0.28, 1.3), at(side * 1.3 + 0.28, 1.3), at(side * 1.3 + 0.28, 0)], dark);
+      poly([at(side * 1.3 - 0.28, 1.3), at(side * 1.3, 1.7), at(side * 1.3 + 0.28, 1.3)], dark);
+    }
+    const rc = at(0, 0.75);
+    ctx.strokeStyle = dark;
+    ctx.lineWidth = Math.max(1, 0.05 * rc.s);
+    ctx.beginPath();
+    ctx.arc(rc.x, rc.y, 0.45 * rc.s, 0, Math.PI * 2);
+    ctx.stroke();
+  } else if (kind === 'dome_minarets') {
+    poly([at(-0.42, 0), at(-0.42, 0.55), at(0.42, 0.55), at(0.42, 0)], dark);
+    const dc = at(0, 0.55);
+    ctx.fillStyle = dark;
+    ctx.beginPath();
+    ctx.ellipse(dc.x, dc.y, 0.42 * dc.s, 0.5 * dc.s, 0, Math.PI, Math.PI * 2);
+    ctx.fill();
+    const f = at(0, 1.05);
+    ctx.strokeStyle = dark;
+    ctx.lineWidth = Math.max(1, 0.02 * f.s);
+    ctx.beginPath();
+    ctx.moveTo(f.x, f.y);
+    ctx.lineTo(f.x, f.y - 0.15 * f.s);
+    ctx.stroke();
+    for (const side of [-1, 1]) {
+      poly([at(side * 1.15 - 0.09, 0), at(side * 1.15 - 0.09, 1.15), at(side * 1.15 + 0.09, 1.15), at(side * 1.15 + 0.09, 0)], dark);
+      const mc = at(side * 1.15, 1.25);
+      ctx.beginPath();
+      ctx.moveTo(mc.x - 0.09 * mc.s, mc.y);
+      ctx.lineTo(mc.x, mc.y - 0.22 * mc.s);
+      ctx.lineTo(mc.x + 0.09 * mc.s, mc.y);
+      ctx.closePath();
+      ctx.fillStyle = dark;
+      ctx.fill();
+    }
+  } else if (kind === 'torii_far') {
+    const postX = 0.75;
+    const pw = 0.11;
+    const topY = 1.7;
+    const color = cfg.torii?.color || dark;
+    for (const side of [-1, 1]) {
+      poly([at(side * postX - pw / 2, 0), at(side * postX - pw / 2, topY), at(side * postX + pw / 2, topY), at(side * postX + pw / 2, 0)], color);
+    }
+    poly([at(-postX - 0.2, topY + 0.15), at(-postX - 0.2, topY + 0.05), at(postX + 0.2, topY + 0.05), at(postX + 0.2, topY + 0.15)], color);
+  } else if (kind === 'gopuram') {
+    let w = 1.1;
+    let y = 0;
+    for (let i = 0; i < 6; i++) {
+      const h = 0.32;
+      poly([at(-w, y), at(-w * 0.82, y + h), at(w * 0.82, y + h), at(w, y)], dark);
+      y += h;
+      w *= 0.8;
+    }
+    poly([at(-0.08, y), at(0, y + 0.3), at(0.08, y)], cfg.pillar?.cap || dark);
+  }
+
+  ctx.restore();
 }
 
 function drawTorii(ctx: CanvasRenderingContext2D, P: Proj, z: number, cfg: SceneConfig) {
