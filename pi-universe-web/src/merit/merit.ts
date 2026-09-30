@@ -1,3 +1,5 @@
+import { Lang, tx } from '../i18n/i18n';
+
 /**
  * Shared wording and types for the merit book (功德簿) and visitor statistics.
  */
@@ -56,7 +58,6 @@ export interface MyMerit {
   visits: { total: number; sanctuaries: number };
 }
 
-type Lang = 'zh' | 'en' | 'vi' | 'th';
 const kind = (religionType?: string) =>
   religionType === 'christian' || religionType === 'catholic' ? 'offering' : religionType === 'islamic' ? 'sadaqah' : 'merit';
 
@@ -64,24 +65,24 @@ const kind = (religionType?: string) =>
 export function giftWord(religionType?: string, lang: Lang = 'zh'): string {
   const k = kind(religionType);
   if (lang === 'zh') return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '功德';
-  return k === 'offering' ? 'offerings' : k === 'sadaqah' ? 'sadaqah' : 'donations';
+  return tx(k === 'offering' ? 'offerings' : k === 'sadaqah' ? 'sadaqah' : 'donations', lang);
 }
 
 /** The verb used on donate buttons */
 export function donateVerb(religionType?: string, lang: Lang = 'zh'): string {
   const k = kind(religionType);
   if (lang === 'zh') return k === 'offering' ? '奉獻' : k === 'sadaqah' ? '樂捐' : '捐獻';
-  return k === 'offering' ? 'Give an offering' : k === 'sadaqah' ? 'Give sadaqah' : 'Donate';
+  return tx(k === 'offering' ? 'Give an offering' : k === 'sadaqah' ? 'Give sadaqah' : 'Donate', lang);
 }
 
 export function bookTitle(religionType?: string, lang: Lang = 'zh'): string {
   const k = kind(religionType);
   if (lang === 'zh') return k === 'offering' ? '奉獻紀錄' : k === 'sadaqah' ? '樂捐紀錄 (Sadaqah)' : '功德簿';
-  return k === 'offering' ? 'Offerings' : k === 'sadaqah' ? 'Sadaqah record' : 'Merit Book';
+  return tx(k === 'offering' ? 'Offering record' : k === 'sadaqah' ? 'Sadaqah record' : 'Merit Book', lang);
 }
 
 /** Name shown for anonymous donors (the server sends 隱名善信) */
-export const anonymousName = (lang: Lang) => (lang === 'zh' ? '隱名善信' : 'Anonymous donor');
+export const anonymousName = (lang: Lang) => (lang === 'zh' ? '隱名善信' : tx('Anonymous donor', lang));
 
 export const piAmount = (v: number | string) => `${Math.round(Number(v || 0) * 100) / 100} π`;
 
