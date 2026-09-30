@@ -13,11 +13,14 @@ import { AmbientHandle, startAmbient } from './ambient';
 export function SanctuaryScene({
   religionType,
   children,
+  altar,
   soundOnLabel,
   soundOffLabel,
 }: {
   religionType: string;
   children?: ReactNode;
+  /** A statue shown at the far end of the hall (only some sanctuaries have one) */
+  altar?: ReactNode;
   soundOnLabel: string;
   soundOffLabel: string;
 }) {
@@ -124,11 +127,12 @@ export function SanctuaryScene({
   return (
     <Box
       ref={wrapRef}
+      data-scene=""
       onPointerMove={onPointer}
       onPointerLeave={() => (target.current = { x: 0, y: 0 })}
       sx={{
         position: 'relative',
-        height: { xs: 360, sm: 420 },
+        height: altar ? { xs: 500, sm: 540 } : { xs: 360, sm: 420 },
         borderRadius: 2,
         overflow: 'hidden',
         mb: 2,
@@ -138,6 +142,9 @@ export function SanctuaryScene({
       }}
     >
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: 'block' }} aria-hidden="true" />
+      {altar && (
+        <Box sx={{ position: 'absolute', left: 0, right: 0, top: { xs: 14, sm: 18 }, display: 'flex', justifyContent: 'center' }}>{altar}</Box>
+      )}
       <Tooltip title={soundOn ? soundOffLabel : soundOnLabel}>
         <IconButton
           onClick={toggleSound}

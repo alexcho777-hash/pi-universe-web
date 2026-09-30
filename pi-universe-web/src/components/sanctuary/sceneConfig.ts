@@ -1,6 +1,8 @@
 /**
- * What each sanctuary's 3D hall is built from. Only architecture, light and small
- * floating things — never statues or images of deities.
+ * What each sanctuary's 3D hall is built from: architecture, light and small floating
+ * things. Statues appear only where the worship itself centres on one (the Thai
+ * Four-Faced Buddha and the Vietnamese Thần Tài altar, see Altars.tsx) — never in the
+ * other halls.
  */
 
 export type ParticleKind = 'smoke' | 'dust' | 'petals' | 'leaves' | 'embers' | 'sparkle';
