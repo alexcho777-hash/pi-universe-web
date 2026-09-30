@@ -167,7 +167,7 @@ const ISLAMIC_DAYS: [number, number, string, string, string?, string?][] = [
   [12, 10, '宰牲節（古爾邦節）', 'Eid al-Adha'],
 ];
 
-function hijri(dt: Date): { month: number; day: number } | null {
+export function hijri(dt: Date): { month: number; day: number } | null {
   try {
     const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { timeZone: 'UTC', month: 'numeric', day: 'numeric' }).formatToParts(
       new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate(), 12))
