@@ -475,15 +475,51 @@ export function QiblaPanel({ lang, tr }: { lang: Lang; tr: TR }) {
     };
   }, []);
 
+  // 'idle' → button shown; 'waiting' → asked, waiting for the first reading;
+  // 'none' → no reading arrived (most computers have no compass); 'denied' → permission refused
+  const [compass, setCompass] = useState<'idle' | 'waiting' | 'none' | 'denied'>('idle');
+  const headingRef = useRef<number | null>(null);
+  headingRef.current = heading;
+
   const enableCompass = async () => {
     const D = (window as any).DeviceOrientationEvent;
-    if (D && typeof D.requestPermission === 'function') {
+    if (!D) {
+      setCompass('none');
+      return;
+    }
+    if (typeof D.requestPermission === 'function') {
+      // iPhone / iPad: the browser asks the visitor first
       try {
-        await D.requestPermission();
+        const r = await D.requestPermission();
+        if (r !== 'granted') {
+          setCompass('denied');
+          return;
+        }
       } catch {
-        /* denied */
+        setCompass('denied');
+        return;
       }
     }
+    setCompass('waiting');
+    window.setTimeout(() => {
+      if (headingRef.current === null) setCompass('none');
+    }, 3000);
+  };
+
+  /** Rough direction in words, for people without a compass (8 points) */
+  const directionWords = (deg: number) => {
+    const names: [string, string][] = [
+      ['北方', 'north'],
+      ['東北方', 'northeast'],
+      ['東方', 'east'],
+      ['東南方', 'southeast'],
+      ['南方', 'south'],
+      ['西南方', 'southwest'],
+      ['西方', 'west'],
+      ['西北方', 'northwest'],
+    ];
+    const [zh, en] = names[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
+    return tr(zh, en);
   };
 
   // With a compass the arrow turns with the phone; without, it is drawn relative to north
@@ -518,14 +554,37 @@ export function QiblaPanel({ lang, tr }: { lang: Lang; tr: TR }) {
           <Typography sx={{ mt: 2, fontSize: '1.3rem', fontWeight: 800 }}>
             {tr(`朝拜方向：由正北順時針 ${bearing.toFixed(0)}°`, `Qibla: ${bearing.toFixed(0)}° clockwise from true north`)}
           </Typography>
+          <Typography sx={{ color: 'text.secondary', mt: 0.5 }}>
+            {tr(`（大約是${directionWords(bearing)}）`, `(roughly ${directionWords(bearing)})`)}
+          </Typography>
           {heading === null ? (
             <>
               <Typography sx={{ color: 'text.secondary', mt: 1 }}>
                 {tr('圖上的北方為正北。手機有指南針時，箭頭會跟著手機轉動。', 'North on the dial is true north. On phones with a compass, the arrow turns with the phone.')}
               </Typography>
-              <Button onClick={enableCompass} sx={{ mt: 1 }}>
-                🧭 {tr('啟用指南針', 'Enable compass')}
-              </Button>
+              {compass === 'waiting' && (
+                <Alert severity="info" sx={{ mt: 1.5, textAlign: 'left' }}>
+                  {tr('正在讀取指南針… 請把手機平放，並在空中畫幾次「8」字校正。', 'Waiting for the compass… hold the phone flat and move it in a figure 8 a few times.')}
+                </Alert>
+              )}
+              {compass === 'none' && (
+                <Alert severity="warning" sx={{ mt: 1.5, textAlign: 'left' }}>
+                  {tr(
+                    `這台裝置沒有偵測到指南針（電腦通常沒有）。請先面向正北，再順時針轉 ${bearing.toFixed(0)}°，大約是${directionWords(bearing)}；或用手機開啟這一頁。`,
+                    `No compass was detected on this device (computers usually don't have one). Face north, then turn ${bearing.toFixed(0)}° clockwise — roughly ${directionWords(bearing)} — or open this page on your phone.`
+                  )}
+                </Alert>
+              )}
+              {compass === 'denied' && (
+                <Alert severity="warning" sx={{ mt: 1.5, textAlign: 'left' }}>
+                  {tr('沒有取得指南針權限。請到瀏覽器設定中允許「動作與方向」存取，再按一次。', 'Compass access was not allowed. Allow "Motion & Orientation" access in your browser settings, then try again.')}
+                </Alert>
+              )}
+              {compass !== 'waiting' && (
+                <Button onClick={enableCompass} sx={{ mt: 1 }}>
+                  🧭 {tr('啟用指南針', 'Enable compass')}
+                </Button>
+              )}
             </>
           ) : (
             <Typography sx={{ color: 'text.secondary', mt: 1 }}>

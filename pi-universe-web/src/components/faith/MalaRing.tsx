@@ -239,6 +239,10 @@ export function MalaRing({
         background: 'transparent',
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
+        // Fast taps count as double-clicks; don't let them select the number as text
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        touchAction: 'manipulation',
         '&:focus-visible': { outline: '3px solid #5B2A93', outlineOffset: 4, borderRadius: 3 },
       }}
     >
