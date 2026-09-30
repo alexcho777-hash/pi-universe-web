@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Card, CardActionArea, CardContent, Dialog, DialogContent, DialogTitle, Grid, IconButton, Paper, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { useI18n } from '../../i18n/i18n';
+import { useI18n, localeOf } from '../../i18n/i18n';
 import { daysUntil, upcomingFestivals } from '../../faith/festivals';
 import {
   AartiPanel,
@@ -294,7 +294,7 @@ export function FestivalList({ religionType }: { religionType: string }) {
           const dateText =
             lang === 'zh'
               ? `${f.date.getFullYear()}年${f.date.getMonth() + 1}月${f.date.getDate()}日（${'日一二三四五六'[f.date.getDay()]}）`
-              : f.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+              : f.date.toLocaleDateString(localeOf(lang), { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
           return (
             <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.6, borderTop: i ? '1px solid #eee' : 'none', bgcolor: n === 0 ? '#FFF6DD' : undefined }}>
               <Box sx={{ flex: 1 }}>

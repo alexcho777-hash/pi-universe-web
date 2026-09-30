@@ -11,8 +11,9 @@
 
 import { useMemo, useState } from 'react';
 import { Alert, Box, Button, Chip, Divider, IconButton, LinearProgress, Paper, TextField, Typography } from '@mui/material';
+import { MalaRing, MALA_COLORS } from './MalaRing';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Lang, tx } from '../../i18n/i18n';
+import { Lang, tx, localeOf } from '../../i18n/i18n';
 import { ANGELUS, ANGELUS_PRAYER, FEASTS, GAYATRI, NAMES_99, STATIONS, STATION_ACCLAMATION } from '../../faith/moreTexts';
 import { hijri } from '../../faith/festivals';
 import { daysBetween } from '../../faith/homeAltar';
@@ -156,7 +157,7 @@ export function GratitudePanel({ tr, lang }: { tr: TR; lang: Lang }) {
           <Typography sx={{ fontWeight: 700, mb: 1 }}>{tr('最近的感恩', 'Recent thanks')}</Typography>
           {past.map((d) => (
             <Box key={d} sx={{ mb: 1 }}>
-              <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>{new Date(d + 'T12:00:00').toLocaleDateString(lang === 'zh' ? 'zh-TW' : lang === 'vi' ? 'vi-VN' : lang === 'th' ? 'th-TH' : 'en-US')}</Typography>
+              <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>{new Date(d + 'T12:00:00').toLocaleDateString(localeOf(lang))}</Typography>
               <Typography>{all[d].join(' · ')}</Typography>
             </Box>
           ))}
@@ -295,7 +296,7 @@ export function SaintPanel({ tr, lang }: { tr: TR; lang: Lang }) {
     }
     return { today: todayFeast, upcoming: list };
   }, []);
-  const dateText = (d: Date) => (lang === 'zh' ? `${d.getMonth() + 1} 月 ${d.getDate()} 日` : d.toLocaleDateString(lang === 'vi' ? 'vi-VN' : lang === 'th' ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric' }));
+  const dateText = (d: Date) => (lang === 'zh' ? `${d.getMonth() + 1} 月 ${d.getDate()} 日` : d.toLocaleDateString(localeOf(lang), { month: 'short', day: 'numeric' }));
   return (
     <Box>
       {today ? (
@@ -568,10 +569,15 @@ export function GayatriPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         <Typography sx={{ mt: 1, fontStyle: 'italic', whiteSpace: 'pre-line', color: '#6b3f10' }}>{GAYATRI.roman}</Typography>
         <Typography sx={{ mt: 1.2 }}>{orig(GAYATRI.meaning, lang)}</Typography>
       </Paper>
-      <Box component="button" onClick={tap} sx={{ width: 150, height: 150, borderRadius: '50%', border: 'none', cursor: 'pointer', background: 'radial-gradient(circle at 35% 30%, #ffd08a, #e39b2d 60%, #9c5a10)', boxShadow: '0 6px 18px rgba(0,0,0,.25)', color: '#3b1d02', fontSize: '1.1rem', fontWeight: 800 }}>
-        {tr('念一遍', 'Tap once per recitation')}
-      </Box>
-      <Typography sx={{ fontSize: '2.2rem', fontWeight: 800, mt: 1 }}>{n % 108}</Typography>
+      <MalaRing
+        value={n}
+        beads={108}
+        onTap={tap}
+        label={n % 108}
+        sublabel={tr('念一遍，點一下', 'Tap once per recitation')}
+        ariaLabel={tr('念一遍', 'Tap once per recitation')}
+        colors={MALA_COLORS.hindu}
+      />
       <Typography sx={{ color: 'text.secondary' }}>{tr(`今天共 ${n} 遍・完成 ${Math.floor(n / 108)} 圈（108 遍一圈）`, `${n} today · ${Math.floor(n / 108)} full round(s) of 108`)}</Typography>
     </Box>
   );

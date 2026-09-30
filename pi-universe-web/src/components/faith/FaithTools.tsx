@@ -9,6 +9,7 @@ import { Lang, tx, localeOf } from '../../i18n/i18n';
 import { LORDS_PRAYER, MYSTERIES, RECITATIONS, ROSARY_PRAYERS, verseOfTheDay } from '../../faith/texts';
 import { CITIES, hhmm, prayerTimes, qiblaBearing } from '../../faith/prayerTimes';
 import { MoonBlocks, ThrowResult } from '../../oracle/OracleArt';
+import { MalaRing, MALA_COLORS } from './MalaRing';
 
 type TR = (zh: string, en: string) => string;
 const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
@@ -86,28 +87,15 @@ export function BeadCounter({ faith, lang, tr }: { faith: 'buddhist' | 'hindu' |
       <Typography sx={{ fontSize: '1.5rem', fontWeight: 800, mb: 0.5 }}>{rec.text}</Typography>
       {lang !== 'zh' && rec.romanized && <Typography sx={{ fontSize: '1.1rem', fontStyle: 'italic', mb: 0.5 }}>{rec.romanized}</Typography>}
       <Typography sx={{ color: 'text.secondary', mb: 2 }}>{pick(rec.hint, lang)}</Typography>
-      <Box
-        component="button"
-        onClick={tap}
-        sx={{
-          width: 190,
-          height: 190,
-          borderRadius: '50%',
-          border: 'none',
-          cursor: 'pointer',
-          background: 'radial-gradient(circle at 35% 30%, #FFE7A8, #D9A441 55%, #8A5A12)',
-          boxShadow: '0 8px 24px rgba(138,90,18,.45), inset 0 -6px 14px rgba(0,0,0,.25)',
-          color: '#3A2206',
-          fontSize: '3.2rem',
-          fontWeight: 800,
-          transition: 'transform .08s',
-          '&:active': { transform: 'scale(.95)' },
-          WebkitTapHighlightColor: 'transparent',
-        }}
-        aria-label={tr('點一下計數', 'Tap to count')}
-      >
-        {round}
-      </Box>
+      <MalaRing
+        value={count}
+        beads={rec.target}
+        onTap={tap}
+        label={round}
+        sublabel={`/ ${rec.target}`}
+        ariaLabel={tr('點一下計數', 'Tap to count')}
+        colors={MALA_COLORS[faith]}
+      />
       <Typography sx={{ mt: 1, color: 'text.secondary' }}>{tr('點圓珠計數一次', 'Tap the bead for each recitation')}</Typography>
       <LinearProgress variant="determinate" value={(round / rec.target) * 100} sx={{ height: 10, borderRadius: 5, my: 2 }} />
       <Box sx={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
