@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Box, Typography, keyframes } from '@mui/material';
 import { Sanctuary } from '../types';
-import { Lang } from '../i18n/i18n';
+import { Lang, tx } from '../i18n/i18n';
 import { sanctuaryName } from '../i18n/sanctuaries';
 
 interface Props {
@@ -371,7 +371,7 @@ export default function CosmosGlobe({ sanctuaries, lang, onSelect }: Props) {
           pointerEvents: 'none',
         }}
       >
-        {lang === 'en' ? 'Drag to spin · tap a sanctuary to enter' : '拖動旋轉星球・點選聖地進入參拜'}
+        {lang === 'zh' ? '拖動旋轉星球・點選聖地進入參拜' : tx('Drag to spin · tap a sanctuary to enter', lang)}
       </Typography>
     </Box>
   );
