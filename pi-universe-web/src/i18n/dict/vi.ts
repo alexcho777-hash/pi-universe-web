@@ -689,6 +689,17 @@ export const VI: Record<string, string> = {
   "地基主 reminder": "Nhắc cúng Địa Cơ Chủ",
   "日本の暦 (Japan)": "Lịch Nhật Bản (日本の暦)",
   "friend": "bạn",
-
-
+  "(roughly {0})": "(khoảng hướng {0})",
+  "north": "bắc",
+  "northeast": "đông bắc",
+  "east": "đông",
+  "southeast": "đông nam",
+  "south": "nam",
+  "southwest": "tây nam",
+  "west": "tây",
+  "northwest": "tây bắc",
+  "Waiting for the compass… hold the phone flat and move it in a figure 8 a few times.": "Đang đọc la bàn… hãy giữ điện thoại nằm ngang và đưa máy vẽ hình số 8 vài lần.",
+  "No compass was detected on this device (computers usually don't have one). Face north, then turn {0}° clockwise — roughly {1} — or open this page on your phone.": "Không phát hiện la bàn trên thiết bị này (máy tính thường không có). Hãy quay mặt về hướng bắc rồi xoay {0}° theo chiều kim đồng hồ — khoảng hướng {1} — hoặc mở trang này trên điện thoại.",
+  "Compass access was not allowed. Allow \"Motion & Orientation\" access in your browser settings, then try again.": "Chưa được cấp quyền dùng la bàn. Hãy cho phép truy cập \"Chuyển động & Hướng\" trong cài đặt trình duyệt rồi thử lại.",
+  "Show the next face": "Xem mặt tiếp theo",
 };

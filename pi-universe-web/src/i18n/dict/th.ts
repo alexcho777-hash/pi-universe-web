@@ -689,6 +689,17 @@ export const TH: Record<string, string> = {
   "地基主 reminder": "เตือนไหว้เจ้าที่ (ตี่จู้)",
   "日本の暦 (Japan)": "ปฏิทินญี่ปุ่น (日本の暦)",
   "friend": "เพื่อน",
-
-
+  "(roughly {0})": "(ประมาณทิศ{0})",
+  "north": "เหนือ",
+  "northeast": "ตะวันออกเฉียงเหนือ",
+  "east": "ตะวันออก",
+  "southeast": "ตะวันออกเฉียงใต้",
+  "south": "ใต้",
+  "southwest": "ตะวันตกเฉียงใต้",
+  "west": "ตะวันตก",
+  "northwest": "ตะวันตกเฉียงเหนือ",
+  "Waiting for the compass… hold the phone flat and move it in a figure 8 a few times.": "กำลังอ่านเข็มทิศ… ถือโทรศัพท์ให้ขนานพื้น แล้ววาดเลข 8 กลางอากาศสักสองสามครั้ง",
+  "No compass was detected on this device (computers usually don't have one). Face north, then turn {0}° clockwise — roughly {1} — or open this page on your phone.": "ไม่พบเข็มทิศในอุปกรณ์นี้ (คอมพิวเตอร์มักไม่มี) ให้หันหน้าไปทางทิศเหนือ แล้วหมุนตามเข็มนาฬิกา {0}° — ประมาณทิศ{1} — หรือเปิดหน้านี้บนโทรศัพท์",
+  "Compass access was not allowed. Allow \"Motion & Orientation\" access in your browser settings, then try again.": "ไม่ได้รับอนุญาตให้ใช้เข็มทิศ โปรดอนุญาตการเข้าถึง \"การเคลื่อนไหวและการวางแนว\" ในการตั้งค่าเบราว์เซอร์ แล้วลองอีกครั้ง",
+  "Show the next face": "ดูหน้าถัดไป",
 };
