@@ -136,11 +136,36 @@ const HI: Record<string, { name: string; description: string; faith: string }> =
   },
 };
 
+const AR: Record<string, { name: string; description: string; faith: string }> = {
+  buddhist: { name: 'قاعة التأمل البوذي', description: 'مكان مقدس للتأمل في البوذية الصينية', faith: 'البوذية' },
+  christian: { name: 'الكنيسة المسيحية', description: 'مجتمع الإيمان المسيحي', faith: 'المسيحية' },
+  catholic: { name: 'الكنيسة الكاثوليكية', description: 'مكان مقدس للصلاة الكاثوليكية', faith: 'الكاثوليكية' },
+  islamic: { name: 'المسجد', description: 'مركز الإيمان الإسلامي', faith: 'الإسلام' },
+  shinto: { name: 'معبد شنتو', description: 'معبد ياباني تقليدي', faith: 'الشنتو' },
+  hindu: { name: 'المعبد الهندوسي', description: 'معبد للعبادة الهندوسية', faith: 'الهندوسية' },
+  taiwan_folk: {
+    name: 'المعبد التايواني',
+    description: 'ماتسو وغوان غونغ وإله الأرض وإله الزواج — المعتقدات الشعبية التايوانية',
+    faith: 'المعتقدات الشعبية التايوانية',
+  },
+  thai_four_face: {
+    name: 'براهما ذو الوجوه الأربعة',
+    description: 'على طراز ضريح إراوان — اطلب أمنيتك، وعد للشكر عند تحققها',
+    faith: 'المعتقدات الشعبية التايلاندية',
+  },
+  vietnamese_folk: {
+    name: 'ثان تاي الفيتنامي',
+    description: 'ثان تاي — إله الثروة، يُكرَّم يوميًا على مذبح المنزل',
+    faith: 'المعتقدات الشعبية الفيتنامية',
+  },
+};
+
 function dict(lang: Lang): Record<string, { name: string; description: string; faith: string }> {
   if (lang === 'vi') return VI;
   if (lang === 'th') return TH;
   if (lang === 'ja') return JA;
   if (lang === 'hi') return HI;
+  if (lang === 'ar') return AR;
   return {};
 }
 

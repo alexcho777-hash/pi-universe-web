@@ -1,6 +1,6 @@
 /**
  * Language picker pinned to the top-right corner of every page: a small button showing
- * the current language, which opens a menu of 中文 / English / Tiếng Việt / ภาษาไทย / 日本語 / हिन्दी.
+ * the current language, which opens a menu of 中文 / English / Tiếng Việt / ภาษาไทย / 日本語 / हिन्दी / العربية.
  */
 import { useState } from 'react';
 import { ButtonBase, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
@@ -16,10 +16,13 @@ const LANGS: { value: Lang; short: string; label: string }[] = [
   { value: 'th', short: 'ไทย', label: 'ภาษาไทย' },
   { value: 'ja', short: '日本語', label: '日本語' },
   { value: 'hi', short: 'हिन्दी', label: 'हिन्दी' },
+  { value: 'ar', short: 'العربية', label: 'العربية' },
 ];
 
 export default function LanguageSwitch() {
-  const { lang, setLang } = useI18n();
+  const { lang, setLang, rtl } = useI18n();
+  // In Arabic (right-to-left) page titles and back links start at the right, so the switch moves left
+  const side = rtl ? 'left' : 'right';
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const current = LANGS.find((l) => l.value === lang) || LANGS[0];
 
@@ -29,11 +32,13 @@ export default function LanguageSwitch() {
         onClick={(e) => setAnchor(e.currentTarget)}
         aria-label="Language / 語言"
         aria-haspopup="menu"
+        // the button itself keeps its left-to-right look in Arabic too
+        dir="ltr"
         aria-expanded={!!anchor}
         sx={{
           position: 'fixed',
           top: 8,
-          right: 8,
+          [side]: 8,
           zIndex: 1300,
           display: 'flex',
           alignItems: 'center',
@@ -57,8 +62,8 @@ export default function LanguageSwitch() {
         anchorEl={anchor}
         open={!!anchor}
         onClose={() => setAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: side }}
+        transformOrigin={{ vertical: 'top', horizontal: side }}
         sx={{ zIndex: 1400 }}
       >
         {LANGS.map((l) => (

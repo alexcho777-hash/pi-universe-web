@@ -170,7 +170,7 @@ export default function SanctuaryPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 2 }}>
-      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')} sx={{ mb: 1, fontSize: '1.05rem' }}>
+      <Button startIcon={<ArrowBackIcon className="flip-rtl" />} onClick={() => navigate('/')} sx={{ mb: 1, fontSize: '1.05rem' }}>
         {tr('回首頁', 'Home')}
       </Button>
 

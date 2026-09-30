@@ -6,10 +6,15 @@
  * comes round to the front — like passing a bead through your fingers. Beads already
  * counted in this round turn gold; finishing a round makes the whole ring glow.
  * The larger "guru" bead with its tassel marks where a round starts.
+ *
+ * Below the ring: a big "+1" button (easy to find on a phone). Tap it to count once; keep it
+ * held down and it keeps counting until you let go. "Auto count" counts by itself at the
+ * chosen pace and stops at the end of each round.
  */
 
-import { useEffect, useRef } from 'react';
-import { Box, Typography } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import { Box, Button, Chip, Typography } from '@mui/material';
+import { useI18n } from '../../i18n/i18n';
 
 export interface MalaColors {
   /** Beads not yet counted in this round: [light, dark] */
@@ -27,6 +32,15 @@ export const MALA_COLORS: Record<string, MalaColors> = {
 };
 
 const TWO_PI = Math.PI * 2;
+
+/** Hold the +1 button this long before it starts repeating */
+const HOLD_DELAY = 450;
+/** Auto-count paces, ms per bead */
+const PACES: { ms: number; zh: string; en: string }[] = [
+  { ms: 1600, zh: '慢', en: 'Slow' },
+  { ms: 1000, zh: '中', en: 'Medium' },
+  { ms: 600, zh: '快', en: 'Fast' },
+];
 
 export function MalaRing({
   value,
@@ -51,6 +65,52 @@ export function MalaRing({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const state = useRef({ pos: value, flashUntil: 0, raf: 0, last: 0, draw: () => {} });
   const prev = useRef(value);
+  const { tr } = useI18n();
+
+  // ---- +1 button (tap / hold to repeat) and auto count ----
+  const tapRef = useRef(onTap);
+  tapRef.current = onTap;
+  const hold = useRef<{ delay: number; repeat: number; repeated: boolean }>({ delay: 0, repeat: 0, repeated: false });
+  const [holding, setHolding] = useState(false);
+  const [auto, setAuto] = useState(false);
+  const [pace, setPace] = useState(1);
+
+  const stopHold = () => {
+    window.clearTimeout(hold.current.delay);
+    window.clearInterval(hold.current.repeat);
+    setHolding(false);
+  };
+  const startHold = () => {
+    setAuto(false);
+    hold.current.repeated = false;
+    window.clearTimeout(hold.current.delay);
+    window.clearInterval(hold.current.repeat);
+    hold.current.delay = window.setTimeout(() => {
+      hold.current.repeated = true;
+      setHolding(true);
+      tapRef.current();
+      hold.current.repeat = window.setInterval(() => tapRef.current(), 700);
+    }, HOLD_DELAY);
+  };
+  // A short press is a normal click; after a long hold the click that follows is ignored
+  const clickPlus = () => {
+    if (hold.current.repeated) {
+      hold.current.repeated = false;
+      return;
+    }
+    tapRef.current();
+  };
+  useEffect(() => () => stopHold(), []);
+
+  useEffect(() => {
+    if (!auto) return;
+    const id = window.setInterval(() => tapRef.current(), PACES[pace].ms);
+    return () => window.clearInterval(id);
+  }, [auto, pace]);
+  // Auto count stops by itself when a round is complete
+  useEffect(() => {
+    if (auto && value > 0 && value % beads === 0) setAuto(false);
+  }, [value, beads, auto]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -224,9 +284,13 @@ export function MalaRing({
   }, [value, beads, colors]);
 
   return (
+    <Box>
     <Box
       component="button"
-      onClick={onTap}
+      onClick={() => {
+        setAuto(false);
+        onTap();
+      }}
       aria-label={ariaLabel}
       sx={{
         position: 'relative',
@@ -247,10 +311,67 @@ export function MalaRing({
       }}
     >
       <canvas ref={canvasRef} style={{ display: 'block', width: '100%', aspectRatio: '1 / 0.9' }} aria-hidden="true" />
-      <Box sx={{ position: 'absolute', left: 0, right: 0, top: '44%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+      <Box dir="ltr" sx={{ position: 'absolute', left: 0, right: 0, top: '44%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
         <Typography sx={{ fontSize: '2.8rem', fontWeight: 800, lineHeight: 1, color: '#3A2206' }}>{label}</Typography>
         {sublabel && <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: '#6b4410', mt: 0.3 }}>{sublabel}</Typography>}
       </Box>
+    </Box>
+
+    {/* Big +1 button: tap = one count, hold = keeps counting */}
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 0.5 }}>
+      <Box
+        component="button"
+        dir="ltr"
+        onClick={clickPlus}
+        onPointerDown={startHold}
+        onPointerUp={stopHold}
+        onPointerLeave={stopHold}
+        onPointerCancel={stopHold}
+        onContextMenu={(e: React.MouseEvent) => e.preventDefault()}
+        aria-label={tr('計數 +1（按住不放會一直數）', 'Count +1 (hold to keep counting)')}
+        sx={{
+          width: 92,
+          height: 92,
+          borderRadius: '50%',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '2rem',
+          fontWeight: 800,
+          color: '#fff',
+          background: holding
+            ? 'radial-gradient(circle at 40% 35%, #9b6ad6, #3d1570)'
+            : 'radial-gradient(circle at 40% 35%, #8a55c9, #4a1c86)',
+          boxShadow: holding ? '0 0 0 8px rgba(91,42,147,.2), 0 2px 6px rgba(0,0,0,.3)' : '0 4px 10px rgba(0,0,0,.3)',
+          transform: holding ? 'scale(.94)' : 'none',
+          transition: 'transform .12s, box-shadow .12s',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          WebkitTouchCallout: 'none',
+          WebkitTapHighlightColor: 'transparent',
+          touchAction: 'manipulation',
+          '&:active': { transform: 'scale(.94)' },
+          '&:focus-visible': { outline: '3px solid #D4AF37', outlineOffset: 3 },
+        }}
+      >
+        +1
+      </Box>
+      <Typography sx={{ mt: 0.8, fontSize: '0.95rem', color: 'text.secondary' }}>
+        {holding ? tr('持續計數中… 放開就停', 'Counting… let go to stop') : tr('點一下數一次・按住不放會一直數', 'Tap to count once · hold to keep counting')}
+      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0.8, mt: 1.2 }}>
+        <Button variant={auto ? 'contained' : 'outlined'} color={auto ? 'secondary' : 'primary'} onClick={() => setAuto((a) => !a)} sx={{ fontSize: '1rem', minWidth: 118 }}>
+          {auto ? `⏸ ${tr('停止', 'Stop')}` : `▶ ${tr('自動計數', 'Auto count')}`}
+        </Button>
+        {PACES.map((p, i) => (
+          <Chip key={p.ms} label={tr(p.zh, p.en)} onClick={() => setPace(i)} color={i === pace ? 'primary' : 'default'} variant={i === pace ? 'filled' : 'outlined'} sx={{ fontSize: '0.95rem' }} />
+        ))}
+      </Box>
+      {auto && (
+        <Typography sx={{ mt: 0.6, fontSize: '0.9rem', color: 'text.secondary' }}>
+          {tr('自動計數中，一輪圓滿會自動停下', 'Counting by itself — it stops when the round is complete')}
+        </Typography>
+      )}
+    </Box>
     </Box>
   );
 }

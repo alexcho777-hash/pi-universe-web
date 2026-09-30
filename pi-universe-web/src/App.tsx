@@ -4,7 +4,7 @@
 
 import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CircularProgress, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { CircularProgress, Box, CssBaseline, GlobalStyles, ThemeProvider, createTheme } from '@mui/material';
 import { useAuthStore } from './stores/authStore';
 import HomePage from './pages/HomePage';
 import AcknowledgmentsPage from './pages/AcknowledgmentsPage';
@@ -26,31 +26,36 @@ const calendarRoute = (
   </Suspense>
 );
 
-// Create Material-UI theme (replace React Native Paper colors)
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#5B2A93', // π Universe primary blue
+// Create Material-UI theme (replace React Native Paper colors).
+// Arabic is right-to-left: the page gets dir="rtl" (set in useI18n) and the theme knows it.
+const makeTheme = (rtl: boolean) =>
+  createTheme({
+    direction: rtl ? 'rtl' : 'ltr',
+    palette: {
+      primary: {
+        main: '#5B2A93', // π Universe primary blue
+      },
+      secondary: {
+        main: '#D4AF37', // Gold
+      },
+      background: {
+        default: '#f5f5f5',
+      },
     },
-    secondary: {
-      main: '#D4AF37', // Gold
+    typography: {
+      fontFamily: 'Roboto, "Noto Sans TC", "Noto Sans JP", "Noto Sans Arabic", Tahoma, sans-serif',
+      // Larger base size so the site is easy to read for all ages (MUI default is 14)
+      fontSize: 16,
+      // Keep "π" and "Pi" as written (the default uppercase turns them into "Π" / "PI")
+      button: { textTransform: 'none' },
     },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: 'Roboto, "Noto Sans TC", "Noto Sans JP", sans-serif',
-    // Larger base size so the site is easy to read for all ages (MUI default is 14)
-    fontSize: 16,
-    // Keep "π" and "Pi" as written (the default uppercase turns them into "Π" / "PI")
-    button: { textTransform: 'none' },
-  },
-});
+  });
+const THEMES = { ltr: makeTheme(false), rtl: makeTheme(true) };
 
 export default function App() {
   const { isAuthenticated, isLoading, initialize } = useAuthStore();
-  const { tr } = useI18n();
+  const { tr, rtl } = useI18n();
+  const theme = rtl ? THEMES.rtl : THEMES.ltr;
 
   useEffect(() => {
     // Initialize auth on app load
@@ -68,6 +73,14 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {/* Right-to-left: back / previous / next arrows (className="flip-rtl") point the other way */}
+      <GlobalStyles
+        styles={{
+          '[dir="rtl"] .flip-rtl': {
+            transform: 'scaleX(-1)',
+          },
+        }}
+      />
       <LanguageSwitch />
       <Router>
         {isAuthenticated ? (

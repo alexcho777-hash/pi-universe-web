@@ -1,19 +1,21 @@
 /**
- * Language (中文 / English / Tiếng Việt / ภาษาไทย / 日本語 / हिन्दी) for the whole site.
+ * Language (中文 / English / Tiếng Việt / ภาษาไทย / 日本語 / हिन्दी / العربية) for the whole site.
  *
  * Texts are written side by side where they are used: tr('中文', 'English').
  * The choice is remembered per browser; the first visit follows the device language
- * (Chinese devices get 中文, Vietnamese/Thai/Japanese/Hindi devices get their own language, everything
+ * (Chinese devices get 中文, Vietnamese/Thai/Japanese/Hindi/Arabic devices get their own language, everything
  * else English).
  * Oracle poems and scripture stay in their original language (a translation is shown
  * under oracle poems).
  *
- * Vietnamese, Thai, Japanese and Hindi: `tr(zh, en)` looks the English text up in
- * dict/vi.ts, th.ts, ja.ts or hi.ts. A key may contain {0}, {1}… for the parts that were filled in at run time
+ * Vietnamese, Thai, Japanese, Hindi and Arabic: `tr(zh, en)` looks the English text up in
+ * dict/vi.ts, th.ts, ja.ts, hi.ts or ar.ts. A key may contain {0}, {1}… for the parts that were filled in at run time
  * (e.g. "{0} day(s) left"). Anything missing from the dictionary is shown in English, so
  * a new string never breaks the page — it just stays English until it is added.
  * The two country-specific sanctuaries use `tr4(zh, en, vi, th)`: Vietnamese and Thai are
- * written out there, Japanese and Hindi come from the dictionaries like everything else.
+ * written out there, Japanese, Hindi and Arabic come from the dictionaries like everything else.
+ * Arabic is written right-to-left: `isRtl(lang)` is true and the whole page is mirrored
+ * (see App.tsx).
  */
 
 import { useEffect } from 'react';
@@ -23,10 +25,11 @@ import { VI } from './dict/vi';
 import { TH } from './dict/th';
 import { JA } from './dict/ja';
 import { HI } from './dict/hi';
+import { AR } from './dict/ar';
 
-export type Lang = 'zh' | 'en' | 'vi' | 'th' | 'ja' | 'hi';
+export type Lang = 'zh' | 'en' | 'vi' | 'th' | 'ja' | 'hi' | 'ar';
 /** Languages whose wording comes from a dictionary keyed by the English text */
-type DictLang = 'vi' | 'th' | 'ja' | 'hi';
+type DictLang = 'vi' | 'th' | 'ja' | 'hi' | 'ar';
 
 function detectLang(): Lang {
   try {
@@ -36,6 +39,7 @@ function detectLang(): Lang {
     if (l.startsWith('th')) return 'th';
     if (l.startsWith('ja')) return 'ja';
     if (l.startsWith('hi')) return 'hi';
+    if (l.startsWith('ar')) return 'ar';
     return 'en';
   } catch {
     return 'zh';
@@ -85,6 +89,7 @@ const TABLES: Record<DictLang, { dict: Dict; patterns: Pattern[] }> = {
   th: { dict: TH, patterns: compilePatterns(TH) },
   ja: { dict: JA, patterns: compilePatterns(JA) },
   hi: { dict: HI, patterns: compilePatterns(HI) },
+  ar: { dict: AR, patterns: compilePatterns(AR) },
 };
 
 /** English text → Vietnamese/Thai (English itself for 'en'/'zh' callers, or when missing). */
@@ -105,7 +110,11 @@ export function tx(en: string, lang: Lang, depth = 0): string {
 }
 
 /** Locale for dates and numbers */
-export const localeOf = (lang: Lang) => ({ zh: 'zh-TW', en: 'en-US', vi: 'vi-VN', th: 'th-TH', ja: 'ja-JP', hi: 'hi-IN' }[lang]);
+export const localeOf = (lang: Lang) =>
+  ({ zh: 'zh-TW', en: 'en-US', vi: 'vi-VN', th: 'th-TH', ja: 'ja-JP', hi: 'hi-IN', ar: 'ar-u-nu-latn' }[lang]);
+
+/** Languages written right-to-left */
+export const isRtl = (lang: Lang) => lang === 'ar';
 
 /** Current language, outside React (e.g. in hooks' error messages) */
 export const currentLang = (): Lang => useLangStore.getState().lang;
@@ -114,18 +123,19 @@ export const trNow = (zh: string, en: string) => {
   return lang === 'zh' ? zh : tx(en, lang);
 };
 
-const LANG_TAGS: Record<Lang, string> = { zh: 'zh-Hant-TW', en: 'en', vi: 'vi', th: 'th', ja: 'ja', hi: 'hi' };
+const LANG_TAGS: Record<Lang, string> = { zh: 'zh-Hant-TW', en: 'en', vi: 'vi', th: 'th', ja: 'ja', hi: 'hi', ar: 'ar' };
 
 export function useI18n() {
   const lang = useLangStore((s) => s.lang);
   const setLang = useLangStore((s) => s.setLang);
   useEffect(() => {
     document.documentElement.lang = LANG_TAGS[lang];
+    document.documentElement.dir = isRtl(lang) ? 'rtl' : 'ltr';
   }, [lang]);
   /** Chinese / English text; Vietnamese and Thai come from the dictionaries. */
   const tr = (zh: string, en: string) => (lang === 'zh' ? zh : tx(en, lang));
   /** Four-language text, written out in full (the two country-specific sanctuaries). */
   const tr4 = (zh: string, en: string, vi: string, th: string) =>
     lang === 'zh' ? zh : lang === 'vi' ? vi : lang === 'th' ? th : tx(en, lang);
-  return { lang, setLang, tr, tr4, isEn: lang === 'en' };
+  return { lang, setLang, tr, tr4, isEn: lang === 'en', rtl: isRtl(lang) };
 }

@@ -448,8 +448,10 @@ export default function OraclePage() {
       </Typography>
       {lang !== 'zh' && (
         <Typography sx={{ position: 'relative', mt: 1.5, fontSize: '1rem', color: '#EBD7B0', lineHeight: 1.6 }}>
-          Known as <i>Kau Cim</i>, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon
-          blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.
+          {tr(
+            '',
+            'Known as Kau Cim, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.'
+          )}
         </Typography>
       )}
     </Box>
@@ -458,7 +460,7 @@ export default function OraclePage() {
   return (
     <Box sx={pageSx}>
       <Container maxWidth="sm" sx={{ pt: 1 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(sanctuaryId ? `/sanctuary/${sanctuaryId}` : '/')} sx={{ color: GOLD, fontSize: '1.05rem' }}>
+        <Button startIcon={<ArrowBackIcon className="flip-rtl" />} onClick={() => navigate(sanctuaryId ? `/sanctuary/${sanctuaryId}` : '/')} sx={{ color: GOLD, fontSize: '1.05rem' }}>
           {tr('返回', 'Back')}
         </Button>
         {header}

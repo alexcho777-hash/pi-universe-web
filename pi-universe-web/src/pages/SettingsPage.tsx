@@ -14,6 +14,7 @@ const LANGS: [Lang, string][] = [
   ['th', 'ภาษาไทย'],
   ['ja', '日本語'],
   ['hi', 'हिन्दी'],
+  ['ar', 'العربية'],
 ];
 
 export default function SettingsPage() {
@@ -38,9 +39,11 @@ export default function SettingsPage() {
         </Typography>
         {/* Plain buttons (not a toggle group) so each one is easy to tap on any phone */}
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
-          {LANGS.map(([value, label]) => (
+          {LANGS.map(([value, label], i) => (
             <Button
               key={value}
+              // an odd last button spans both columns instead of sitting alone on the left
+              style={i === LANGS.length - 1 && LANGS.length % 2 ? { gridColumn: 'span 2' } : undefined}
               variant={lang === value ? 'contained' : 'outlined'}
               onClick={() => setLang(value)}
               aria-pressed={lang === value}

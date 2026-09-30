@@ -132,7 +132,7 @@ export function SanctuaryScene({
       onPointerLeave={() => (target.current = { x: 0, y: 0 })}
       sx={{
         position: 'relative',
-        height: altar ? { xs: 500, sm: 540 } : { xs: 360, sm: 420 },
+        height: altar ? { xs: 530, sm: 560 } : { xs: 360, sm: 420 },
         borderRadius: 2,
         overflow: 'hidden',
         mb: 2,

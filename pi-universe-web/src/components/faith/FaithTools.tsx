@@ -96,7 +96,7 @@ export function BeadCounter({ faith, lang, tr }: { faith: 'buddhist' | 'hindu' |
         ariaLabel={tr('點一下計數', 'Tap to count')}
         colors={MALA_COLORS[faith]}
       />
-      <Typography sx={{ mt: 1, color: 'text.secondary' }}>{tr('點圓珠計數一次', 'Tap the bead for each recitation')}</Typography>
+      <Typography sx={{ mt: 1, color: 'text.secondary' }}>{tr('每念一聲，點一下圓珠或 +1 按鈕', 'For each recitation, tap the beads or the +1 button')}</Typography>
       <LinearProgress variant="determinate" value={(round / rec.target) * 100} sx={{ height: 10, borderRadius: 5, my: 2 }} />
       <Box sx={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
         {[

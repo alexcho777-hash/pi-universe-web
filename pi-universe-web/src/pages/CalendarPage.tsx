@@ -93,7 +93,7 @@ export default function CalendarPage() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 2, pb: 12 }}>
-      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')} sx={{ mb: 1, fontSize: '1.05rem' }}>
+      <Button startIcon={<ArrowBackIcon className="flip-rtl" />} onClick={() => navigate('/')} sx={{ mb: 1, fontSize: '1.05rem' }}>
         {tr('回首頁', 'Home')}
       </Button>
       <ToggleButtonGroup
@@ -110,7 +110,7 @@ export default function CalendarPage() {
       {/* Date navigation */}
       <Paper sx={{ p: 1.5, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
         <IconButton aria-label="前一天" onClick={() => setDate(addDays(date, -1))} size="large">
-          <ChevronLeftIcon fontSize="large" />
+          <ChevronLeftIcon className="flip-rtl" fontSize="large" />
         </IconButton>
         <Box sx={{ flex: 1, textAlign: 'center' }}>
           <TextField
@@ -130,7 +130,7 @@ export default function CalendarPage() {
           </Button>
         )}
         <IconButton aria-label="後一天" onClick={() => setDate(addDays(date, 1))} size="large">
-          <ChevronRightIcon fontSize="large" />
+          <ChevronRightIcon className="flip-rtl" fontSize="large" />
         </IconButton>
       </Paper>
 
@@ -406,13 +406,13 @@ function MonthGrid({ mode, date, onPick, lang }: { mode: Mode; date: Date; onPic
     <Paper sx={{ p: 1.5, mb: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
         <IconButton aria-label="上個月" onClick={() => onPick(new Date(y, m - 1, 1))}>
-          <ChevronLeftIcon />
+          <ChevronLeftIcon className="flip-rtl" />
         </IconButton>
         <Typography sx={{ fontSize: '1.3rem', fontWeight: 700 }}>
           {en ? `${MONTH_EN[m]} ${y}` : `${y}年${m + 1}月`}
         </Typography>
         <IconButton aria-label="下個月" onClick={() => onPick(new Date(y, m + 1, 1))}>
-          <ChevronRightIcon />
+          <ChevronRightIcon className="flip-rtl" />
         </IconButton>
       </Box>
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0.5 }}>
