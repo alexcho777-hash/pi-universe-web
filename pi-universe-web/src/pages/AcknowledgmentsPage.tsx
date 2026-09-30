@@ -109,9 +109,10 @@ export default function AcknowledgmentsPage() {
                     </Typography>
                     <Typography sx={{ fontSize: '1.02rem', color: 'text.secondary' }}>
                       {tr(
-                        `本月${giftWord(r.religion_type)} ${piAmount(r.month_amount)}・護持 ${r.donor_count} 人${r.ranking_enabled ? '' : '（不公開排名）'}`,
-                        `This month ${piAmount(r.month_amount)} · ${r.donor_count} supporter${r.donor_count === 1 ? '' : 's'}${r.ranking_enabled ? '' : ' (no public ranking)'}`
+                        `本月${giftWord(r.religion_type)} ${piAmount(r.month_amount)}・護持 ${r.donor_count} 人`,
+                        `This month ${piAmount(r.month_amount)} · ${r.donor_count} supporter${r.donor_count === 1 ? '' : 's'}`
                       )}
+                      {r.ranking_enabled ? '' : tr('（不公開排名）', ' (no public ranking)')}
                     </Typography>
                   </CardContent>
                 </CardActionArea>
@@ -153,9 +154,9 @@ export default function AcknowledgmentsPage() {
                       <ListItemText
                         primary={<Typography component="span" sx={{ fontSize: '1.15rem' }}>{r.icon} {sanctuaryName(r, lang)}</Typography>}
                         secondary={
-                          lang === 'en'
-                            ? `${r.times} time${r.times === 1 ? '' : 's'}${r.rank ? ` · rank #${r.rank} all time` : ''}`
-                            : r.rank ? `${r.times} 次・累計排名第 ${r.rank} 名` : `${r.times} 次`
+                          r.rank
+                            ? tr(`${r.times} 次・累計排名第 ${r.rank} 名`, `${r.times} time(s) · rank #${r.rank} all time`)
+                            : tr(`${r.times} 次`, `${r.times} time(s)`)
                         }
                       />
                     </ListItem>

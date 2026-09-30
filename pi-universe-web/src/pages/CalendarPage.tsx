@@ -21,7 +21,7 @@ import {
   Divider,
 } from '@mui/material';
 import CalendarHealth from '../components/CalendarHealth';
-import { useI18n, Lang } from '../i18n/i18n';
+import { useI18n, Lang, tx } from '../i18n/i18n';
 import {
   OBSERVANCE_EN,
   TIANSHEN_EN,
@@ -124,7 +124,7 @@ export default function CalendarPage() {
         </IconButton>
       </Paper>
 
-      <CalendarHealth date={date} lang={mode === 'jp' ? 'jp' : lang === 'en' ? 'en' : 'tw'} />
+      <CalendarHealth date={date} lang={mode === 'jp' ? 'jp' : lang !== 'zh' ? 'en' : 'tw'} />
       {mode === 'tw' ? <TaiwanDayCard date={date} lang={lang} /> : <JapanDayCard date={date} />}
       <MonthGrid mode={mode} date={date} onPick={setDate} lang={lang} />
       {mode === 'tw' ? <TaiwanGoodDaySearch onPick={setDate} lang={lang} /> : <JapanLuckySearch onPick={setDate} />}
@@ -145,7 +145,7 @@ export default function CalendarPage() {
 function TaiwanDayCard({ date, lang }: { date: Date; lang: Lang }) {
   const d = useMemo(() => taiwanDay(...toParts(date)), [date]);
   const [y, m, dd] = toParts(date);
-  if (lang === 'en') return <TaiwanDayCardEn date={date} />;
+  if (lang !== 'zh') return <TaiwanDayCardEn date={date} />;
   return (
     <Paper sx={{ p: { xs: 2.5, sm: 3 }, mb: 2, borderTop: `6px solid ${d.huangDao ? GOOD : BAD}` }}>
       <Typography sx={{ fontSize: '1.15rem', color: 'text.secondary' }}>
@@ -380,7 +380,7 @@ function SenjitsuLine({ k }: { k: SenjitsuKey }) {
 
 // ---------------------------------------------------------------------------
 function MonthGrid({ mode, date, onPick, lang }: { mode: Mode; date: Date; onPick: (d: Date) => void; lang: Lang }) {
-  const en = mode === 'tw' && lang === 'en';
+  const en = mode === 'tw' && lang !== 'zh';
   const y = date.getFullYear();
   const m = date.getMonth();
   const first = new Date(y, m, 1);
@@ -475,8 +475,8 @@ function MonthGrid({ mode, date, onPick, lang }: { mode: Mode; date: Date; onPic
 
 // ---------------------------------------------------------------------------
 function TaiwanGoodDaySearch({ onPick, lang }: { onPick: (d: Date) => void; lang: Lang }) {
-  const en = lang === 'en';
-  const tr = (zh: string, e: string) => (en ? e : zh);
+  const en = lang !== 'zh';
+  const tr = (zh: string, e: string) => (en ? tx(e, lang) : zh);
   const [activity, setActivity] = useState('move');
   const [months, setMonths] = useState(3);
   const [zodiac, setZodiac] = useState('');

@@ -32,7 +32,7 @@ import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import { LIUSHI_JIAZI, Lot } from '../oracle/liushiJiazi';
 import { LotCylinder, MoonBlocks, SacredGlow, ThrowResult } from '../oracle/OracleArt';
-import { useI18n, Lang } from '../i18n/i18n';
+import { useI18n, Lang, tx } from '../i18n/i18n';
 
 type Step = 'loading' | 'age' | 'ask' | 'pray' | 'permit' | 'shake' | 'verify' | 'poem' | 'limit';
 
@@ -102,7 +102,7 @@ const THROW_INFO: Record<ThrowResult, { name: [string, string]; meaning: [string
     ],
   },
 };
-const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : pair[1]);
+const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
 
 function randomThrow(): ThrowResult {
   const a = new Uint8Array(1);
@@ -114,7 +114,7 @@ function randomThrow(): ThrowResult {
 /** Label printed on the bamboo stick (always Chinese, like a real one) */
 const stickLabel = (lot: Lot) => `第${lot.no}籤 ${lot.ganzhi}`;
 const lotLabel = (lot: Lot, lang: Lang) =>
-  lang === 'en' ? `Lot ${lot.no} · ${ganzhiPinyin(lot.ganzhi)} ${lot.ganzhi}` : `第${lot.no}籤 ${lot.ganzhi}`;
+  lang === 'zh' ? `第${lot.no}籤 ${lot.ganzhi}` : `${tx(`Lot ${lot.no}`, lang)} · ${ganzhiPinyin(lot.ganzhi)} ${lot.ganzhi}`;
 const findLot = (no: number) => LIUSHI_JIAZI.find((l) => l.no === no)!;
 
 // Colors of the red-and-gold temple theme
@@ -202,7 +202,7 @@ function Title({ children }: { children: React.ReactNode }) {
   const { lang } = useI18n();
   return (
     <Typography
-      sx={{ fontSize: { xs: '1.6rem', sm: '1.9rem' }, fontWeight: 800, color: GOLD, textAlign: 'center', mb: 1.5, letterSpacing: lang === 'en' ? 0 : '0.1em' }}
+      sx={{ fontSize: { xs: '1.6rem', sm: '1.9rem' }, fontWeight: 800, color: GOLD, textAlign: 'center', mb: 1.5, letterSpacing: lang === 'zh' ? '0.1em' : 0 }}
     >
       {children}
     </Typography>
@@ -311,7 +311,7 @@ export default function OraclePage() {
   const petition = useMemo(() => {
     const form = mode === 'form';
     const topicPair = TOPICS.find((t) => t[0] === topic);
-    if (lang === 'en') {
+    if (lang !== 'zh') {
       const who = form && name.trim() ? name.trim() : user?.username || 'your devotee';
       const born = form && birth ? `, born on ${birth}${shichen !== SHICHEN[0][0] ? ` at ${SHICHEN.find((h) => h[0] === shichen)?.[1]}` : ''}` : '';
       const home = form && address.trim() ? `, living in ${address.trim()}` : '';
@@ -348,8 +348,8 @@ export default function OraclePage() {
     if (!synth) return;
     synth.cancel();
     const u = new SpeechSynthesisUtterance(petition);
-    u.lang = lang === 'en' ? 'en-US' : 'zh-TW';
-    u.rate = lang === 'en' ? 0.95 : 0.85;
+    u.lang = lang === 'zh' ? 'zh-TW' : 'en-US';
+    u.rate = lang === 'zh' ? 0.85 : 0.95;
     synth.speak(u);
   };
 
@@ -383,7 +383,7 @@ export default function OraclePage() {
       } else if (r.code === 'DRAW_LIMIT') {
         setError(tr('今天搖籤次數已達上限，請明天再來', 'You have shaken the cylinder many times today. Please come back tomorrow.'));
       } else {
-        setError(lang === 'en' ? 'Could not draw a lot. Please try again.' : r.error || '搖籤失敗');
+        setError(lang === 'zh' ? r.error || '搖籤失敗' : tx('Could not draw a lot. Please try again.', lang));
       }
     }, wait);
   };
@@ -403,7 +403,7 @@ export default function OraclePage() {
         setError(
           r.code === 'NOT_PENDING'
             ? tr('這支籤已經驗過了，請重新搖籤', 'This lot was already checked. Please shake again.')
-            : lang === 'en' ? 'The blocks could not be cast. Please shake again.' : r.error || '擲筊失敗'
+            : lang !== 'zh' ? tx('The blocks could not be cast. Please shake again.', lang) : r.error || '擲筊失敗'
         );
         setStep('shake');
         setDraw(null);
@@ -437,7 +437,7 @@ export default function OraclePage() {
     <Box sx={{ position: 'relative', textAlign: 'center', pt: 2, pb: 1 }}>
       <SacredGlow size={200} />
       <Typography sx={{ position: 'relative', fontSize: '2.8rem' }}>🏮</Typography>
-      <Typography sx={{ position: 'relative', fontSize: { xs: '2rem', sm: '2.4rem' }, fontWeight: 900, color: GOLD, letterSpacing: lang === 'en' ? '0.04em' : '0.2em' }}>
+      <Typography sx={{ position: 'relative', fontSize: { xs: '2rem', sm: '2.4rem' }, fontWeight: 900, color: GOLD, letterSpacing: lang === 'zh' ? '0.2em' : '0.04em' }}>
         {tr('線上求籤', 'Temple Oracle')}
       </Typography>
       <Typography sx={{ position: 'relative', fontSize: '1.05rem', color: '#F3D9A4' }}>
@@ -446,7 +446,7 @@ export default function OraclePage() {
       <Typography sx={{ position: 'relative', mt: 1, fontSize: '1.1rem', fontWeight: 700 }}>
         {tr(`全程約 3 分鐘，共 6 步驟　·　今日還可求 ${remaining} 支`, `About 3 minutes, 6 steps  ·  ${remaining} draw${remaining === 1 ? '' : 's'} left today`)}
       </Typography>
-      {lang === 'en' && (
+      {lang !== 'zh' && (
         <Typography sx={{ position: 'relative', mt: 1.5, fontSize: '1rem', color: '#EBD7B0', lineHeight: 1.6 }}>
           Known as <i>Kau Cim</i>, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon
           blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.
@@ -516,7 +516,7 @@ export default function OraclePage() {
                 {TOPICS.map(([t, en]) => (
                   <Chip
                     key={t}
-                    label={lang === 'en' ? en : t}
+                    label={lang === 'zh' ? t : tx(en, lang)}
                     onClick={() => setTopic(t)}
                     sx={{
                       fontSize: '1.1rem',
@@ -535,10 +535,10 @@ export default function OraclePage() {
                 <TextField variant="filled" label={tr('姓名', 'Name')} value={name} onChange={(e) => setName(e.target.value)} sx={fieldSx} slotProps={{ htmlInput: { maxLength: 20 } }} />
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <TextField variant="filled" label={tr('生辰（國曆）', 'Date of birth')} type="date" value={birth} onChange={(e) => setBirth(e.target.value)} sx={{ ...fieldSx, flex: 1 }} slotProps={{ inputLabel: { shrink: true } }} />
-                  <TextField variant="filled" select label={tr('時辰', 'Hour of birth')} value={shichen} onChange={(e) => setShichen(e.target.value)} sx={{ ...fieldSx, width: lang === 'en' ? 170 : 140 }}>
+                  <TextField variant="filled" select label={tr('時辰', 'Hour of birth')} value={shichen} onChange={(e) => setShichen(e.target.value)} sx={{ ...fieldSx, width: lang === 'zh' ? 140 : 170 }}>
                     {SHICHEN.map(([zh, en]) => (
                       <MenuItem key={zh} value={zh}>
-                        {lang === 'en' ? en : zh}
+                        {lang === 'zh' ? zh : tx(en, lang)}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -670,14 +670,14 @@ export default function OraclePage() {
         {step === 'poem' && result && (
           <Panel>
             <Title>{tr('六、籤詩', '6. Your poem')}</Title>
-            {lang === 'en' && (
-              <Typography sx={{ textAlign: 'center', fontSize: '1.3rem', fontWeight: 800, color: GOLD, mb: 1.5 }}>{lotLabel(result, 'en')}</Typography>
+            {lang !== 'zh' && (
+              <Typography sx={{ textAlign: 'center', fontSize: '1.3rem', fontWeight: 800, color: GOLD, mb: 1.5 }}>{lotLabel(result, lang)}</Typography>
             )}
             <PoemSlip lot={result} />
-            {lang === 'en' ? (
+            {lang !== 'zh' ? (
               <>
                 <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: 'rgba(255,240,210,.08)', border: '1px solid rgba(232,193,112,.4)' }}>
-                  <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: GOLD, mb: 1 }}>English translation</Typography>
+                  <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: GOLD, mb: 1 }}>{tx('English translation', lang)}</Typography>
                   {result.poem_en.map((line, i) => (
                     <Typography key={i} sx={{ fontSize: '1.12rem', lineHeight: 1.7, fontStyle: 'italic' }}>
                       {line}
@@ -688,12 +688,14 @@ export default function OraclePage() {
                   )}
                 </Box>
                 <Box sx={{ mt: 2, p: 2, borderRadius: 2, backgroundColor: 'rgba(255,240,210,.08)', border: '1px solid rgba(232,193,112,.4)' }}>
-                  <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: GOLD, mb: 1 }}>What it means (for reference only)</Typography>
+                  <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: GOLD, mb: 1 }}>{tx('What it means (for reference only)', lang)}</Typography>
                   <Typography sx={{ fontSize: '1.12rem', lineHeight: 1.8 }}>{result.explain_en}</Typography>
                 </Box>
                 <Typography sx={{ mt: 2, fontSize: '0.95rem', color: '#d9b98a' }}>
-                  ※ The poem is the traditional 60 Jiazi oracle used in Taiwanese temples. Read it top to bottom, right to left. The translation
-                  and interpretation are our own and for reference only; a temple's oracle interpreter can explain it in depth.
+                  {tx(
+                    "※ The poem is the traditional 60 Jiazi oracle used in Taiwanese temples. Read it top to bottom, right to left. The translation and interpretation are our own and for reference only; a temple's oracle interpreter can explain it in depth.",
+                    lang
+                  )}
                 </Typography>
               </>
             ) : (

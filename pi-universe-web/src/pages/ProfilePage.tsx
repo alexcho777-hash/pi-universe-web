@@ -4,7 +4,7 @@
 
 import { Container, Paper, Typography, Grid, Card, CardContent } from '@mui/material';
 import { useAuthStore } from '../stores/authStore';
-import { useI18n } from '../i18n/i18n';
+import { useI18n, localeOf } from '../i18n/i18n';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
@@ -31,7 +31,7 @@ export default function ProfilePage() {
             <CardContent>
               <Typography color="textSecondary">{tr('加入日期', 'Member since')}</Typography>
               <Typography sx={{ fontSize: '1.1rem' }}>
-                {user?.created_at ? new Date(user.created_at).toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-TW') : '-'}
+                {user?.created_at ? new Date(user.created_at).toLocaleDateString(localeOf(lang)) : '-'}
               </Typography>
             </CardContent>
           </Card>

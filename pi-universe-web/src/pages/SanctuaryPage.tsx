@@ -31,10 +31,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import DonateDialog from '../components/DonateDialog';
-import { SacredGlow } from '../oracle/OracleArt';
+import { SanctuaryScene } from '../components/sanctuary/SanctuaryScene';
 import { FaithActivities, FestivalList } from '../components/faith/FaithActivities';
 import { BoardPanel } from '../components/faith/BoardPanel';
-import { useI18n, Lang } from '../i18n/i18n';
+import { useI18n, Lang, tx } from '../i18n/i18n';
 import { sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 import {
   RankRow,
@@ -84,10 +84,10 @@ function RankList({ rows, empty, lang }: { rows: RankRow[]; empty: string; lang:
             primary={
               <Typography component="span" sx={{ fontSize: '1.15rem' }}>
                 {medal(r.rank)} {r.anonymous ? anonymousName(lang) : r.name}
-                {r.is_me ? (lang === 'zh' ? '（我）' : ' (me)') : ''}
+                {r.is_me ? (lang === 'zh' ? '（我）' : tx(' (me)', lang)) : ''}
               </Typography>
             }
-            secondary={lang === 'zh' ? `${r.times} 次` : `${r.times} time${r.times === 1 ? '' : 's'}`}
+            secondary={lang === 'zh' ? `${r.times} 次` : tx(`${r.times} time(s)`, lang)}
           />
         </ListItem>
       ))}
@@ -106,7 +106,7 @@ function RecentList({ rows, empty, lang }: { rows: RecentRow[]; empty: string; l
           secondaryAction={<Typography sx={{ fontSize: '1.1rem' }}>{piAmount(r.amount)}</Typography>}
         >
           <ListItemText
-            primary={<Typography component="span" sx={{ fontSize: '1.1rem' }}>{r.anonymous ? anonymousName(lang) : r.name}{r.is_me ? (lang === 'zh' ? '（我）' : ' (me)') : ''}</Typography>}
+            primary={<Typography component="span" sx={{ fontSize: '1.1rem' }}>{r.anonymous ? anonymousName(lang) : r.name}{r.is_me ? (lang === 'zh' ? '（我）' : tx(' (me)', lang)) : ''}</Typography>}
             secondary={shortDate(r.at)}
           />
         </ListItem>
@@ -166,10 +166,6 @@ export default function SanctuaryPage() {
   const name = sanctuaryName(s, lang);
   const description = sanctuaryDescription(s, lang);
   const visits = merit?.visits || visit?.visits;
-  const color = s?.color && s.color !== '#FFFFFF' ? s.color : '#8B4513';
-  // Glow color per faith (white-gold light for the Christian chapel)
-  const glowHex = s?.color && s.color !== '#FFFFFF' ? s.color : '#F4D27A';
-  const glowRgb = [1, 3, 5].map((i) => parseInt(glowHex.slice(i, i + 2), 16) || 200).join(',');
 
   return (
     <Container maxWidth="md" sx={{ py: 2 }}>
@@ -181,38 +177,28 @@ export default function SanctuaryPage() {
 
       {s && (
         <>
-          {/* Big welcome */}
-          <Paper
-            elevation={2}
-            sx={{
-              p: { xs: 3, sm: 4 },
-              mb: 2,
-              textAlign: 'center',
-              background: 'linear-gradient(180deg, #FFF8E7 0%, #F5E6D3 100%)',
-              borderTop: `6px solid ${color}`,
-              overflow: 'hidden',
-              position: 'relative',
-            }}
+          {/* Big welcome, over the sanctuary's 3D hall */}
+          <SanctuaryScene
+            religionType={s.religion_type}
+            soundOnLabel={tr('播放環境音', 'Play ambient sound')}
+            soundOffLabel={tr('關閉環境音', 'Turn off ambient sound')}
           >
-            <Box sx={{ position: 'relative', height: { xs: 110, sm: 130 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <SacredGlow size={150} color={glowRgb} />
-              <Typography sx={{ position: 'relative', fontSize: { xs: '3.4rem', sm: '4rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>
-            </Box>
-            <Typography sx={{ fontSize: { xs: '1.6rem', sm: '2rem' }, fontWeight: 700, color: '#5a3a1a', mt: 1 }}>
+            <Typography sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>
+            <Typography sx={{ fontSize: { xs: '1.15rem', sm: '1.4rem' }, fontWeight: 600, mt: 0.5, color: '#F3E3C0' }}>
               {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}, to the`)}
             </Typography>
-            <Typography sx={{ fontSize: { xs: '2rem', sm: '2.5rem' }, fontWeight: 800, color: '#8B4513' }}>{name}</Typography>
+            <Typography sx={{ fontSize: { xs: '1.8rem', sm: '2.3rem' }, fontWeight: 800, color: '#FFE3A3', lineHeight: 1.25 }}>{name}</Typography>
             {visit && (
-              <Typography sx={{ fontSize: { xs: '1.35rem', sm: '1.6rem' }, mt: 1.5, color: '#333' }}>
+              <Typography sx={{ fontSize: { xs: '1.1rem', sm: '1.3rem' }, mt: 0.8, color: '#fff' }}>
                 {tr('您是今天第', 'You are visitor no.')}{' '}
-                <Box component="span" sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, fontWeight: 800, color: '#C62828' }}>
+                <Box component="span" sx={{ fontSize: { xs: '1.7rem', sm: '2rem' }, fontWeight: 800, color: '#FFB4A2' }}>
                   {visit.visitor_number}
                 </Box>{' '}
                 {tr('位參訪者', 'today')}
               </Typography>
             )}
-            {description && <Typography sx={{ mt: 1, color: 'text.secondary', fontSize: '1.05rem' }}>{description}</Typography>}
-          </Paper>
+            {description && <Typography sx={{ mt: 0.5, color: 'rgba(255,255,255,.8)', fontSize: '0.98rem' }}>{description}</Typography>}
+          </SanctuaryScene>
 
           {/* Visitor statistics */}
           {visits && (
