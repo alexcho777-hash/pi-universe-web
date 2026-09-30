@@ -19,11 +19,11 @@ import {
 } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { apiClient } from '../../api/ApiClient';
-import { Lang } from '../../i18n/i18n';
+import { Lang, tx } from '../../i18n/i18n';
 import { JOSS_PAPER, daysBetween, nextAnniversary, nextLunarDay } from '../../faith/homeAltar';
 
 type TR = (zh: string, en: string) => string;
-const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : pair[1]);
+const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
 
 const today = () => {
   const d = new Date();

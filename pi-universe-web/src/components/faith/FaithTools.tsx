@@ -5,13 +5,13 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Box, Button, Chip, LinearProgress, MenuItem, TextField, Typography, keyframes } from '@mui/material';
-import { Lang } from '../../i18n/i18n';
+import { Lang, tx, localeOf } from '../../i18n/i18n';
 import { LORDS_PRAYER, MYSTERIES, RECITATIONS, ROSARY_PRAYERS, verseOfTheDay } from '../../faith/texts';
 import { CITIES, hhmm, prayerTimes, qiblaBearing } from '../../faith/prayerTimes';
 import { MoonBlocks, ThrowResult } from '../../oracle/OracleArt';
 
 type TR = (zh: string, en: string) => string;
-const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : pair[1]);
+const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
 const today = () => {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
@@ -84,7 +84,7 @@ export function BeadCounter({ faith, lang, tr }: { faith: 'buddhist' | 'hindu' |
         ))}
       </Box>
       <Typography sx={{ fontSize: '1.5rem', fontWeight: 800, mb: 0.5 }}>{rec.text}</Typography>
-      {lang === 'en' && rec.romanized && <Typography sx={{ fontSize: '1.1rem', fontStyle: 'italic', mb: 0.5 }}>{rec.romanized}</Typography>}
+      {lang !== 'zh' && rec.romanized && <Typography sx={{ fontSize: '1.1rem', fontStyle: 'italic', mb: 0.5 }}>{rec.romanized}</Typography>}
       <Typography sx={{ color: 'text.secondary', mb: 2 }}>{pick(rec.hint, lang)}</Typography>
       <Box
         component="button"
@@ -198,7 +198,7 @@ export function VersePanel({ lang, tr }: { lang: Lang; tr: TR }) {
   return (
     <Box>
       <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: '#FFF9EC', borderLeft: '5px solid #D4AF37' }}>
-        <Typography sx={{ fontSize: '1.3rem', lineHeight: 1.9, fontFamily: '"Noto Serif TC", Georgia, serif' }}>{lang === 'en' ? v.en : v.zh}</Typography>
+        <Typography sx={{ fontSize: '1.3rem', lineHeight: 1.9, fontFamily: '"Noto Serif TC", Georgia, serif' }}>{lang === 'zh' ? v.zh : v.en}</Typography>
         <Typography sx={{ mt: 1, textAlign: 'right', fontWeight: 700 }}>— {pick(v.ref, lang)}</Typography>
       </Box>
       <Typography sx={{ mt: 1, fontSize: '0.9rem', color: 'text.secondary' }}>
@@ -264,7 +264,7 @@ const flicker = keyframes`
   75% { transform: scaleY(1.04) translateX(0); opacity: 1; }
 `;
 
-function Flame({ size = 1 }: { size?: number }) {
+export function Flame({ size = 1 }: { size?: number }) {
   return (
     <Box
       sx={{
@@ -281,8 +281,9 @@ function Flame({ size = 1 }: { size?: number }) {
   );
 }
 
-export function CandlePanel({ tr }: { tr: TR }) {
-  const key = `pu-candle-${today()}`;
+export function CandlePanel({ tr, scope = '' }: { tr: TR; scope?: string }) {
+  // Each sanctuary keeps its own candle (the Catholic one keeps the original key)
+  const key = scope ? `pu-candle-${scope}-${today()}` : `pu-candle-${today()}`;
   const [lit, setLit] = useState<{ intention: string } | null>(() => load(key, null));
   const [intention, setIntention] = useState('');
   const [now, setNow] = useState(() => new Date());
@@ -439,7 +440,7 @@ export function PrayerTimesPanel({ lang, tr }: { lang: Lang; tr: TR }) {
       {loc.place && times && (
         <>
           <Typography sx={{ mb: 1, color: 'text.secondary' }}>
-            {loc.place.name} · {now.toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-TW')}
+            {loc.place.name} · {now.toLocaleDateString(localeOf(lang))}
           </Typography>
           {rows.map(([zh, en, t]) => {
             const isNext = next && next[1] === en;
@@ -449,7 +450,7 @@ export function PrayerTimesPanel({ lang, tr }: { lang: Lang; tr: TR }) {
                 sx={{ display: 'flex', justifyContent: 'space-between', p: 1.3, borderRadius: 1.5, mb: 0.5, bgcolor: isNext ? '#E8F5E9' : '#fafafa', border: isNext ? '2px solid #2E7D32' : '1px solid #eee' }}
               >
                 <Typography sx={{ fontSize: '1.15rem', fontWeight: isNext ? 800 : 500 }}>
-                  {lang === 'en' ? en : zh}
+                  {lang === 'zh' ? zh : tx(en, lang)}
                   {isNext ? tr('（下一個）', ' (next)') : ''}
                 </Typography>
                 <Typography sx={{ fontSize: '1.2rem', fontWeight: 700 }}>{hhmm(t)}</Typography>
@@ -575,7 +576,7 @@ export function ShrinePanel({ lang, tr }: { lang: Lang; tr: TR }) {
         <>
           <Typography sx={{ fontSize: '4rem', lineHeight: 1.2 }}>{s[0]}</Typography>
           <Typography sx={{ fontWeight: 800, mb: 1 }}>{tr(`步驟 ${step + 1} / ${SHRINE_STEPS.length}`, `Step ${step + 1} of ${SHRINE_STEPS.length}`)}</Typography>
-          <Big>{lang === 'en' ? s[2] : s[1]}</Big>
+          <Big>{lang === 'zh' ? s[1] : tx(s[2], lang)}</Big>
           <Button variant="contained" size="large" fullWidth sx={{ mt: 2, fontSize: '1.15rem' }} onClick={() => { setStep(step + 1); buzz(20); }}>
             {tr('下一步', 'Next')}
           </Button>

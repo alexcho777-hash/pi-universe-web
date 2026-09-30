@@ -33,6 +33,23 @@ import {
 import { LampPanel } from './LampPanel';
 import { WishVowPanel } from './WishVowPanel';
 import { ThanTaiInfoPanel, ThanTaiDayPanel } from './VietnameseFolk';
+import {
+  AngelusPanel,
+  DeityOfDayPanel,
+  GayatriPanel,
+  GratitudePanel,
+  LanternPanel,
+  NamesPanel,
+  OmamoriPanel,
+  PrayerListPanel,
+  PujaPanel,
+  RamadanPanel,
+  SaintPanel,
+  StationsPanel,
+  ThaiOfferingPanel,
+  ThaiVisitPanel,
+  TsukinamiPanel,
+} from './MoreActivities';
 
 interface Activity {
   key: string;
@@ -77,29 +94,46 @@ const ACTIVITIES: Record<string, Activity[]> = {
   ],
   thai_four_face: [
     { key: 'wishvow', icon: '🛕', title: ['許願還願', 'Wish & fulfil'], minutes: ['免費許願', 'Free to wish'] },
+    { key: 'thaiVisit', icon: '🧭', title: ['四面參拜順序', 'How to visit the four faces'], minutes: ['約 3 分鐘', 'About 3 min'] },
+    { key: 'thaiOffer', icon: '🌼', title: ['上香獻花', 'Incense, candles & garlands'], minutes: ['約 2 分鐘', 'About 2 min'] },
+    { key: 'candleThai', icon: '🕯️', title: ['點燭祈福', 'Light a candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
   ],
   vietnamese_folk: VIETNAMESE_ALTAR,
   christian: [
     { key: 'verse', icon: '📖', title: ['每日經文', 'Verse of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
     { key: 'prayer', icon: '🙏', title: ['主禱文與默禱', "Lord's Prayer & quiet prayer"], minutes: ['約 4 分鐘', 'About 4 min'] },
+    { key: 'candleChristian', icon: '🕯️', title: ['點蠟燭祈禱', 'Light a prayer candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+    { key: 'gratitude', icon: '📝', title: ['感恩日記', 'Gratitude journal'], minutes: ['每天三件', 'Three a day'] },
+    { key: 'prayerList', icon: '🤲', title: ['代禱事項', 'Prayer list'], minutes: ['記錄與回顧', 'Keep and look back'] },
   ],
   catholic: [
     { key: 'rosary', icon: '📿', title: ['玫瑰經', 'Pray the Rosary'], minutes: ['約 20 分鐘', 'About 20 min'] },
     { key: 'candle', icon: '🕯️', title: ['點蠟燭祈禱', 'Light a prayer candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
     { key: 'verse', icon: '📖', title: ['每日經文', 'Verse of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
+    { key: 'angelus', icon: '🔔', title: ['三鐘經', 'The Angelus'], minutes: ['約 3 分鐘', 'About 3 min'] },
+    { key: 'stations', icon: '✝️', title: ['苦路十四處', 'Stations of the Cross'], minutes: ['約 15 分鐘', 'About 15 min'] },
+    { key: 'saint', icon: '😇', title: ['今日聖人', 'Feast of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
   ],
   islamic: [
     { key: 'times', icon: '🕌', title: ['今日禮拜時間', "Today's prayer times"], minutes: ['即時計算', 'Calculated for you'] },
     { key: 'qibla', icon: '🧭', title: ['朝拜方向', 'Qibla direction'], minutes: ['約 1 分鐘', 'About 1 min'] },
     { key: 'beads', icon: '📿', title: ['讚念（Tasbih）', 'Tasbih (dhikr)'], minutes: ['約 3 分鐘', 'About 3 min'] },
+    { key: 'names99', icon: '✨', title: ['真主九十九尊名', 'The 99 Names'], minutes: ['每天一個', 'One a day'] },
+    { key: 'ramadan', icon: '🌙', title: ['齋戒月倒數', 'Ramadan countdown'], minutes: ['自動倒數', 'Auto countdown'] },
   ],
   shinto: [
     { key: 'shrine', icon: '⛩️', title: ['參拜作法', 'How to visit a shrine'], minutes: ['約 2 分鐘', 'About 2 min'] },
     { key: 'ema', icon: '🪧', title: ['繪馬許願', 'Write an ema wish'], minutes: ['最多掛 20 個', 'Up to 20 wishes'] },
+    { key: 'lantern', icon: '🏮', title: ['奉納燈籠', 'Offer a lantern'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+    { key: 'omamori', icon: '🧧', title: ['御守', 'Omamori charms'], minutes: ['約 1 分鐘', 'About 1 min'] },
+    { key: 'tsukinami', icon: '📅', title: ['月次祭提醒', 'Tsukinami-sai reminder'], minutes: ['每月 1 日、15 日', '1st & 15th monthly'] },
   ],
   hindu: [
     { key: 'beads', icon: '📿', title: ['108 念珠持咒', 'Japa mala (108)'], minutes: ['約 10 分鐘', 'About 10 min'] },
     { key: 'aarti', icon: '🪔', title: ['Aarti 獻燈', 'Aarti (offering light)'], minutes: ['約 2 分鐘', 'About 2 min'] },
+    { key: 'gayatri', icon: '🕉️', title: ['Gayatri 咒語', 'Gayatri mantra'], minutes: ['108 遍一圈', '108 per round'] },
+    { key: 'deityDay', icon: '🌺', title: ['今日守護神', 'Deity of the day'], minutes: ['依星期', 'By weekday'] },
+    { key: 'puja', icon: '🍌', title: ['Puja 供奉步驟', 'Home puja steps'], minutes: ['約 10 分鐘', 'About 10 min'] },
   ],
 };
 
@@ -166,6 +200,40 @@ export function FaithActivities({
         return <ThanTaiInfoPanel />;
       case 'thantaiDay':
         return <ThanTaiDayPanel />;
+      case 'thaiVisit':
+        return <ThaiVisitPanel tr={tr} lang={lang} />;
+      case 'thaiOffer':
+        return <ThaiOfferingPanel tr={tr} lang={lang} />;
+      case 'candleThai':
+        return <CandlePanel tr={tr} scope="thai" />;
+      case 'candleChristian':
+        return <CandlePanel tr={tr} scope="christian" />;
+      case 'gratitude':
+        return <GratitudePanel tr={tr} lang={lang} />;
+      case 'prayerList':
+        return <PrayerListPanel tr={tr} />;
+      case 'angelus':
+        return <AngelusPanel tr={tr} lang={lang} />;
+      case 'stations':
+        return <StationsPanel tr={tr} lang={lang} />;
+      case 'saint':
+        return <SaintPanel tr={tr} lang={lang} />;
+      case 'names99':
+        return <NamesPanel tr={tr} lang={lang} />;
+      case 'ramadan':
+        return <RamadanPanel tr={tr} />;
+      case 'lantern':
+        return <LanternPanel tr={tr} />;
+      case 'omamori':
+        return <OmamoriPanel tr={tr} lang={lang} />;
+      case 'tsukinami':
+        return <TsukinamiPanel tr={tr} />;
+      case 'gayatri':
+        return <GayatriPanel tr={tr} lang={lang} />;
+      case 'deityDay':
+        return <DeityOfDayPanel tr={tr} lang={lang} />;
+      case 'puja':
+        return <PujaPanel tr={tr} lang={lang} />;
       default:
         return null;
     }

@@ -22,7 +22,7 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { apiClient } from '../../api/ApiClient';
-import { Lang } from '../../i18n/i18n';
+import { Lang, tx } from '../../i18n/i18n';
 import { useAuthStore } from '../../stores/authStore';
 
 type TR = (zh: string, en: string) => string;
@@ -38,14 +38,15 @@ interface Post {
 }
 
 function timeAgo(iso: string, lang: Lang): string {
+  const tr = (zh: string, en: string) => (lang === 'zh' ? zh : tx(en, lang));
   const diffMs = Date.now() - new Date(iso).getTime();
   const mins = Math.max(0, Math.round(diffMs / 60000));
-  if (mins < 1) return lang === 'en' ? 'just now' : '剛剛';
-  if (mins < 60) return lang === 'en' ? `${mins} min ago` : `${mins} 分鐘前`;
+  if (mins < 1) return tr('剛剛', 'just now');
+  if (mins < 60) return tr(`${mins} 分鐘前`, `${mins} min ago`);
   const hours = Math.round(mins / 60);
-  if (hours < 24) return lang === 'en' ? `${hours} h ago` : `${hours} 小時前`;
+  if (hours < 24) return tr(`${hours} 小時前`, `${hours} h ago`);
   const days = Math.round(hours / 24);
-  return lang === 'en' ? `${days} d ago` : `${days} 天前`;
+  return tr(`${days} 天前`, `${days} d ago`);
 }
 
 export function BoardPanel({ religionType, tr, lang }: { religionType: string; tr: TR; lang: Lang }) {
