@@ -2,15 +2,24 @@
  * Settings Page - π Universe Web
  */
 
-import { Container, Paper, Box, Typography, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Container, Paper, Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { useI18n } from '../i18n/i18n';
+import { useI18n, Lang } from '../i18n/i18n';
+
+const LANGS: [Lang, string][] = [
+  ['zh', '中文'],
+  ['en', 'English'],
+  ['vi', 'Tiếng Việt'],
+  ['th', 'ภาษาไทย'],
+  ['ja', '日本語'],
+  ['hi', 'हिन्दी'],
+];
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { logout } = useAuthStore();
-  const { lang, setLang, tr } = useI18n();
+  const { lang, setLang, tr, tr4 } = useI18n();
 
   const handleLogout = async () => {
     if (window.confirm(tr('確定要登出嗎？', 'Are you sure you want to sign out?'))) {
@@ -24,16 +33,22 @@ export default function SettingsPage() {
       <Typography sx={{ fontSize: '1.4rem', fontWeight: 700, mb: 1.5 }}>{tr('設定', 'Settings')}</Typography>
 
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Typography sx={{ fontSize: '1.1rem' }}>{tr('語言 Language', 'Language 語言')}</Typography>
-          <ToggleButtonGroup exclusive value={lang} onChange={(_, v) => v && setLang(v)}>
-            <ToggleButton value="en" sx={{ fontSize: '1.05rem', px: 2.5 }}>
-              English
-            </ToggleButton>
-            <ToggleButton value="zh" sx={{ fontSize: '1.05rem', px: 2.5 }}>
-              中文
-            </ToggleButton>
-          </ToggleButtonGroup>
+        <Typography sx={{ fontSize: '1.1rem', mb: 1.5 }}>
+          {tr4('語言 Language', 'Language 語言', 'Ngôn ngữ · Language', 'ภาษา · Language')}
+        </Typography>
+        {/* Plain buttons (not a toggle group) so each one is easy to tap on any phone */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+          {LANGS.map(([value, label]) => (
+            <Button
+              key={value}
+              variant={lang === value ? 'contained' : 'outlined'}
+              onClick={() => setLang(value)}
+              aria-pressed={lang === value}
+              sx={{ fontSize: '1.05rem', py: 1.1, textTransform: 'none' }}
+            >
+              {label}
+            </Button>
+          ))}
         </Box>
       </Paper>
 

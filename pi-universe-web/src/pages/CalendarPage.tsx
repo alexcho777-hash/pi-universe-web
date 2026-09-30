@@ -4,6 +4,8 @@
  */
 
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   Container,
   Paper,
@@ -21,7 +23,7 @@ import {
   Divider,
 } from '@mui/material';
 import CalendarHealth from '../components/CalendarHealth';
-import { useI18n, Lang, tx } from '../i18n/i18n';
+import { useI18n, useLangStore, Lang, tx, localeOf } from '../i18n/i18n';
 import {
   OBSERVANCE_EN,
   TIANSHEN_EN,
@@ -75,17 +77,25 @@ const pad = (n: number) => String(n).padStart(2, '0');
 const toParts = (dt: Date) => [dt.getFullYear(), dt.getMonth() + 1, dt.getDate()] as const;
 const addDays = (dt: Date, n: number) => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n);
 const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+/** Chinese and Japanese readers get the almanac in its own characters (農曆八月廿一, 宜/忌) */
+const readsKanji = (lang: Lang) => lang === 'zh' || lang === 'ja';
 /** 冬月/臘月 -> 十一月/十二月 for readability */
 const lunarMonthName = (m: string) => (m === '冬' ? '十一' : m === '臘' ? '十二' : m);
 
 export default function CalendarPage() {
-  const [mode, setMode] = useState<Mode>(() => (navigator.language || '').toLowerCase().startsWith('ja') ? 'jp' : 'tw');
+  const [mode, setMode] = useState<Mode>(() =>
+    useLangStore.getState().lang === 'ja' || (navigator.language || '').toLowerCase().startsWith('ja') ? 'jp' : 'tw'
+  );
   const [date, setDate] = useState<Date>(() => new Date());
   const today = new Date();
   const { tr, lang } = useI18n();
+  const navigate = useNavigate();
 
   return (
-    <Container maxWidth="md" sx={{ pt: 7, pb: 12 }}>
+    <Container maxWidth="md" sx={{ pt: 2, pb: 12 }}>
+      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')} sx={{ mb: 1, fontSize: '1.05rem' }}>
+        {tr('回首頁', 'Home')}
+      </Button>
       <ToggleButtonGroup
         exclusive
         fullWidth
@@ -124,7 +134,7 @@ export default function CalendarPage() {
         </IconButton>
       </Paper>
 
-      <CalendarHealth date={date} lang={mode === 'jp' ? 'jp' : lang !== 'zh' ? 'en' : 'tw'} />
+      <CalendarHealth date={date} lang={mode === 'jp' ? 'jp' : readsKanji(lang) ? 'tw' : 'en'} />
       {mode === 'tw' ? <TaiwanDayCard date={date} lang={lang} /> : <JapanDayCard date={date} />}
       <MonthGrid mode={mode} date={date} onPick={setDate} lang={lang} />
       {mode === 'tw' ? <TaiwanGoodDaySearch onPick={setDate} lang={lang} /> : <JapanLuckySearch onPick={setDate} />}
@@ -145,7 +155,7 @@ export default function CalendarPage() {
 function TaiwanDayCard({ date, lang }: { date: Date; lang: Lang }) {
   const d = useMemo(() => taiwanDay(...toParts(date)), [date]);
   const [y, m, dd] = toParts(date);
-  if (lang !== 'zh') return <TaiwanDayCardEn date={date} />;
+  if (!readsKanji(lang)) return <TaiwanDayCardEn date={date} lang={lang} />;
   return (
     <Paper sx={{ p: { xs: 2.5, sm: 3 }, mb: 2, borderTop: `6px solid ${d.huangDao ? GOOD : BAD}` }}>
       <Typography sx={{ fontSize: '1.15rem', color: 'text.secondary' }}>
@@ -208,9 +218,9 @@ function TaiwanDayCard({ date, lang }: { date: Date; lang: Lang }) {
   );
 }
 
-function TaiwanDayCardEn({ date }: { date: Date }) {
+function TaiwanDayCardEn({ date, lang }: { date: Date; lang: Lang }) {
   const d = useMemo(() => taiwanDay(...toParts(date)), [date]);
-  const gregorian = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const gregorian = date.toLocaleDateString(localeOf(lang), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   return (
     <Paper sx={{ p: { xs: 2.5, sm: 3 }, mb: 2, borderTop: `6px solid ${d.huangDao ? GOOD : BAD}` }} lang="en">
       <Typography sx={{ fontSize: '1.15rem', color: 'text.secondary' }}>{gregorian}</Typography>
@@ -380,7 +390,7 @@ function SenjitsuLine({ k }: { k: SenjitsuKey }) {
 
 // ---------------------------------------------------------------------------
 function MonthGrid({ mode, date, onPick, lang }: { mode: Mode; date: Date; onPick: (d: Date) => void; lang: Lang }) {
-  const en = mode === 'tw' && lang !== 'zh';
+  const en = mode === 'tw' && !readsKanji(lang);
   const y = date.getFullYear();
   const m = date.getMonth();
   const first = new Date(y, m, 1);
