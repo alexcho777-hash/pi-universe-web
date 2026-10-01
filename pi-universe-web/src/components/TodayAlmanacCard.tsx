@@ -4,7 +4,7 @@
 
 import { Paper, Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { taiwanDay } from '../calendar/almanac';
+import { japanDay, taiwanDay } from '../calendar/almanac';
 import CalendarHealth from './CalendarHealth';
 import { useI18n, tx } from '../i18n/i18n';
 import { OBSERVANCE_EN, chongEn, lunarDateEn, yijiEn } from '../calendar/almanacEn';
@@ -17,6 +17,17 @@ export default function TodayAlmanacCard() {
   const d = taiwanDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const color = d.huangDao ? '#2E7D32' : '#C62828';
   const { lang } = useI18n();
+  const jp = japanDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const jpStrip = (
+    <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
+      <Typography sx={{ fontSize: '1.05rem' }}>
+        🇯🇵 日本の暦　<b>{jp.rokuyo}</b>　旧暦{jp.kyureki}
+      </Typography>
+      <Button variant="outlined" onClick={() => navigate('/calendar?mode=jp')} sx={{ fontSize: '1.05rem' }}>
+        日本の暦 →
+      </Button>
+    </Box>
+  );
   // Chinese and Japanese readers get the almanac in its own characters; others get the English wording
   if (lang !== 'zh' && lang !== 'ja') {
     return (
@@ -48,6 +59,7 @@ export default function TodayAlmanacCard() {
           <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ mt: 1.5, fontSize: '1.05rem' }}>
             {tx('Full almanac & good-day finder →', lang)}
           </Button>
+        {jpStrip}
         </Paper>
       </>
     );
@@ -80,6 +92,7 @@ export default function TodayAlmanacCard() {
       <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ mt: 1.5, fontSize: '1.05rem' }}>
         {lang === 'ja' ? tx('Full almanac & good-day finder →', lang) : '查看完整農民曆・擇日 →'}
       </Button>
+      {jpStrip}
     </Paper>
     </>
   );

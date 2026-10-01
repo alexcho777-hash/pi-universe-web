@@ -84,6 +84,7 @@ const lunarMonthName = (m: string) => (m === '冬' ? '十一' : m === '臘' ? '�
 
 export default function CalendarPage() {
   const [mode, setMode] = useState<Mode>(() =>
+    new URLSearchParams(window.location.search).get('mode') === 'jp' ||
     useLangStore.getState().lang === 'ja' || (navigator.language || '').toLowerCase().startsWith('ja') ? 'jp' : 'tw'
   );
   const [date, setDate] = useState<Date>(() => new Date());

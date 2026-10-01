@@ -10,6 +10,8 @@ export interface AmbientHandle {
   stop: () => void;
   /** Re-try starting audio after a user gesture (browsers block autoplay) */
   resume: () => void;
+  /** Turn the background down while someone is being read to, back up afterwards */
+  duck: (on: boolean) => void;
 }
 
 /**
@@ -341,6 +343,15 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
   return {
+    duck: (on: boolean) => {
+      try {
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+        master.gain.linearRampToValueAtTime(on ? 0.06 : 0.5, ctx.currentTime + 0.8);
+      } catch {
+        /* ignore */
+      }
+    },
     resume: () => {
       if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     },

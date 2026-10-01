@@ -3,6 +3,7 @@
  * and a quiet prayer-watch timer. Everything stays on this device (localStorage).
  */
 
+import { ListenButton } from './ListenButton';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Button, Chip, Paper, Typography } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
@@ -245,6 +246,13 @@ export function PsalmsPanel({ tr, lang }: Props) {
         >
           {slow ? tr('結束慢讀', 'Exit slow reading') : tr('慢慢讀', 'Read slowly')}
         </Button>
+        <ListenButton
+          key={idx}
+          lines={p.v.map((pair) => (lang === 'zh' ? pair[0] : pair[1]))}
+          voice={lang === 'zh' ? 'zh-TW' : 'en-US'}
+          label={tr('聽經文', 'Listen')}
+          stopLabel={tr('停止', 'Stop')}
+        />
         {slow && (
           <>
             <Button variant="outlined" disabled={shown >= p.v.length} onClick={() => setShown(shown + 1)} sx={{ color: GOLD, borderColor: GOLD }}>

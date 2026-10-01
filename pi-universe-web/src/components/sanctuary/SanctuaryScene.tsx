@@ -141,8 +141,11 @@ export function SanctuaryScene({
     // if the browser blocked autoplay, the first touch lets it through
     const kick = () => ambient.current?.resume();
     window.addEventListener('pointerdown', kick, { once: true });
+    const onReading = (e: Event) => ambient.current?.duck(!!(e as CustomEvent).detail);
+    window.addEventListener('pu-reading', onReading);
     return () => {
       window.removeEventListener('pointerdown', kick);
+      window.removeEventListener('pu-reading', onReading);
       ambient.current?.stop();
       ambient.current = null;
     };

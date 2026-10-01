@@ -17,6 +17,9 @@ import { Lang, tx } from '../../i18n/i18n';
 import { DeityStatue } from './DeityStatue';
 import { GoldenShovelGift } from './GoldenShovel';
 import { useAdminStore } from '../../stores/adminStore';
+import { DEITY_INFO } from '../../faith/deityInfo';
+import { SCRIPTURES } from '../../faith/scriptures';
+import { ScriptureReader } from './ScriptureReader';
 import { Deity, GroupKey, PantheonSet, TAIWAN_SET } from '../../faith/pantheon';
 
 type TR = (zh: string, en: string) => string;
@@ -156,11 +159,34 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
         <Box sx={{ width: 36, height: '1px', background: 'rgba(228,193,112,.5)', mx: 'auto', my: 1 }} />
         <Typography sx={{ fontSize: '0.85rem', color: 'rgba(230,220,205,.8)', position: 'relative' }}>{pick(deity.short, lang)}</Typography>
       </Box>
-      <DialogContent>
-        <Typography sx={{ color: 'text.secondary', mb: 2 }}>{pick(deity.intro, lang)}</Typography>
-        <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', fontStyle: 'italic', mb: 2 }}>
+      <DialogContent sx={{ color: '#f0e6d7' }}>
+        <Typography sx={{ color: 'rgba(240,230,215,.85)', mb: 2 }}>{pick(deity.intro, lang)}</Typography>
+        <Typography sx={{ fontSize: '0.85rem', color: 'rgba(240,230,215,.85)', fontStyle: 'italic', mb: 2 }}>
           {disclaimer ? tr(disclaimer[0], disclaimer[1]) : tr('各地廟宇的說法與習俗略有不同，僅供參考。', 'Traditions and customs vary by temple and region — shown here for reference only.')}
         </Typography>
+
+
+        {DEITY_INFO[deity.key] && (() => {
+          const info = DEITY_INFO[deity.key];
+          const rows: [string, [string, string]][] = [
+            [tr('來歷', 'Origin'), info.origin],
+            [tr('供品', 'Offerings'), info.offering],
+            [tr('怎麼祈願', 'How to pray'), info.wish],
+          ];
+          if (info.day) rows.push([tr('重要日子', 'Special days'), info.day]);
+          return (
+            <Box sx={{ mb: 2 }}>
+              {rows.map(([h, v]) => (
+                <Box key={h} sx={{ mb: 1.5 }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#e8c170' }}>{h}</Typography>
+                  <Typography sx={{ fontSize: '0.9rem', color: 'rgba(240,230,215,.85)', lineHeight: 1.8 }}>{pick(v, lang)}</Typography>
+                </Box>
+              ))}
+              <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#e8c170', mb: 1 }}>{tr('經文・跟讀', 'Scriptures · read along')}</Typography>
+              {info.scriptures.map((id) => SCRIPTURES[id] && <ScriptureReader key={id} scripture={SCRIPTURES[id]} tr={tr} />)}
+            </Box>
+          );
+        })()}
 
         <DeityIncense deityKey={deity.key} tr={tr} />
 

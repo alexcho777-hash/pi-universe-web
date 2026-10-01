@@ -4,6 +4,8 @@
  * Counts are kept on this device only (localStorage, key `pu-chant-<yyyy-m-d>`).
  */
 
+import { ListenButton } from './ListenButton';
+import { SCRIPTURES } from '../../faith/scriptures';
 import { useState } from 'react';
 import { Box, Button, Chip, Collapse, Paper, Switch, FormControlLabel, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import type { Lang } from '../../i18n/i18n';
@@ -72,12 +74,8 @@ const ITEMS: Record<string, Item> = {
   compassion: {
     id: 'compassion',
     title: '大悲咒',
-    sub: ['計數專用', 'Counter only'],
-    lines: [],
-    counterOnly: [
-      '大悲咒全文較長，為免抄錄有誤，這裡僅提供計數。請依您所持的經本或師長教導誦持，誦完一遍按 +1。',
-      'The Great Compassion Mantra is long; to avoid transcription errors, only a counter is offered here. Chant from your own text or teacher, then tap +1 after each round.',
-    ],
+    sub: ['千手千眼觀世音菩薩廣大圓滿無礙大悲心陀羅尼', 'Great Compassion Dharani of Avalokiteshvara'],
+    lines: SCRIPTURES.bd_dabei.lines,
   },
   rebirth: {
     id: 'rebirth',
@@ -258,6 +256,9 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
                   >
                     {item.counterOnly || item.id === 'name' ? tr('＋1 遍', '+1') : tr('讀完一遍 ＋1', 'Completed once +1')}
                   </Button>
+                  {!item.counterOnly && (
+                    <ListenButton lines={item.lines} voice="zh-TW" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} />
+                  )}
                   {readAlong && pos >= 0 && (
                     <Button variant="outlined" onClick={() => setPos(-1)} sx={{ color: GOLD, borderColor: `${GOLD}77` }}>
                       {tr('重頭', 'Restart')}

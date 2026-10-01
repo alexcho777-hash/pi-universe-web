@@ -333,13 +333,13 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         >
           {tr('銀紙爐', 'Silver-paper furnace')}
           <br />
-          <span style={{ fontSize: '0.8rem', fontWeight: 400 }}>{tr('祖先與亡者', 'ancestors & the departed')}</span>
+          <span style={{ fontSize: '0.8rem', fontWeight: 400 }}>{tr('祖先與往生者', 'ancestors & the departed')}</span>
         </Button>
       </Box>
       <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 1.5 }}>
         {kind === 'god'
-          ? tr('敬神的金紙燒在金爐；祖先與亡者的紙錢另外燒，不可混在一起。', 'Paper for the gods goes in the gold furnace; paper for ancestors and the departed is burned separately.')
-          : tr('祖先與亡者的紙錢燒在獨立的銀紙爐，和敬神的金爐分開。', 'Paper for ancestors and the departed is burned in its own furnace, apart from the one for the gods.')}
+          ? tr('敬神的金紙燒在金爐；祖先與往生者的紙錢另外燒，不可混在一起。', 'Paper for the gods goes in the gold furnace; paper for ancestors and the departed is burned separately.')
+          : tr('祖先與往生者的紙錢燒在獨立的銀紙爐，和敬神的金爐分開。', 'Paper for ancestors and the departed is burned in its own furnace, apart from the one for the gods.')}
       </Typography>
       <Typography sx={{ fontWeight: 700, mb: 1 }}>{tr('再選要燒哪一種紙', 'Then choose the paper')}</Typography>
       <Paper variant="outlined" sx={{ mb: 2 }}>

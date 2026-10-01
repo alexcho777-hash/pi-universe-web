@@ -64,5 +64,5 @@ export const JOSS_PAPER: JossPaper[] = [
   { furnace: 'god', name: ['刈金', 'Yijin'], use: ['拜土地公、地基主、一般家神', 'For the Earth God, house spirits'] },
   { furnace: 'god', name: ['福金', 'Fujin'], use: ['拜土地公、財神', 'For the Earth God, wealth deities'] },
   { furnace: 'dead', name: ['大銀 / 小銀', 'Silver joss paper'], use: ['拜祖先', 'For ancestors'] },
-  { furnace: 'dead', name: ['往生錢', 'Rebirth money'], use: ['超度、祭拜亡者', 'For the deceased, deliverance rites'] },
+  { furnace: 'dead', name: ['往生錢', 'Rebirth money'], use: ['超度、祭拜往生者', 'For the deceased, deliverance rites'] },
 ];
