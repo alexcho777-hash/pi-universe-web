@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Button, Collapse, Typography } from '@mui/material';
 import type { Scripture } from '../../faith/scriptures';
+import { NO_VOICE_NOTE, useVoiceAvailable } from './ListenButton';
 
 type TR = (zh: string, en: string) => string;
 
@@ -37,6 +38,7 @@ export function ScriptureReader({ scripture, tr }: { scripture: Scripture; tr: T
       window.dispatchEvent(new CustomEvent('pu-reading', { detail: false }));
     };
   }, [playing]);
+  const voiceOk = useVoiceAvailable(scripture.voice);
   const hasVoice = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
   const stop = () => {
@@ -122,6 +124,11 @@ export function ScriptureReader({ scripture, tr }: { scripture: Scripture; tr: T
               </Typography>
             ))}
           </Box>
+          {!voiceOk && (
+            <Typography sx={{ fontSize: '0.8rem', fontStyle: 'italic', color: 'rgba(230,220,205,.65)', mt: 0.5 }}>
+              {tr(NO_VOICE_NOTE[0].replace('目前無法朗讀（尚無錄音檔）', '目前沒有聲音，只會逐行標示讓您跟著念（尚無錄音檔）'), 'This device has no voice for this language: the lines will light up one by one so you can read along, but there is no sound (no recordings yet).')}
+            </Typography>
+          )}
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center', mt: 1 }}>
             {playing ? (
               <Button size="small" variant="outlined" onClick={() => (stop(), setPos(-1))} sx={{ color: GOLD, borderColor: GOLD }}>

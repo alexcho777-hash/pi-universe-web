@@ -18,15 +18,16 @@ export default function TodayAlmanacCard() {
   const color = d.huangDao ? '#2E7D32' : '#C62828';
   const { lang } = useI18n();
   const jp = japanDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
-  const jpStrip = (
-    <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
-      <Typography sx={{ fontSize: '1.05rem' }}>
-        🇯🇵 日本の暦　<b>{jp.rokuyo}</b>　旧暦{jp.kyureki}
-      </Typography>
-      <Button variant="outlined" onClick={() => navigate('/calendar?mode=jp')} sx={{ fontSize: '1.05rem' }}>
-        日本の暦 →
-      </Button>
-    </Box>
+  const jpKyu = jp.kyureki.startsWith('旧暦') ? jp.kyureki : `旧暦${jp.kyureki}`;
+  const jpInfo = (
+    <Typography component="span" sx={{ fontSize: '1.05rem', fontWeight: 700, color: '#8B4513' }}>
+      日本の暦　<span style={{ color: jp.rokuyo === '大安' ? '#2E7D32' : jp.rokuyo === '仏滅' || jp.rokuyo === '赤口' ? '#C62828' : 'inherit' }}>{jp.rokuyo}</span>　{jpKyu}
+    </Typography>
+  );
+  const jpButton = (
+    <Button variant="outlined" onClick={() => navigate('/calendar?mode=jp')} sx={{ fontSize: '1.05rem' }}>
+      日本の暦 →
+    </Button>
   );
   // Chinese and Japanese readers get the almanac in its own characters; others get the English wording
   if (lang !== 'zh' && lang !== 'ja') {
@@ -41,6 +42,7 @@ export default function TodayAlmanacCard() {
           <Typography sx={{ fontSize: '1.15rem', color: '#8B4513', fontWeight: 700, mt: 0.5 }}>
             {lunarDateEn(d)} · {chongEn(d)}
           </Typography>
+          <Box sx={{ mt: 0.3 }}>{jpInfo}</Box>
           {d.observances.map((o) => {
             const en = OBSERVANCE_EN[o.name];
             return (
@@ -56,10 +58,12 @@ export default function TodayAlmanacCard() {
           <Typography sx={{ fontSize: '1.05rem' }}>
             <b style={{ color: '#C62828' }}>{tx('Avoid', lang)}</b>　{d.ji.slice(0, 4).map(yijiEn).join(', ') || '—'}
           </Typography>
-          <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ mt: 1.5, fontSize: '1.05rem' }}>
-            {tx('Full almanac & good-day finder →', lang)}
-          </Button>
-        {jpStrip}
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1.5 }}>
+            <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ fontSize: '1.05rem' }}>
+              {tx('Full almanac & good-day finder →', lang)}
+            </Button>
+            {jpButton}
+          </Box>
         </Paper>
       </>
     );
@@ -74,9 +78,12 @@ export default function TodayAlmanacCard() {
           {lang === 'ja' ? tx(d.huangDao ? 'Auspicious day' : 'Inauspicious day', lang) : d.huangDao ? '黃道吉日' : '黑道日'}
         </Typography>
       </Box>
-      <Typography sx={{ fontSize: '1.2rem', color: '#8B4513', fontWeight: 700, mt: 0.5 }}>
-        農曆{lunarMonthName(d.lunarMonth)}月{d.lunarDay}　{d.chong}
-      </Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', columnGap: 3, rowGap: 0.3, mt: 0.5 }}>
+        <Typography sx={{ fontSize: '1.2rem', color: '#8B4513', fontWeight: 700 }}>
+          農曆{lunarMonthName(d.lunarMonth)}月{d.lunarDay}　{d.chong}
+        </Typography>
+        {jpInfo}
+      </Box>
       {d.observances.map((o) => (
         <Typography key={o.name} sx={{ fontSize: '1.1rem', mt: 0.5 }}>
           🙏 {o.name}
@@ -89,10 +96,12 @@ export default function TodayAlmanacCard() {
       <Typography sx={{ fontSize: '1.1rem' }}>
         <b style={{ color: '#C62828' }}>忌</b>　{d.ji.slice(0, 6).join('、') || '—'}
       </Typography>
-      <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ mt: 1.5, fontSize: '1.05rem' }}>
-        {lang === 'ja' ? tx('Full almanac & good-day finder →', lang) : '查看完整農民曆・擇日 →'}
-      </Button>
-      {jpStrip}
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1.5 }}>
+        <Button variant="outlined" onClick={() => navigate('/calendar')} sx={{ fontSize: '1.05rem' }}>
+          {lang === 'ja' ? tx('Full almanac & good-day finder →', lang) : '查看完整農民曆・擇日 →'}
+        </Button>
+        {jpButton}
+      </Box>
     </Paper>
     </>
   );

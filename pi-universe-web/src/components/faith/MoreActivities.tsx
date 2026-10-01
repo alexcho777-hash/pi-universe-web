@@ -9,7 +9,7 @@
  * Everything is kept on this device only (localStorage) — nothing is sent to the server.
  */
 
-import { ListenButton } from './ListenButton';
+import { ListenButton, NO_VOICE_NOTE } from './ListenButton';
 import { useMemo, useState } from 'react';
 import { Alert, Box, Button, Chip, Divider, IconButton, LinearProgress, Paper, TextField, Typography } from '@mui/material';
 import { MalaRing, MALA_COLORS } from './MalaRing';
@@ -261,7 +261,7 @@ export function AngelusPanel({ tr, lang }: { tr: TR; lang: Lang }) {
       ))}
       <Paper sx={{ p: 2, bgcolor: '#FFF9EC', borderLeft: '5px solid #D4AF37' }}>
         <Typography sx={{ fontSize: '1.08rem', lineHeight: 1.9 }}>{orig(ANGELUS_PRAYER, lang)}</Typography>
-        <ListenButton lines={[...ANGELUS.flatMap((a) => [orig(a.v, lang), orig(a.r, lang)]), orig(ANGELUS_PRAYER, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
+        <ListenButton lines={[...ANGELUS.flatMap((a) => [orig(a.v, lang), orig(a.r, lang)]), orig(ANGELUS_PRAYER, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
       </Paper>
     </Box>
   );
@@ -570,7 +570,7 @@ export function GayatriPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         <Typography sx={{ fontSize: '1.3rem', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{GAYATRI.devanagari}</Typography>
         <Typography sx={{ mt: 1, fontStyle: 'italic', whiteSpace: 'pre-line', color: '#6b3f10' }}>{GAYATRI.roman}</Typography>
         <Typography sx={{ mt: 1.2 }}>{orig(GAYATRI.meaning, lang)}</Typography>
-        <ListenButton lines={GAYATRI.devanagari.split('\n')} voice="hi-IN" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
+        <ListenButton lines={GAYATRI.devanagari.split('\n')} voice="hi-IN" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
       </Paper>
       <MalaRing
         value={n}

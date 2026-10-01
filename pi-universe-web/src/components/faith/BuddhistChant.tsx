@@ -4,7 +4,7 @@
  * Counts are kept on this device only (localStorage, key `pu-chant-<yyyy-m-d>`).
  */
 
-import { ListenButton } from './ListenButton';
+import { ListenButton, NO_VOICE_NOTE } from './ListenButton';
 import { SCRIPTURES } from '../../faith/scriptures';
 import { useState } from 'react';
 import { Box, Button, Chip, Collapse, Paper, Switch, FormControlLabel, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
@@ -257,7 +257,7 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
                     {item.counterOnly || item.id === 'name' ? tr('＋1 遍', '+1') : tr('讀完一遍 ＋1', 'Completed once +1')}
                   </Button>
                   {!item.counterOnly && (
-                    <ListenButton lines={item.lines} voice="zh-TW" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} />
+                    <ListenButton lines={item.lines} voice="zh-TW" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} />
                   )}
                   {readAlong && pos >= 0 && (
                     <Button variant="outlined" onClick={() => setPos(-1)} sx={{ color: GOLD, borderColor: `${GOLD}77` }}>

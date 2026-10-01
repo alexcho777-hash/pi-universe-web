@@ -9,7 +9,7 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { sceneFor } from './sceneConfig';
 import { Camera, Particle, renderScene, spawnParticle, stepParticles } from './renderScene';
-import { AmbientHandle, startAmbient } from './ambient';
+import { AmbientHandle, startAmbient, stopAllAmbient } from './ambient';
 
 export function SanctuaryScene({
   religionType,
@@ -155,6 +155,7 @@ export function SanctuaryScene({
   const toggleSound = () => {
     if (soundOn) {
       ambient.current?.stop();
+      stopAllAmbient();
       ambient.current = null;
       setSoundOn(false);
       setPref(false);

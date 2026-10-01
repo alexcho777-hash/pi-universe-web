@@ -60,12 +60,38 @@ function unlockIosAudio(): HTMLAudioElement | null {
 
 const midi = (n: number) => 440 * Math.pow(2, (n - 69) / 12);
 
+const activeAmbients = new Set<AmbientHandle>();
+
+/** Silence every background sound that is still running (safety net for the speaker button). */
+export function stopAllAmbient() {
+  [...activeAmbients].forEach((h) => h.stop());
+  activeAmbients.clear();
+}
+
+/** Only one background sound at a time: starting a new one stops any earlier one. */
 export function startAmbient(kind: AmbientKind): AmbientHandle | null {
+  stopAllAmbient();
+  const h = startAmbientInner(kind);
+  if (!h) return null;
+  const rawStop = h.stop;
+  const wrapped: AmbientHandle = {
+    ...h,
+    stop: () => {
+      activeAmbients.delete(wrapped);
+      rawStop();
+    },
+  };
+  activeAmbients.add(wrapped);
+  return wrapped;
+}
+
+function startAmbientInner(kind: AmbientKind): AmbientHandle | null {
   const AC: typeof AudioContext | undefined = (window as any).AudioContext || (window as any).webkitAudioContext;
   if (!AC) return null;
   const keepAlive = unlockIosAudio();
   const ctx = new AC();
   const timers: number[] = [];
+  let stopped = false;
   const nodes: AudioScheduledSourceNode[] = [];
 
   // master → (dry + reverb) → out
@@ -94,6 +120,7 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
 
   const every = (min: number, max: number, fn: () => void, firstDelay = 0) => {
     const loop = () => {
+      if (stopped) return;
       fn();
       timers.push(window.setTimeout(loop, (min + Math.random() * (max - min)) * 1000));
     };
@@ -356,6 +383,7 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
       if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     },
     stop: () => {
+      stopped = true;
       timers.forEach((t) => window.clearTimeout(t));
       try {
         master.gain.cancelScheduledValues(ctx.currentTime);
