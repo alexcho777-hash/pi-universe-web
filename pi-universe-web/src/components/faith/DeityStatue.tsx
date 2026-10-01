@@ -217,6 +217,8 @@ function Body({ kind, robe, robeDark, trim, gold, skin }: { kind: Body; robe: st
         <path d="M76 64 Q90 92 80 116 L68 116 Q74 92 68 68Z" fill={robe} stroke={robeDark} strokeWidth="0.8" />
         <path d="M54 64 L60 86 L66 64" fill="none" stroke={trim} strokeWidth="1.8" />
         <path d="M24 134 Q60 126 96 134" fill="none" stroke={trim} strokeWidth="1.2" opacity="0.8" />
+        <path d="M50 100 Q44 118 34 136 M58 104 Q56 120 54 134 M70 104 Q74 120 80 134 M78 98 Q88 114 94 134" fill="none" stroke={robeDark} strokeWidth="0.9" opacity="0.55" strokeLinecap="round" />
+        <path d="M44 66 Q40 80 41 96" fill="none" stroke={shade('#ffffff', 0)} strokeWidth="0.8" opacity="0.18" />
         {kind === 'buddha' ? (
           <path d="M60 64 L77 66 L80 96 Q70 104 62 100 Z" fill={skin} stroke="#a77c45" strokeWidth="0.8" />
         ) : (
@@ -253,11 +255,14 @@ function Body({ kind, robe, robeDark, trim, gold, skin }: { kind: Body; robe: st
         </>
       )}
       {!armor && <path d="M54 64 L60 88 L66 64" fill="none" stroke={trim} strokeWidth="1.8" />}
+      {!armor && <path d="M48 96 Q46 118 44 138 M56 100 Q55 120 54 138 M64 100 Q65 120 66 138 M72 96 Q74 118 76 138" fill="none" stroke={robeDark} strokeWidth="0.9" opacity="0.5" strokeLinecap="round" />}
+      <path d="M45 64 Q41 78 40 92" fill="none" stroke="#ffffff" strokeWidth="0.8" opacity="0.16" />
     </g>
   );
 }
 
 function Head({ kind, skin, trim, gold, beard, beardColor, robe }: { kind: Head; skin: string; trim: string; gold: string; beard?: string; beardColor?: string; robe: string }) {
+  const fid = useId().replace(/:/g, '');
   const fierce = ['helmet', 'official', 'hair'].includes(kind) || skin === '#c0392b';
   const face = (
     <g>
@@ -273,20 +278,38 @@ function Head({ kind, skin, trim, gold, beard, beardColor, robe }: { kind: Head;
         </>
       ) : (
         <>
-          <ellipse cx="60" cy="45" rx="11.8" ry="14.2" fill={skin} stroke="#a77c45" strokeWidth="0.8" />
+          <defs>
+            <radialGradient id={`fs${fid}`} cx="45%" cy="38%" r="70%">
+              <stop offset="0" stopColor={shade(skin, 0.14)} />
+              <stop offset="0.65" stopColor={skin} />
+              <stop offset="1" stopColor={shade(skin, -0.22)} />
+            </radialGradient>
+          </defs>
+          <path d="M53.5 54 L53 65 Q60 69 67 65 L66.5 54Z" fill={shade(skin, -0.2)} stroke="#a77c45" strokeWidth="0.6" />
+          <ellipse cx="48.4" cy="46.5" rx="2" ry="3.6" fill={shade(skin, -0.08)} stroke="#a77c45" strokeWidth="0.6" />
+          <ellipse cx="71.6" cy="46.5" rx="2" ry="3.6" fill={shade(skin, -0.08)} stroke="#a77c45" strokeWidth="0.6" />
+          <path d="M48 31 Q60 25 72 31 L71.5 40 Q60 36 48.5 40Z" fill="none" />
+          <path d="M51 31 Q44 44 51 57 Q60 63.4 69 57 Q76 44 69 31 Q60 26 51 31Z" fill={`url(#fs${fid})`} stroke="#a77c45" strokeWidth="0.8" />
+          <ellipse cx="53.4" cy="50" rx="3.4" ry="2.4" fill="#d9786a" opacity="0.13" />
+          <ellipse cx="66.6" cy="50" rx="3.4" ry="2.4" fill="#d9786a" opacity="0.13" />
+          <path d="M59 43 Q58.4 47 57.2 49.8 M61 43 Q61.6 47 62.8 49.8" stroke={shade(skin, -0.28)} strokeWidth="0.7" fill="none" opacity="0.7" strokeLinecap="round" />
           {fierce ? (
             <>
               <path d="M49.5 40.5 L57 42.2 M70.5 40.5 L63 42.2" stroke="#2a1608" strokeWidth="1.7" strokeLinecap="round" />
               <path d="M51 44 q3 -1.8 6 0 q-3 1.8 -6 0 M63 44 q3 -1.8 6 0 q-3 1.8 -6 0" fill="#fff6e6" stroke="#2a1608" strokeWidth="0.8" />
               <circle cx="54" cy="44" r="1.1" fill="#2a1608" />
               <circle cx="66" cy="44" r="1.1" fill="#2a1608" />
-              <path d="M60 45 v4.5 M56.6 52.4 h6.8" stroke="#6b2a1a" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+              <path d="M60 45 v4.5 M56.6 52.6 q3.4 1.2 6.8 0" stroke="#6b2a1a" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+              <path d="M60.4 49.6 q-1.6 0.8 -3 0.2 M59.6 49.6 q1.6 0.8 3 0.2" stroke="#6b2a1a" strokeWidth="0.7" fill="none" opacity="0.8" />
             </>
           ) : (
             <>
               <path d="M50.4 41 q3.4 -1.9 6.8 -0.2 M62.8 40.8 q3.4 -1.7 6.8 0.2" stroke="#4a3220" strokeWidth="1" fill="none" strokeLinecap="round" />
-              <path d="M51.4 44 q3 1.6 6 0 M62.6 44 q3 1.6 6 0" stroke="#2a1608" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-              <path d="M60 45 v4 M57.2 52.2 q2.8 0.9 5.6 0" stroke="#8a4a32" strokeWidth="1.1" strokeLinecap="round" fill="none" />
+              <path d="M51.2 43.6 q3.2 -1.6 6.4 0 q-3.2 2.6 -6.4 0Z M62.4 43.6 q3.2 -1.6 6.4 0 q-3.2 2.6 -6.4 0Z" fill={shade(skin, -0.3)} opacity="0.55" />
+              <path d="M51.2 43.8 q3.2 1.9 6.4 0 M62.4 43.8 q3.2 1.9 6.4 0" stroke="#2a1608" strokeWidth="1.15" fill="none" strokeLinecap="round" />
+              <path d="M51.6 42.6 q3 -1.4 6 0 M62.4 42.6 q3 -1.4 6 0" stroke={shade(skin, -0.35)} strokeWidth="0.6" fill="none" opacity="0.8" />
+              <path d="M60.4 49.6 q-1.6 0.8 -3 0.2 M59.6 49.6 q1.6 0.8 3 0.2" stroke="#8a4a32" strokeWidth="0.7" fill="none" opacity="0.8" />
+              <path d="M56.4 52.6 q3.6 1.2 7.2 0 q-3.6 2 -7.2 0Z" fill="#b5594a" stroke="#8a4a32" strokeWidth="0.5" />
             </>
           )}
           {['ushnisha', 'veil', 'marian'].includes(kind) && <circle cx="60" cy="38" r="1" fill="#c0392b" />}
