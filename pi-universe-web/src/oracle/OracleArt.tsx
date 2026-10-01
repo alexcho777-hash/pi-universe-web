@@ -53,17 +53,17 @@ function Block({ face, flip, tossing, delay }: { face: BlockFace; flip?: boolean
             <stop offset="1" stopColor={flat ? '#C6362E' : '#9E1A1C'} />
           </linearGradient>
         </defs>
-        {/* both faces share one half-moon outline, so the pair always looks symmetrical;
+        {/* both faces share one crescent outline, so the pair always looks symmetrical;
             only the surface differs: flat = matte, round = glossy dome */}
         <path
-          d="M17 14 Q17 8 23 10 Q66 22 66 58 Q66 94 23 106 Q17 108 17 102 Z"
+          d="M20 15 Q21 9 26 11 Q66 24 66 58 Q66 92 26 105 Q21 107 20 101 Q41 58 20 15 Z"
           fill={`url(#${uid}Fill)`}
           stroke={flat ? '#8E211B' : '#7A1214'}
           strokeWidth="1.6"
           strokeLinejoin="round"
         />
         {flat ? (
-          <path d="M24 22 L24 94" stroke="rgba(255,255,255,.28)" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M30 26 Q44 58 30 90" stroke="rgba(255,255,255,.3)" strokeWidth="2.4" fill="none" strokeLinecap="round" />
         ) : (
           <>
             <path d="M33 26 Q54 38 56 58" stroke="rgba(255,255,255,.5)" strokeWidth="4" fill="none" strokeLinecap="round" />
