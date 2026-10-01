@@ -319,16 +319,16 @@ const proc = keyframes`
   1%   { opacity: 1; }
   7%   { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); opacity: 1; filter: none; }
   22%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
-  25.5%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
-  27%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  25.5%  { transform: translateX(0) perspective(520px) rotateX(-58deg) translateY(5px); }
+  27%  { transform: translateX(0) perspective(520px) rotateX(-58deg) translateY(5px); }
   30.5%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
   47%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
-  50.5%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
-  52%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  50.5%  { transform: translateX(0) perspective(520px) rotateX(-58deg) translateY(5px); }
+  52%  { transform: translateX(0) perspective(520px) rotateX(-58deg) translateY(5px); }
   55.5%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
   72%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
-  75.5%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
-  77%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  75.5%  { transform: translateX(0) perspective(520px) rotateX(-58deg) translateY(5px); }
+  77%  { transform: translateX(0) perspective(520px) rotateX(-58deg) translateY(5px); }
   80.5%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
   88%  { transform: translateX(0) translateY(0); opacity: 1; filter: none; }
   98%  { transform: translateX(0) translateY(-8px); opacity: 0; filter: blur(5px) brightness(2.2); }
@@ -620,7 +620,7 @@ function Crowd({ religionType }: { religionType: string }) {
         ctx.save();
         ctx.globalAlpha = clamp01(u * 5) * (1 - v);
         ctx.translate(x, y);
-        ctx.scale(k, k * (1 - 0.14 * Math.min(1, bow)));
+        ctx.scale(k, k * (1 - 0.24 * Math.min(1, bow)));
         ctx.translate(-30, -128);
         drawLook(ctx, f.look);
         ctx.restore();
@@ -692,10 +692,10 @@ function greeting(religionType: string, lang: string): string {
 
 // feet position (% of the hall height), figure height (px) and distance from the aisle centre (%) for each row, far → near
 const ROWS = [
-  { y: 50, h: 0.25, d: 22 },
-  { y: 60, h: 0.33, d: 27 },
-  { y: 71, h: 0.43, d: 32 },
-  { y: 84, h: 0.56, d: 37 },
+  { y: 50, h: 0.25, d: 16.5 },
+  { y: 60, h: 0.33, d: 20.5 },
+  { y: 71, h: 0.43, d: 24 },
+  { y: 84, h: 0.56, d: 28 },
 ];
 
 export function WelcomeCeremony({ religionType, onDone }: { religionType: string; onDone: () => void }) {
