@@ -20,7 +20,7 @@ const LANGS: [Lang, string][] = [
 
 export default function SettingsPage() {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const { lang, setLang, tr, tr4 } = useI18n();
   const adminRole = useAdminStore((s) => s.role);
 
@@ -33,7 +33,10 @@ export default function SettingsPage() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 7, pb: 3 }}>
-      <Typography sx={{ fontSize: '1.4rem', fontWeight: 700, mb: 1.5 }}>{tr('設定', 'Settings')}</Typography>
+      <Typography sx={{ fontSize: '1.4rem', fontWeight: 700, mb: 0.5 }}>{tr('設定', 'Settings')}</Typography>
+      {user?.username && (
+        <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{tr('目前登入：', 'Signed in as: ')}{user.username}</Typography>
+      )}
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography sx={{ fontSize: '1.1rem', mb: 1.5 }}>

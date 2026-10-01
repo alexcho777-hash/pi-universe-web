@@ -161,7 +161,8 @@ const glowPulse = keyframes`
  * closed except for an arched mouth in front and a window on each side, a tiled roof with up-turned
  * eaves, and a chimney on top that carries the smoke away.
  */
-function Furnace({ burning }: { burning: boolean }) {
+function Furnace({ burning, kind = 'god' }: { burning: boolean; kind?: 'god' | 'dead' }) {
+  const dead = kind === 'dead';
   const uid = useId().replace(/:/g, '');
   const k = 1.45; // display scale
   const arch = 'M58 196 V160 Q58 143 85 143 Q112 143 112 160 V196 Z';
@@ -202,12 +203,12 @@ function Furnace({ burning }: { burning: boolean }) {
       >
         <defs>
           <linearGradient id={`wall${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#b8372b" />
-            <stop offset="1" stopColor="#7a1f17" />
+            <stop offset="0" stopColor={dead ? '#6b7683' : '#b8372b'} />
+            <stop offset="1" stopColor={dead ? '#353c46' : '#7a1f17'} />
           </linearGradient>
           <linearGradient id={`roof${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#f0cd6a" />
-            <stop offset="1" stopColor="#b8872a" />
+            <stop offset="0" stopColor={dead ? '#e3e6ea' : '#f0cd6a'} />
+            <stop offset="1" stopColor={dead ? '#8d939c' : '#b8872a'} />
           </linearGradient>
           <linearGradient id={`stone${uid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#8a7e70" />
@@ -229,14 +230,14 @@ function Furnace({ burning }: { burning: boolean }) {
 
         {/* lower tier body */}
         <rect x="28" y="126" width="114" height="72" fill={`url(#wall${uid})`} stroke="#3a0f0a" strokeWidth="1.4" />
-        <rect x="24" y="190" width="122" height="8" fill="#d6a93e" stroke="#7a5a12" strokeWidth="0.8" />
+        <rect x="24" y="190" width="122" height="8" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.8" />
         {/* corner pillars */}
-        <rect x="28" y="126" width="7" height="64" fill="#d6a93e" opacity="0.9" />
-        <rect x="135" y="126" width="7" height="64" fill="#d6a93e" opacity="0.9" />
+        <rect x="28" y="126" width="7" height="64" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
+        <rect x="135" y="126" width="7" height="64" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
         {/* plaque */}
         <rect x="68" y="130" width="34" height="11" rx="1.5" fill="#2c0b07" stroke="#e8c170" strokeWidth="0.9" />
-        <text x="85" y="139" textAnchor="middle" fontSize="9" fontWeight={800} fill="#f3d27a" fontFamily="serif">
-          金爐
+        <text x="85" y="139" textAnchor="middle" fontSize={dead ? 7.5 : 9} fontWeight={800} fill={dead ? '#e6e9ee' : '#f3d27a'} fontFamily="serif">
+          {dead ? '銀紙爐' : '金爐'}
         </text>
 
         {/* side windows (the burner is open on three sides) */}
@@ -273,20 +274,20 @@ function Furnace({ burning }: { burning: boolean }) {
 
         {/* upper tier */}
         <rect x="50" y="94" width="70" height="28" fill={`url(#wall${uid})`} stroke="#3a0f0a" strokeWidth="1.2" />
-        <rect x="50" y="94" width="6" height="28" fill="#d6a93e" opacity="0.9" />
-        <rect x="114" y="94" width="6" height="28" fill="#d6a93e" opacity="0.9" />
+        <rect x="50" y="94" width="6" height="28" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
+        <rect x="114" y="94" width="6" height="28" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
         <path d="M78 118 V106 Q78 99 85 99 Q92 99 92 106 V118 Z" fill="#17080a" stroke="#e8c170" strokeWidth="1.4" />
         <path d="M78 118 V106 Q78 99 85 99 Q92 99 92 106 V118 Z" fill="#ff8a2a" className={burning ? 'gl' : undefined} opacity={burning ? 0.8 : 0.2} />
 
         {/* upper roof */}
         <path d="M36 98 Q38 86 54 83 L116 83 Q132 86 134 98 Q124 93 116 94 L54 94 Q46 93 36 98Z" fill={`url(#roof${uid})`} stroke="#6b4a10" strokeWidth="1.2" />
         <path d="M36 98 Q34 92 38 88 M134 98 Q136 92 132 88" stroke="#6b4a10" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <rect x="66" y="79" width="38" height="5" rx="2" fill="#d6a93e" stroke="#6b4a10" strokeWidth="0.8" />
+        <rect x="66" y="79" width="38" height="5" rx="2" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#6b4a10" strokeWidth="0.8" />
 
         {/* chimney */}
         <rect x="78" y="34" width="14" height="46" fill={`url(#wall${uid})`} stroke="#3a0f0a" strokeWidth="1.1" />
-        <rect x="76" y="48" width="18" height="4" fill="#d6a93e" stroke="#7a5a12" strokeWidth="0.6" />
-        <rect x="76" y="64" width="18" height="4" fill="#d6a93e" stroke="#7a5a12" strokeWidth="0.6" />
+        <rect x="76" y="48" width="18" height="4" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.6" />
+        <rect x="76" y="64" width="18" height="4" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.6" />
         <path d="M72 35 L98 35 L94 27 L76 27Z" fill={`url(#roof${uid})`} stroke="#6b4a10" strokeWidth="1" />
         <ellipse cx="85" cy="27" rx="9" ry="2" fill="#1a0c06" />
         <circle cx="85" cy="24" r="2" fill="#f3d27a" />
@@ -298,23 +299,51 @@ function Furnace({ burning }: { burning: boolean }) {
 /** 金爐：先選要燒哪種金紙，再按下去有燃燒動畫（純粹是個記錄+小儀式感）。 */
 export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
   const key = `pu-jossburn-${today()}`;
+  const [kind, setKind] = useState<'god' | 'dead'>('god');
   const [picked, setPicked] = useState(0);
   const [burnedLog, setBurnedLog] = useState<string[]>(() => load(key, []));
   const [burning, setBurning] = useState(false);
+  const list = JOSS_PAPER.filter((p) => p.furnace === kind);
   const burn = () => {
     setBurning(true);
     setTimeout(() => {
       setBurning(false);
-      const next = [...burnedLog, JOSS_PAPER[picked].name[0]];
+      const next = [...burnedLog, list[picked].name[0]];
       setBurnedLog(next);
       save(key, next);
     }, 3800);
   };
   return (
     <Box sx={{ py: 1 }}>
-      <Typography sx={{ fontWeight: 700, mb: 1 }}>{tr('先選要燒哪一種金紙', 'Choose which joss paper to burn')}</Typography>
+      <Typography sx={{ fontWeight: 700, mb: 1 }}>{tr('先選哪一個爐', 'First choose the furnace')}</Typography>
+      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, mb: 1 }}>
+        <Button
+          variant={kind === 'god' ? 'contained' : 'outlined'}
+          onClick={() => (setKind('god'), setPicked(0))}
+          sx={{ textTransform: 'none', py: 1, lineHeight: 1.3, ...(kind === 'god' ? { backgroundColor: '#8B4513' } : {}) }}
+        >
+          {tr('金爐', 'Gold furnace')}
+          <br />
+          <span style={{ fontSize: '0.8rem', fontWeight: 400 }}>{tr('敬神明', 'for the gods')}</span>
+        </Button>
+        <Button
+          variant={kind === 'dead' ? 'contained' : 'outlined'}
+          onClick={() => (setKind('dead'), setPicked(0))}
+          sx={{ textTransform: 'none', py: 1, lineHeight: 1.3, ...(kind === 'dead' ? { backgroundColor: '#4b5563' } : {}) }}
+        >
+          {tr('銀紙爐', 'Silver-paper furnace')}
+          <br />
+          <span style={{ fontSize: '0.8rem', fontWeight: 400 }}>{tr('祖先與亡者', 'ancestors & the departed')}</span>
+        </Button>
+      </Box>
+      <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 1.5 }}>
+        {kind === 'god'
+          ? tr('敬神的金紙燒在金爐；祖先與亡者的紙錢另外燒，不可混在一起。', 'Paper for the gods goes in the gold furnace; paper for ancestors and the departed is burned separately.')
+          : tr('祖先與亡者的紙錢燒在獨立的銀紙爐，和敬神的金爐分開。', 'Paper for ancestors and the departed is burned in its own furnace, apart from the one for the gods.')}
+      </Typography>
+      <Typography sx={{ fontWeight: 700, mb: 1 }}>{tr('再選要燒哪一種紙', 'Then choose the paper')}</Typography>
       <Paper variant="outlined" sx={{ mb: 2 }}>
-        {JOSS_PAPER.map((p, i) => (
+        {list.map((p, i) => (
           <Box
             key={i}
             onClick={() => setPicked(i)}
@@ -341,7 +370,7 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         ))}
       </Paper>
       <Box sx={{ textAlign: 'center' }}>
-        <Furnace burning={burning} />
+        <Furnace burning={burning} kind={kind} />
         <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
           {burnedLog.length > 0
             ? tr(`今天已焚化：${burnedLog.join('、')}`, `Burned today: ${burnedLog.join(', ')}`)
@@ -350,7 +379,7 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         <Button variant="contained" onClick={burn} disabled={burning} sx={{ backgroundColor: '#8B4513' }}>
           {burning
             ? tr('焚化中…', 'Burning…')
-            : tr(`焚燒「${pick(JOSS_PAPER[picked].name, lang)}」`, `Burn "${pick(JOSS_PAPER[picked].name, lang)}"`)}
+            : tr(`焚燒「${pick(list[picked].name, lang)}」`, `Burn "${pick(list[picked].name, lang)}"`)}
         </Button>
       </Box>
     </Box>

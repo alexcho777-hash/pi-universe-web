@@ -51,16 +51,18 @@ export const daysBetween = (a: Date, b: Date) => {
 };
 
 export interface JossPaper {
+  /** god = burned in the 金爐 for deities; dead = burned in its own 銀紙爐 for ancestors and the deceased */
+  furnace: 'god' | 'dead';
   name: [string, string];
   use: [string, string];
 }
 
 /** Which joss paper (金紙) suits which kind of worship — general Taiwanese folk practice. */
 export const JOSS_PAPER: JossPaper[] = [
-  { name: ['天公金', 'Tiangong gold'], use: ['拜天公、玉皇大帝', 'For the Jade Emperor (Heaven)'] },
-  { name: ['壽金', 'Shoujin'], use: ['拜佛菩薩、觀音、一般神明', 'For Buddhas, Guanyin, most deities'] },
-  { name: ['刈金', 'Yijin'], use: ['拜土地公、地基主、一般家神', 'For the Earth God, house spirits'] },
-  { name: ['福金', 'Fujin'], use: ['拜土地公、財神', 'For the Earth God, wealth deities'] },
-  { name: ['大銀 / 小銀', 'Silver joss paper'], use: ['拜祖先', 'For ancestors'] },
-  { name: ['往生錢', 'Rebirth money'], use: ['超度、祭拜亡者', 'For the deceased, deliverance rites'] },
+  { furnace: 'god', name: ['天公金', 'Tiangong gold'], use: ['拜天公、玉皇大帝', 'For the Jade Emperor (Heaven)'] },
+  { furnace: 'god', name: ['壽金', 'Shoujin'], use: ['拜佛菩薩、觀音、一般神明', 'For Buddhas, Guanyin, most deities'] },
+  { furnace: 'god', name: ['刈金', 'Yijin'], use: ['拜土地公、地基主、一般家神', 'For the Earth God, house spirits'] },
+  { furnace: 'god', name: ['福金', 'Fujin'], use: ['拜土地公、財神', 'For the Earth God, wealth deities'] },
+  { furnace: 'dead', name: ['大銀 / 小銀', 'Silver joss paper'], use: ['拜祖先', 'For ancestors'] },
+  { furnace: 'dead', name: ['往生錢', 'Rebirth money'], use: ['超度、祭拜亡者', 'For the deceased, deliverance rites'] },
 ];
