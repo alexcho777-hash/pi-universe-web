@@ -692,10 +692,10 @@ function greeting(religionType: string, lang: string): string {
 
 // feet position (% of the hall height), figure height (px) and distance from the aisle centre (%) for each row, far → near
 const ROWS = [
-  { y: 40, h: 0.25, d: 22 },
-  { y: 52, h: 0.33, d: 27 },
-  { y: 66, h: 0.43, d: 32 },
-  { y: 82, h: 0.56, d: 37 },
+  { y: 50, h: 0.25, d: 22 },
+  { y: 60, h: 0.33, d: 27 },
+  { y: 71, h: 0.43, d: 32 },
+  { y: 84, h: 0.56, d: 37 },
 ];
 
 export function WelcomeCeremony({ religionType, onDone }: { religionType: string; onDone: () => void }) {
@@ -753,7 +753,7 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
               sx={{
                 width: '100%',
                 height: '100%',
-                transformOrigin: '50% 72%',
+                transformOrigin: '50% 100%',
                 '--dx': `${side * (58 - row.d)}cqw`,
                 
                 opacity: 0,

@@ -50,14 +50,14 @@ function Block({ face, flip, tossing, delay }: { face: BlockFace; flip?: boolean
         </radialGradient>
       </defs>
       <path
-        d="M14 52 C 4 34, 28 9, 60 9 C 92 9, 116 34, 106 52 C 101 62, 86 60, 76 51 C 67 44, 53 44, 44 51 C 34 60, 19 62, 14 52 Z"
+        d="M5 52 Q5 45 20 31 Q38 13 64 12 Q92 10 112 32 Q119 41 113 50 Q108 55 100 53 Q80 46 56 46 Q32 46 15 56 Q7 59 5 52 Z"
         fill={fill}
         stroke="#E8C170"
         strokeWidth="2.5"
         strokeLinejoin="round"
       />
-      {face === 'round' && <path d="M30 27 C 45 19, 70 18, 88 25" stroke="rgba(255,255,255,.35)" strokeWidth="4" fill="none" strokeLinecap="round" />}
-      {face === 'flat' && <path d="M26 48 C 45 40, 75 40, 94 48" stroke="#B5613F" strokeWidth="2" fill="none" />}
+      {face === 'round' && <path d="M30 26 C 46 18, 72 17, 92 26" stroke="rgba(255,255,255,.35)" strokeWidth="4" fill="none" strokeLinecap="round" />}
+      {face === 'flat' && <path d="M26 40 C 42 36, 68 35, 92 40" stroke="#B5613F" strokeWidth="2" fill="none" />}
     </Box>
   );
 }
