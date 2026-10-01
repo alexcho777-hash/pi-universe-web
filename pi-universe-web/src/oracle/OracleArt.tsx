@@ -24,40 +24,53 @@ const toss = keyframes`
 `;
 
 function Block({ face, flip, tossing, delay }: { face: BlockFace; flip?: boolean; tossing: boolean; delay: number }) {
-  // A crescent: flat face shows the lighter inner surface, round face shows the dark shell
-  const fill = face === 'flat' ? 'url(#jiaoFlat)' : 'url(#jiaoRound)';
+  // Real 筊杯 are one block cut in half: the flat face is a half-moon (D shape), the round face is
+  // the domed back. Both have soft, blunt ends. The tilt and mirror live on the inner svg so the
+  // toss animation on the wrapper never undoes them.
+  const flat = face === 'flat';
+  const uid = flat ? 'jf' : 'jr';
   return (
     <Box
-      component="svg"
-      viewBox="0 0 120 70"
       sx={{
-        width: { xs: 120, sm: 150 },
-        height: 'auto',
-        transform: flip ? 'scaleX(-1)' : undefined,
         animation: tossing ? `${toss} 1.1s ease-in-out ${delay}s both` : undefined,
-        filter: 'drop-shadow(0 6px 8px rgba(0,0,0,.5))',
+        filter: 'drop-shadow(0 6px 7px rgba(0,0,0,.45))',
       }}
     >
-      <defs>
-        <linearGradient id="jiaoFlat" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#F2B28C" />
-          <stop offset="1" stopColor="#D9825B" />
-        </linearGradient>
-        <radialGradient id="jiaoRound" cx="0.4" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#E0453A" />
-          <stop offset="0.6" stopColor="#A5161B" />
-          <stop offset="1" stopColor="#6B0B0F" />
-        </radialGradient>
-      </defs>
-      <path
-        d="M5 52 Q5 45 20 31 Q38 13 64 12 Q92 10 112 32 Q119 41 113 50 Q108 55 100 53 Q80 46 56 46 Q32 46 15 56 Q7 59 5 52 Z"
-        fill={fill}
-        stroke="#E8C170"
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-      />
-      {face === 'round' && <path d="M30 26 C 46 18, 72 17, 92 26" stroke="rgba(255,255,255,.35)" strokeWidth="4" fill="none" strokeLinecap="round" />}
-      {face === 'flat' && <path d="M26 40 C 42 36, 68 35, 92 40" stroke="#B5613F" strokeWidth="2" fill="none" />}
+      <Box
+        component="svg"
+        viewBox="0 0 76 116"
+        sx={{
+          display: 'block',
+          width: { xs: 64, sm: 80 },
+          height: 'auto',
+          // straight edges face the middle; both blocks lean the same amount
+          transform: `${flip ? 'scaleX(-1) ' : ''}rotate(${flip ? 9 : -9}deg)`,
+        }}
+      >
+        <defs>
+          <linearGradient id={`${uid}Fill`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor={flat ? '#E8574B' : '#F0584C'} />
+            <stop offset="1" stopColor={flat ? '#C6362E' : '#9E1A1C'} />
+          </linearGradient>
+        </defs>
+        {/* both faces share one half-moon outline, so the pair always looks symmetrical;
+            only the surface differs: flat = matte, round = glossy dome */}
+        <path
+          d="M17 14 Q17 8 23 10 Q66 22 66 58 Q66 94 23 106 Q17 108 17 102 Z"
+          fill={`url(#${uid}Fill)`}
+          stroke={flat ? '#8E211B' : '#7A1214'}
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+        {flat ? (
+          <path d="M24 22 L24 94" stroke="rgba(255,255,255,.28)" strokeWidth="2.4" strokeLinecap="round" />
+        ) : (
+          <>
+            <path d="M33 26 Q54 38 56 58" stroke="rgba(255,255,255,.5)" strokeWidth="4" fill="none" strokeLinecap="round" />
+            <circle cx="50" cy="72" r="2" fill="rgba(255,255,255,.35)" />
+          </>
+        )}
+      </Box>
     </Box>
   );
 }
@@ -65,9 +78,9 @@ function Block({ face, flip, tossing, delay }: { face: BlockFace; flip?: boolean
 export function MoonBlocks({ result, tossing }: { result: ThrowResult | null; tossing: boolean }) {
   const faces: [BlockFace, BlockFace] = result ? THROW_FACES[result] : ['round', 'flat'];
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', gap: { xs: 2, sm: 4 }, minHeight: 110, alignItems: 'flex-end' }}>
-      <Block face={faces[0]} tossing={tossing} delay={0} />
-      <Block face={faces[1]} flip tossing={tossing} delay={0.08} />
+    <Box sx={{ display: 'flex', justifyContent: 'center', gap: { xs: 1.5, sm: 2.5 }, minHeight: 110, alignItems: 'center' }}>
+      <Block face={faces[0]} flip tossing={tossing} delay={0} />
+      <Block face={faces[1]} tossing={tossing} delay={0.08} />
     </Box>
   );
 }
