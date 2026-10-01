@@ -29,6 +29,14 @@ export function ScriptureReader({ scripture, tr }: { scripture: Scripture; tr: T
   const [done, setDone] = useState(0);
   const timer = useRef<number | null>(null);
   const run = useRef(0); // bumps when playback is cancelled
+  // lower the sanctuary's background sound while the voice reads
+  useEffect(() => {
+    if (!playing) return;
+    window.dispatchEvent(new CustomEvent('pu-reading', { detail: true }));
+    return () => {
+      window.dispatchEvent(new CustomEvent('pu-reading', { detail: false }));
+    };
+  }, [playing]);
   const hasVoice = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
   const stop = () => {

@@ -19,7 +19,7 @@ export interface DeityInfo {
   scriptures: string[];
 }
 
-export const DEITY_INFO: Record<string, DeityInfo> = {
+const BUDDHIST_INFO: Record<string, DeityInfo> = {
   bd_shakyamuni: {
     origin: [
       '佛陀約在兩千五百年前出生於古印度釋迦族的王家，名悉達多。他看見人生的生老病死之苦，二十九歲出家修行，三十五歲在菩提樹下覺悟成佛，之後四十多年四處說法，教人用戒、定、慧離苦得樂。',
@@ -165,3 +165,12 @@ export const DEITY_INFO: Record<string, DeityInfo> = {
     scriptures: ['bd_skanda_name', 'bd_dedication'],
   },
 };
+
+import { INFO as TW } from './info/taiwan';
+import { INFO as CT } from './info/catholic';
+import { INFO as HD } from './info/hindu';
+import { INFO as SH } from './info/shinto';
+import { INFO as TH } from './info/thai';
+import { INFO as VN } from './info/vietnamese';
+
+export const DEITY_INFO: Record<string, DeityInfo> = { ...BUDDHIST_INFO, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN };

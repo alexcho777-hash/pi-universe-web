@@ -21,7 +21,7 @@ export interface Scripture {
 
 const ZH = 'zh-TW';
 
-export const SCRIPTURES: Record<string, Scripture> = {
+const BUDDHIST_SCRIPTURES: Record<string, Scripture> = {
   bd_mouth: {
     id: 'bd_mouth',
     title: ['淨口業真言', 'Mantra for purifying speech'],
@@ -244,3 +244,12 @@ export const SCRIPTURES: Record<string, Scripture> = {
     times: 108,
   },
 };
+
+import { SCRIPTS as TW } from './info/taiwan';
+import { SCRIPTS as CT } from './info/catholic';
+import { SCRIPTS as HD } from './info/hindu';
+import { SCRIPTS as SH } from './info/shinto';
+import { SCRIPTS as TH } from './info/thai';
+import { SCRIPTS as VN } from './info/vietnamese';
+
+export const SCRIPTURES: Record<string, Scripture> = { ...BUDDHIST_SCRIPTURES, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN };
