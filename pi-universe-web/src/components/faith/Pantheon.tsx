@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { apiClient } from '../../api/ApiClient';
 import { Lang, tx } from '../../i18n/i18n';
 import { DeityStatue } from './DeityStatue';
-import { DEITIES, Deity, GROUPS, GroupKey } from '../../faith/pantheon';
+import { Deity, GroupKey, PantheonSet, TAIWAN_SET } from '../../faith/pantheon';
 
 type TR = (zh: string, en: string) => string;
 const pick = (pair: [string, string], lang: Lang) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
@@ -73,7 +73,7 @@ function DeityIncense({ deityKey, tr }: { deityKey: string; tr: TR }) {
 }
 
 /** One deity's dialog: introduction, incense, and a short wish (with fulfil-tracking). */
-function DeityDialog({ deity, sanctuaryId, tr, lang, onClose }: { deity: Deity; sanctuaryId: number; tr: TR; lang: Lang; onClose: () => void }) {
+function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { deity: Deity; sanctuaryId: number; tr: TR; lang: Lang; onClose: () => void; disclaimer?: [string, string] }) {
   const prefix = `[${deity.title[0]}] `;
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [text, setText] = useState('');
@@ -136,7 +136,7 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose }: { deity: Deity; 
           <CloseIcon />
         </IconButton>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1, position: 'relative' }}>
-          <DeityStatue deityKey={deity.key} size={150} />
+          <DeityStatue deityKey={deity.key} look={deity.look} size={150} />
         </Box>
         <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#f4e2b5', letterSpacing: '0.02em', position: 'relative' }}>{pick(deity.title, lang)}</Typography>
         <Box sx={{ width: 36, height: '1px', background: 'rgba(228,193,112,.5)', mx: 'auto', my: 1 }} />
@@ -145,7 +145,7 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose }: { deity: Deity; 
       <DialogContent>
         <Typography sx={{ color: 'text.secondary', mb: 2 }}>{pick(deity.intro, lang)}</Typography>
         <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', fontStyle: 'italic', mb: 2 }}>
-          {tr('各地廟宇的說法與習俗略有不同，僅供參考。', 'Traditions and customs vary by temple and region — shown here for reference only.')}
+          {disclaimer ? tr(disclaimer[0], disclaimer[1]) : tr('各地廟宇的說法與習俗略有不同，僅供參考。', 'Traditions and customs vary by temple and region — shown here for reference only.')}
         </Typography>
 
         <DeityIncense deityKey={deity.key} tr={tr} />
@@ -203,18 +203,15 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose }: { deity: Deity; 
   );
 }
 
-export function PantheonPanel({ sanctuaryId, tr, lang }: { sanctuaryId: number; tr: TR; lang: Lang }) {
+export function PantheonPanel({ sanctuaryId, tr, lang, set = TAIWAN_SET }: { sanctuaryId: number; tr: TR; lang: Lang; set?: PantheonSet }) {
   const [group, setGroup] = useState<GroupKey | 'all'>('all');
   const [selected, setSelected] = useState<Deity | null>(null);
-  const shown = useMemo(() => (group === 'all' ? DEITIES : DEITIES.filter((d) => d.group === group)), [group]);
+  const shown = useMemo(() => (group === 'all' ? set.deities : set.deities.filter((d) => d.group === group)), [group, set]);
 
   return (
     <Box sx={{ py: 1 }}>
       <Typography sx={{ color: 'text.secondary', mb: 2 }}>
-        {tr(
-          '台灣廟宇經常合祀多位神明。這裡依照大家常去祈求的事項分類，方便您找到想拜的神明；同一座廟實際供奉哪些神明，各地不盡相同。',
-          'Taiwanese folk temples often enshrine many deities together. They are grouped here by what people most often go to each one for, to help you find the one you want; which deities any one temple actually enshrines varies by place.'
-        )}
+        {tr(set.intro[0], set.intro[1])}
       </Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, mb: 2 }}>
         <Chip
@@ -223,7 +220,7 @@ export function PantheonPanel({ sanctuaryId, tr, lang }: { sanctuaryId: number; 
           color={group === 'all' ? 'primary' : 'default'}
           variant={group === 'all' ? 'filled' : 'outlined'}
         />
-        {GROUPS.map((g) => (
+        {set.groups.map((g) => (
           <Chip
             key={g.key}
             label={`${g.icon} ${pick(g.label, lang)}`}
@@ -254,7 +251,7 @@ export function PantheonPanel({ sanctuaryId, tr, lang }: { sanctuaryId: number; 
             }}
           >
             <CardActionArea onClick={() => setSelected(d)} sx={{ py: 1.8, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-              <DeityStatue deityKey={d.key} size={92} />
+              <DeityStatue deityKey={d.key} look={d.look} size={92} />
               <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, color: '#f0dba8', letterSpacing: '0.02em' }}>
                 {pick(d.title, lang)}
               </Typography>
@@ -264,7 +261,7 @@ export function PantheonPanel({ sanctuaryId, tr, lang }: { sanctuaryId: number; 
           </Card>
         ))}
       </Box>
-      {selected && <DeityDialog deity={selected} sanctuaryId={sanctuaryId} tr={tr} lang={lang} onClose={() => setSelected(null)} />}
+      {selected && <DeityDialog deity={selected} sanctuaryId={sanctuaryId} tr={tr} lang={lang} disclaimer={set.disclaimer} onClose={() => setSelected(null)} />}
     </Box>
   );
 }

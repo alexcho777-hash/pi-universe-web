@@ -6,21 +6,32 @@
  */
 import { useId } from 'react';
 
-type Body = 'seated' | 'standing' | 'armor' | 'child' | 'tiger';
-type Head = 'mianliu' | 'phoenix' | 'scholar' | 'official' | 'helmet' | 'softhat' | 'veil' | 'dizang' | 'buns' | 'hair' | 'pig' | 'bald';
-type Held = 'blade' | 'sword' | 'spear' | 'rake' | 'staff' | 'whip' | 'ingot' | 'brush' | 'thread' | 'tablet' | 'peach' | 'baby' | 'vase' | 'pearl' | 'none';
+export type Body = 'seated' | 'standing' | 'armor' | 'child' | 'tiger' | 'buddha' | 'fox';
+export type Head =
+  | 'mianliu' | 'phoenix' | 'scholar' | 'official' | 'helmet' | 'softhat' | 'veil' | 'dizang' | 'buns' | 'hair' | 'pig' | 'bald'
+  | 'ushnisha' | 'elephant' | 'cone' | 'jata' | 'marian' | 'monkey' | 'hood' | 'eboshi' | 'plain';
+export type Held =
+  | 'blade' | 'sword' | 'spear' | 'rake' | 'staff' | 'whip' | 'ingot' | 'brush' | 'thread' | 'tablet' | 'peach' | 'baby' | 'vase' | 'pearl' | 'none'
+  | 'trident' | 'mace' | 'lotus' | 'cross' | 'rosary' | 'book' | 'lily' | 'flower' | 'bow' | 'conch' | 'flute' | 'bowl' | 'wheel' | 'jar'
+  | 'sheaf' | 'fish' | 'mallet' | 'mirror' | 'coin' | 'lamp' | 'drum';
 
-interface Look {
+export interface Look {
   body: Body;
   head: Head;
   held: Held;
+  /** a second held object in the other hand (drawn mirrored) */
+  held2?: Held;
+  /** draw extra arms (multi-armed deities); they hold `held3`/`held4` */
+  arms?: boolean;
+  held3?: Held;
+  held4?: Held;
   robe: string;
   trim?: string;
   skin?: string;
   beard?: 'long' | 'short' | 'none';
   beardColor?: string;
   halo?: boolean;
-  extra?: 'turtle' | 'wheels' | 'lotus';
+  extra?: 'turtle' | 'wheels' | 'lotus' | 'mouse' | 'lion';
 }
 
 const GOLD = '#e8c170';
@@ -44,9 +55,9 @@ export const LOOKS: Record<string, Look> = {
   dizang: { body: 'seated', head: 'dizang', held: 'pearl', robe: '#d98b1f', trim: '#f6dc8a', halo: true, extra: 'lotus' },
 };
 
-export function DeityStatue({ deityKey, size = 120 }: { deityKey: string; size?: number }) {
+export function DeityStatue({ deityKey, size = 120, look }: { deityKey: string; size?: number; look?: Look }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
-  const L = LOOKS[deityKey] || LOOKS.mazu;
+  const L = look || LOOKS[deityKey] || LOOKS.mazu;
   const skin = L.skin || SKIN;
   const trim = L.trim || GOLD;
   const robeDark = shade(L.robe, -0.35);
@@ -81,10 +92,14 @@ export function DeityStatue({ deityKey, size = 120 }: { deityKey: string; size?:
       <path d="M14 156 V66 Q14 17 60 17 Q106 17 106 66 V156" fill="none" stroke="rgba(232,193,112,.35)" strokeWidth="0.8" />
       <ellipse cx="60" cy="70" rx="46" ry="60" fill={`url(#glow${uid})`} />
 
+      {/* mandorla — the pointed-oval back light behind a revered figure */}
+      <path d="M60 18 C 98 52 98 112 60 146 C 22 112 22 52 60 18 Z" fill="rgba(255,226,140,.07)" stroke="rgba(232,193,112,.5)" strokeWidth="0.9" />
+      <path d="M60 25 C 91 56 91 108 60 138 C 29 108 29 56 60 25 Z" fill="none" stroke="rgba(232,193,112,.22)" strokeWidth="0.7" />
       {L.halo && (
         <>
-          <circle cx="60" cy="46" r="27" fill="rgba(255,236,170,.18)" stroke="rgba(255,226,140,.8)" strokeWidth="1.6" />
-          <circle cx="60" cy="46" r="22" fill="none" stroke="rgba(255,226,140,.35)" strokeWidth="0.8" />
+          <circle cx="60" cy="46" r="27" fill="rgba(255,236,170,.2)" stroke="rgba(255,226,140,.85)" strokeWidth="1.6" />
+          <circle cx="60" cy="46" r="22" fill="none" stroke="rgba(255,226,140,.4)" strokeWidth="0.8" />
+          <circle cx="60" cy="46" r="30" fill="none" stroke="rgba(255,226,140,.25)" strokeWidth="0.6" strokeDasharray="1.5 2.5" />
         </>
       )}
 
@@ -97,10 +112,13 @@ export function DeityStatue({ deityKey, size = 120 }: { deityKey: string; size?:
 
       {L.body === 'tiger' ? (
         <Tiger />
+      ) : L.body === 'fox' ? (
+        <Fox />
       ) : (
         <>
           <g transform={L.body === 'child' ? 'translate(60 140) scale(.84) translate(-60 -140)' : undefined}>
-            <Body kind={L.body} robe={`url(#robe${uid})`} robeDark={robeDark} trim={trim} gold={`url(#gold${uid})`} />
+            <Body kind={L.body} robe={`url(#robe${uid})`} robeDark={robeDark} trim={trim} gold={`url(#gold${uid})`} skin={skin} />
+            {L.arms && <ExtraArms robe={`url(#robe${uid})`} robeDark={robeDark} />}
             {L.beard === 'long' && <path d="M51 49 Q60 92 69 49 Q60 56 51 49Z" fill={L.beardColor} opacity="0.95" />}
             <Head kind={L.head} skin={skin} trim={trim} gold={`url(#gold${uid})`} beard={L.beard} beardColor={L.beardColor} robe={L.robe} />
           </g>
@@ -138,9 +156,27 @@ export function DeityStatue({ deityKey, size = 120 }: { deityKey: string; size?:
               <circle cx="38" cy="108" r="4.4" fill="#fff6c8" stroke="#e8c170" strokeWidth="0.8" />
             </g>
           )}
+          <Attrs L={L} trim={trim} gold={`url(#gold${uid})`} />
         </>
       )}
 
+      {L.extra === 'mouse' && (
+        <g>
+          <ellipse cx="90" cy="146" rx="8" ry="5" fill="#8d8d96" stroke="#55555d" strokeWidth="0.7" />
+          <circle cx="97" cy="143" r="3.4" fill="#8d8d96" stroke="#55555d" strokeWidth="0.7" />
+          <circle cx="95.5" cy="140.4" r="1.8" fill="#c4a0a0" />
+          <path d="M82 147 q-8 2 -10 -4" fill="none" stroke="#c4a0a0" strokeWidth="1" />
+        </g>
+      )}
+      {L.extra === 'lion' && (
+        <g>
+          <circle cx="32" cy="142" r="11" fill="#c98a2a" stroke="#7a4b10" strokeWidth="0.8" />
+          <circle cx="32" cy="143" r="6.5" fill="#f0c36a" />
+          <circle cx="29.5" cy="141.5" r="1" fill="#2a1608" />
+          <circle cx="34.5" cy="141.5" r="1" fill="#2a1608" />
+          <path d="M30 146 q2 1.6 4 0" stroke="#2a1608" strokeWidth="0.9" fill="none" />
+        </g>
+      )}
       {L.extra === 'turtle' && (
         <g>
           <ellipse cx="60" cy="146" rx="22" ry="7" fill="#2f4a3a" stroke={trim} strokeWidth="0.8" />
@@ -172,8 +208,8 @@ export function DeityStatue({ deityKey, size = 120 }: { deityKey: string; size?:
 
 /* ---------- parts ---------- */
 
-function Body({ kind, robe, robeDark, trim, gold }: { kind: Body; robe: string; robeDark: string; trim: string; gold: string }) {
-  if (kind === 'seated') {
+function Body({ kind, robe, robeDark, trim, gold, skin }: { kind: Body; robe: string; robeDark: string; trim: string; gold: string; skin?: string }) {
+  if (kind === 'seated' || kind === 'buddha') {
     return (
       <g>
         <path d="M44 64 Q60 57 76 64 L82 100 Q98 118 102 140 L18 140 Q22 118 38 100 Z" fill={robe} stroke={robeDark} strokeWidth="1" />
@@ -181,7 +217,11 @@ function Body({ kind, robe, robeDark, trim, gold }: { kind: Body; robe: string; 
         <path d="M76 64 Q90 92 80 116 L68 116 Q74 92 68 68Z" fill={robe} stroke={robeDark} strokeWidth="0.8" />
         <path d="M54 64 L60 86 L66 64" fill="none" stroke={trim} strokeWidth="1.8" />
         <path d="M24 134 Q60 126 96 134" fill="none" stroke={trim} strokeWidth="1.2" opacity="0.8" />
-        <rect x="45" y="104" width="30" height="4" rx="2" fill={gold} opacity="0.9" />
+        {kind === 'buddha' ? (
+          <path d="M60 64 L77 66 L80 96 Q70 104 62 100 Z" fill={skin} stroke="#a77c45" strokeWidth="0.8" />
+        ) : (
+          <rect x="45" y="104" width="30" height="4" rx="2" fill={gold} opacity="0.9" />
+        )}
       </g>
     );
   }
@@ -218,6 +258,7 @@ function Body({ kind, robe, robeDark, trim, gold }: { kind: Body; robe: string; 
 }
 
 function Head({ kind, skin, trim, gold, beard, beardColor, robe }: { kind: Head; skin: string; trim: string; gold: string; beard?: string; beardColor?: string; robe: string }) {
+  const fierce = ['helmet', 'official', 'hair'].includes(kind) || skin === '#c0392b';
   const face = (
     <g>
       {kind === 'pig' ? (
@@ -227,17 +268,36 @@ function Head({ kind, skin, trim, gold, beard, beardColor, robe }: { kind: Head;
           <ellipse cx="60" cy="50" rx="7.5" ry="5.4" fill="#f3b8b0" stroke="#b9736c" strokeWidth="0.8" />
           <circle cx="57.5" cy="50" r="1.1" fill="#7a3d38" />
           <circle cx="62.5" cy="50" r="1.1" fill="#7a3d38" />
-          <path d="M51 41 q2 -2 5 0 M64 41 q2 -2 5 0" stroke="#3a2a1a" strokeWidth="1.2" fill="none" />
+          <path d="M49.5 39.5 L57 41.8 M70.5 39.5 L63 41.8" stroke="#3a2a1a" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M51 44 q3 -2 6 0 M63 44 q3 -2 6 0" stroke="#3a2a1a" strokeWidth="1.6" fill="none" strokeLinecap="round" />
         </>
       ) : (
         <>
-          <circle cx="60" cy="45" r="13.5" fill={skin} stroke="#a77c45" strokeWidth="0.8" />
-          <path d="M52 43 q2.2 2 4.4 0 M63.6 43 q2.2 2 4.4 0" stroke="#3a2a1a" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-          <path d="M57 51 q3 2 6 0" stroke="#7a3d2a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
-          {kind !== 'dizang' && kind !== 'bald' && <circle cx="60" cy="38" r="0.9" fill="#c0392b" />}
+          <ellipse cx="60" cy="45" rx="11.8" ry="14.2" fill={skin} stroke="#a77c45" strokeWidth="0.8" />
+          {fierce ? (
+            <>
+              <path d="M49.5 40.5 L57 42.2 M70.5 40.5 L63 42.2" stroke="#2a1608" strokeWidth="1.7" strokeLinecap="round" />
+              <path d="M51 44 q3 -1.8 6 0 q-3 1.8 -6 0 M63 44 q3 -1.8 6 0 q-3 1.8 -6 0" fill="#fff6e6" stroke="#2a1608" strokeWidth="0.8" />
+              <circle cx="54" cy="44" r="1.1" fill="#2a1608" />
+              <circle cx="66" cy="44" r="1.1" fill="#2a1608" />
+              <path d="M60 45 v4.5 M56.6 52.4 h6.8" stroke="#6b2a1a" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+            </>
+          ) : (
+            <>
+              <path d="M50.4 41 q3.4 -1.9 6.8 -0.2 M62.8 40.8 q3.4 -1.7 6.8 0.2" stroke="#4a3220" strokeWidth="1" fill="none" strokeLinecap="round" />
+              <path d="M51.4 44 q3 1.6 6 0 M62.6 44 q3 1.6 6 0" stroke="#2a1608" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+              <path d="M60 45 v4 M57.2 52.2 q2.8 0.9 5.6 0" stroke="#8a4a32" strokeWidth="1.1" strokeLinecap="round" fill="none" />
+            </>
+          )}
+          {['ushnisha', 'veil', 'marian'].includes(kind) && <circle cx="60" cy="38" r="1" fill="#c0392b" />}
         </>
       )}
-      {beard === 'short' && <path d="M50 49 Q60 62 70 49 Q60 54 50 49Z" fill={beardColor} />}
+      {beard === 'short' && (
+        <g fill={beardColor}>
+          <path d="M52.5 50.4 Q60 46.6 67.5 50.4 Q64 52.6 60 51.4 Q56 52.6 52.5 50.4Z" />
+          <path d="M56.6 55 Q60 68 63.4 55 Q60 57 56.6 55Z" />
+        </g>
+      )}
     </g>
   );
 
@@ -334,6 +394,95 @@ function Head({ kind, skin, trim, gold, beard, beardColor, robe }: { kind: Head;
           <path d="M47 33 Q60 20 73 33 Q60 28 47 33Z" fill={gold} stroke="#8a5f12" strokeWidth="0.6" />
         </g>
       );
+    case 'ushnisha':
+      return (
+        <g>
+          <ellipse cx="45" cy="48" rx="2.6" ry="7" fill={skin} stroke="#a77c45" strokeWidth="0.6" />
+          <ellipse cx="75" cy="48" rx="2.6" ry="7" fill={skin} stroke="#a77c45" strokeWidth="0.6" />
+          {face}
+          <path d="M46.5 41 Q46 28 60 28 Q74 28 73.5 41 Q60 35 46.5 41Z" fill="#2a3358" />
+          <circle cx="60" cy="25" r="5.4" fill="#2a3358" />
+          <path d="M60 19 q-2 -5 0 -9 q3 4 0 9Z" fill="#ffb02e" />
+          {[50, 56, 62, 68].map((x) => <circle key={x} cx={x} cy={33} r="1.5" fill="#3b4778" />)}
+        </g>
+      );
+    case 'elephant':
+      return (
+        <g>
+          <ellipse cx="42" cy="44" rx="9" ry="13" fill="#b9a99c" stroke="#7d6e62" strokeWidth="0.8" />
+          <ellipse cx="78" cy="44" rx="9" ry="13" fill="#b9a99c" stroke="#7d6e62" strokeWidth="0.8" />
+          <circle cx="60" cy="43" r="14" fill="#c9baad" stroke="#7d6e62" strokeWidth="0.8" />
+          <path d="M60 47 Q60 62 50 66" fill="none" stroke="#c9baad" strokeWidth="7" strokeLinecap="round" />
+          <path d="M60 47 Q60 62 50 66" fill="none" stroke="#7d6e62" strokeWidth="0.8" strokeLinecap="round" />
+          <path d="M55 52 Q51 60 54 64 M65 52 Q69 60 66 64" fill="none" stroke="#fffaf0" strokeWidth="2.4" strokeLinecap="round" />
+          <circle cx="54" cy="40" r="1.4" fill="#2a1608" />
+          <circle cx="66" cy="40" r="1.4" fill="#2a1608" />
+          <path d="M47 33 L50 22 L55 29 L60 18 L65 29 L70 22 L73 33Z" fill={gold} stroke="#8a5f12" strokeWidth="0.7" />
+          <circle cx="60" cy="33" r="1.3" fill="#d8261b" />
+        </g>
+      );
+    case 'cone':
+      return (
+        <g>
+          {face}
+          <path d="M47 35 L60 2 L73 35Z" fill={gold} stroke="#8a5f12" strokeWidth="0.7" />
+          <path d="M51 28 H69 M54 20 H66 M57 12 H63" stroke="#8a5f12" strokeWidth="0.9" />
+          <rect x="46" y="33" width="28" height="4" rx="1.5" fill={gold} stroke="#8a5f12" strokeWidth="0.6" />
+          <circle cx="60" cy="35" r="1.6" fill="#d8261b" />
+        </g>
+      );
+    case 'jata':
+      return (
+        <g>
+          <path d="M44 42 Q44 24 60 24 Q76 24 76 42 L80 74 Q60 62 40 74Z" fill="#241b16" />
+          {face}
+          <circle cx="60" cy="19" r="7.5" fill="#241b16" />
+          <path d="M66 14 a6 6 0 1 1 -2 10 a4.6 4.6 0 1 0 2 -10Z" fill="#fff6c8" stroke="#d9c26a" strokeWidth="0.5" />
+          <path d="M58 33 v6" stroke="#d8261b" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M50 37 H70 M51 40 H69" stroke="#f4f0e6" strokeWidth="0.9" opacity="0.9" />
+        </g>
+      );
+    case 'marian':
+      return (
+        <g>
+          <path d="M43 54 Q42 26 60 26 Q78 26 77 54 L86 112 L34 112 Z" fill="#2f5aa8" stroke="#1c3a73" strokeWidth="0.8" />
+          <path d="M47 50 Q47 30 60 30 Q73 30 73 50 Q60 44 47 50Z" fill="#f6f3ea" />
+          {face}
+          {Array.from({ length: 9 }).map((_, i) => {
+            const a = Math.PI + (i / 8) * Math.PI;
+            return <circle key={i} cx={60 + Math.cos(a) * 22} cy={44 + Math.sin(a) * 22} r="1.9" fill="#ffe27a" />;
+          })}
+        </g>
+      );
+    case 'monkey':
+      return (
+        <g>
+          <circle cx="45" cy="43" r="5.5" fill="#c9783a" stroke="#7a4220" strokeWidth="0.7" />
+          <circle cx="75" cy="43" r="5.5" fill="#c9783a" stroke="#7a4220" strokeWidth="0.7" />
+          <circle cx="60" cy="43" r="14" fill="#d98a47" stroke="#7a4220" strokeWidth="0.8" />
+          <ellipse cx="60" cy="48" rx="9" ry="8" fill="#f0c9a0" />
+          <circle cx="55.5" cy="42" r="1.5" fill="#2a1608" />
+          <circle cx="64.5" cy="42" r="1.5" fill="#2a1608" />
+          <path d="M56 52 q4 3 8 0" stroke="#7a3d2a" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+          <path d="M47 33 L50 24 L55 30 L60 20 L65 30 L70 24 L73 33Z" fill={gold} stroke="#8a5f12" strokeWidth="0.7" />
+        </g>
+      );
+    case 'hood':
+      return (
+        <g>
+          <path d="M43 54 Q42 26 60 26 Q78 26 77 54 L84 96 L36 96 Z" fill={robe} stroke="#00000055" strokeWidth="0.8" />
+          {face}
+        </g>
+      );
+    case 'eboshi':
+      return (
+        <g>
+          {face}
+          <path d="M47 36 Q47 20 62 14 Q70 24 73 36 Q60 31 47 36Z" fill="#15151b" stroke={trim} strokeWidth="0.6" />
+        </g>
+      );
+    case 'plain':
+      return face;
     default:
       return face;
   }
@@ -411,14 +560,223 @@ function Tiger() {
       <circle cx="78" cy="86" r="6" fill="#e0902a" stroke="#8a4b0c" strokeWidth="0.8" />
       <circle cx="60" cy="98" r="22" fill="#f0a63a" stroke="#8a4b0c" strokeWidth="1" />
       <path d="M52 80 v8 M60 78 v10 M68 80 v8 M56 82 h8" stroke="#2a1608" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="51" cy="98" r="3" fill="#fff6d8" />
-      <circle cx="69" cy="98" r="3" fill="#fff6d8" />
-      <circle cx="51" cy="98" r="1.6" fill="#2a1608" />
-      <circle cx="69" cy="98" r="1.6" fill="#2a1608" />
-      <ellipse cx="60" cy="108" rx="9" ry="7" fill="#fff0d0" />
-      <path d="M56 105 h8 l-4 4z" fill="#8a2a1a" />
-      <path d="M60 109 v3 M54 113 q6 4 12 0" stroke="#2a1608" strokeWidth="1.2" fill="none" />
+      <path d="M44 93 L56 98 M76 93 L64 98" stroke="#2a1608" strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M46 99 q5 -4 10 0 q-5 3 -10 0 M64 99 q5 -4 10 0 q-5 3 -10 0" fill="#ffd34a" stroke="#2a1608" strokeWidth="0.9" />
+      <ellipse cx="51" cy="99" rx="1.1" ry="2" fill="#2a1608" />
+      <ellipse cx="69" cy="99" rx="1.1" ry="2" fill="#2a1608" />
+      <ellipse cx="60" cy="109" rx="10" ry="7" fill="#fff0d0" />
+      <path d="M56 105 h8 l-4 4z" fill="#5a1a10" />
+      <path d="M60 109 v3 M52 112 q8 5 16 0" stroke="#2a1608" strokeWidth="1.3" fill="none" />
+      <path d="M54.5 113 l1.6 5 l1.8 -4.2 M66 113 l-1.6 5 l-1.8 -4.2" fill="#fffdf4" stroke="#2a1608" strokeWidth="0.5" />
       <path d="M44 106 H30 M44 110 H31 M76 106 H90 M76 110 H89" stroke="#fff0d0" strokeWidth="0.8" />
+    </g>
+  );
+}
+
+function ExtraArms({ robe, robeDark }: { robe: string; robeDark: string }) {
+  return (
+    <g>
+      <path d="M44 66 Q22 70 18 96 L26 98 Q32 80 46 74Z" fill={robe} stroke={robeDark} strokeWidth="0.8" />
+      <path d="M76 66 Q98 70 102 96 L94 98 Q88 80 74 74Z" fill={robe} stroke={robeDark} strokeWidth="0.8" />
+    </g>
+  );
+}
+
+/** Small held objects. Coordinates are for the figure's right hand (x≈92); `mirror` flips them to the left. */
+function HeldItem({ kind, trim, gold }: { kind: Held; trim: string; gold: string }) {
+  switch (kind) {
+    case 'trident':
+      return (
+        <g>
+          <path d="M92 40 V148" stroke="#6b3a1a" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M83 30 Q83 42 92 42 Q101 42 101 30 M92 42 V14 M83 30 L83 22 M101 30 L101 22" fill="none" stroke="#dfe6ea" strokeWidth="2.2" strokeLinecap="round" />
+        </g>
+      );
+    case 'mace':
+      return (
+        <g>
+          <path d="M92 74 V148" stroke="#6b3a1a" strokeWidth="2.6" strokeLinecap="round" />
+          <circle cx="92" cy="64" r="11" fill={gold} stroke="#8a5f12" strokeWidth="1" />
+          {[[92, 54], [82, 64], [102, 64], [92, 74]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.8" fill="#8a5f12" />)}
+        </g>
+      );
+    case 'lotus':
+      return (
+        <g>
+          <path d="M88 130 Q86 116 88 104" stroke="#4c9a4a" strokeWidth="1.8" fill="none" />
+          {[-14, 0, 14].map((r) => <ellipse key={r} cx="88" cy="98" rx="4.4" ry="9" fill="#f7a6c0" stroke="#d1647f" strokeWidth="0.6" transform={`rotate(${r} 88 106)`} />)}
+        </g>
+      );
+    case 'cross':
+      return (
+        <g>
+          <path d="M92 46 V148" stroke="#6b3a1a" strokeWidth="2.6" strokeLinecap="round" />
+          <path d="M84 56 H100 M92 46 V66" stroke={trim} strokeWidth="3" strokeLinecap="round" />
+        </g>
+      );
+    case 'rosary':
+      return (
+        <g>
+          <path d="M82 108 Q70 128 60 132" fill="none" stroke="#6b3a1a" strokeWidth="1" />
+          {Array.from({ length: 9 }).map((_, i) => <circle key={i} cx={82 - i * 2.7} cy={108 + i * 2.7 + (i > 5 ? 0 : 0)} r="1.7" fill="#f3ecd6" stroke="#8a7a50" strokeWidth="0.4" />)}
+          <path d="M60 132 v8 M57 136 h6" stroke={trim} strokeWidth="1.6" />
+        </g>
+      );
+    case 'book':
+      return (
+        <g transform="rotate(-8 84 108)">
+          <rect x="76" y="98" width="16" height="20" rx="1.5" fill="#5a2a1c" stroke={trim} strokeWidth="0.8" />
+          <path d="M80 104 H88 M80 108 H88" stroke={trim} strokeWidth="0.8" />
+        </g>
+      );
+    case 'lily':
+      return (
+        <g>
+          <path d="M88 132 Q86 112 90 94" stroke="#4c9a4a" strokeWidth="1.8" fill="none" />
+          <path d="M90 94 q-8 -8 -4 -16 q6 4 4 16 q8 -10 14 -6 q-4 8 -14 6Z" fill="#fffaf0" stroke="#cbbf9a" strokeWidth="0.6" />
+        </g>
+      );
+    case 'flower':
+      return (
+        <g>
+          <path d="M88 130 Q87 116 88 102" stroke="#4c9a4a" strokeWidth="1.6" fill="none" />
+          {[0, 72, 144, 216, 288].map((r) => <ellipse key={r} cx="88" cy="96" rx="3" ry="5.4" fill="#ff9ec0" transform={`rotate(${r} 88 100)`} />)}
+          <circle cx="88" cy="100" r="2.2" fill="#ffd34a" />
+        </g>
+      );
+    case 'bow':
+      return (
+        <g>
+          <path d="M96 48 Q112 84 96 120" fill="none" stroke="#6b3a1a" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M96 48 L96 120" stroke="#e8e0cc" strokeWidth="0.8" />
+        </g>
+      );
+    case 'conch':
+      return (
+        <g>
+          <path d="M80 108 Q80 96 92 98 Q100 100 96 110 Q92 118 82 114 Z" fill="#fffaf0" stroke="#bda97a" strokeWidth="0.8" />
+          <path d="M84 106 q4 -4 8 0" stroke="#bda97a" strokeWidth="0.8" fill="none" />
+        </g>
+      );
+    case 'flute':
+      return <path d="M46 112 L96 92" stroke="#7a4b1c" strokeWidth="3" strokeLinecap="round" />;
+    case 'bowl':
+      return (
+        <g>
+          <path d="M46 114 Q60 134 74 114Z" fill="#1d1d24" stroke={trim} strokeWidth="0.8" />
+          <ellipse cx="60" cy="114" rx="14" ry="3" fill="#2d2d38" stroke={trim} strokeWidth="0.6" />
+        </g>
+      );
+    case 'wheel':
+      return (
+        <g>
+          <circle cx="92" cy="98" r="10" fill="none" stroke={gold} strokeWidth="2" />
+          <circle cx="92" cy="98" r="2.4" fill={gold} />
+          {[0, 45, 90, 135].map((r) => <path key={r} d="M92 88 V108" stroke={gold} strokeWidth="1.2" transform={`rotate(${r} 92 98)`} />)}
+        </g>
+      );
+    case 'jar':
+      return (
+        <g>
+          <path d="M52 110 h16 l2 10 q0 8 -10 8 q-10 0 -10 -8Z" fill="#3a5fb0" stroke={trim} strokeWidth="0.9" />
+          <rect x="54" y="106" width="12" height="5" rx="2" fill={gold} />
+        </g>
+      );
+    case 'sheaf':
+      return (
+        <g>
+          {[-8, -3, 2, 7].map((d) => <path key={d} d={`M${90 + d} 126 Q${88 + d * 1.4} 104 ${86 + d * 2} 84`} stroke="#d9b43a" strokeWidth="1.6" fill="none" />)}
+          {[-8, -3, 2, 7].map((d) => <ellipse key={d} cx={86 + d * 2} cy={82} rx="2.4" ry="5" fill="#f0c94a" />)}
+        </g>
+      );
+    case 'fish':
+      return (
+        <g>
+          <path d="M72 112 Q86 100 100 112 Q86 124 72 112Z" fill="#e8553a" stroke="#8a2a1a" strokeWidth="0.8" />
+          <path d="M100 112 L108 104 L108 120Z" fill="#e8553a" stroke="#8a2a1a" strokeWidth="0.8" />
+          <circle cx="78" cy="110" r="1.2" fill="#2a1608" />
+        </g>
+      );
+    case 'mallet':
+      return (
+        <g>
+          <path d="M90 122 L84 92" stroke="#6b3a1a" strokeWidth="2.4" strokeLinecap="round" />
+          <rect x="74" y="80" width="22" height="14" rx="3" fill={gold} stroke="#8a5f12" strokeWidth="1" transform="rotate(-14 84 87)" />
+        </g>
+      );
+    case 'mirror':
+      return (
+        <g>
+          <path d="M90 134 L90 116" stroke="#6b3a1a" strokeWidth="2.6" strokeLinecap="round" />
+          <circle cx="90" cy="104" r="11" fill="#dfe6ea" stroke={gold} strokeWidth="2.2" />
+          <path d="M84 100 q4 -5 10 -3" stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+        </g>
+      );
+    case 'coin':
+      return (
+        <g>
+          <circle cx="90" cy="102" r="9" fill={gold} stroke="#8a5f12" strokeWidth="1.2" />
+          <rect x="86.5" y="98.5" width="7" height="7" fill="none" stroke="#8a5f12" strokeWidth="1" />
+        </g>
+      );
+    case 'lamp':
+      return (
+        <g>
+          <path d="M78 114 Q90 126 104 114 Q92 118 78 114Z" fill="#c98a2a" stroke="#7a4b10" strokeWidth="0.8" />
+          <path d="M92 114 q-4 -8 0 -14 q4 6 0 14Z" fill="#ffd54a" />
+        </g>
+      );
+    case 'drum':
+      return (
+        <g>
+          <path d="M82 94 L102 94 L92 106 L102 118 L82 118 L92 106Z" fill="#c98a2a" stroke="#7a4b10" strokeWidth="0.8" />
+          <path d="M92 106 Q104 104 104 116" fill="none" stroke="#6b3a1a" strokeWidth="0.9" />
+        </g>
+      );
+    default:
+      return null;
+  }
+}
+
+function Attrs({ L, trim, gold }: { L: Look; trim: string; gold: string }) {
+  const NEW: Held[] = ['trident', 'mace', 'lotus', 'cross', 'rosary', 'book', 'lily', 'flower', 'bow', 'conch', 'flute', 'bowl', 'wheel', 'jar', 'sheaf', 'fish', 'mallet', 'mirror', 'coin', 'lamp', 'drum'];
+  const has = (h?: Held): h is Held => !!h && NEW.includes(h);
+  return (
+    <g>
+      {has(L.held) && <HeldItem kind={L.held} trim={trim} gold={gold} />}
+      {L.held2 && has(L.held2) && (
+        <g transform="translate(120 0) scale(-1 1)">
+          <HeldItem kind={L.held2} trim={trim} gold={gold} />
+        </g>
+      )}
+      {L.held3 && has(L.held3) && (
+        <g transform="translate(18 -34) scale(.55)">
+          <HeldItem kind={L.held3} trim={trim} gold={gold} />
+        </g>
+      )}
+      {L.held4 && has(L.held4) && (
+        <g transform="translate(102 -34) scale(-.55 .55)">
+          <HeldItem kind={L.held4} trim={trim} gold={gold} />
+        </g>
+      )}
+    </g>
+  );
+}
+
+function Fox() {
+  return (
+    <g>
+      <path d="M84 134 Q112 128 106 98 Q100 112 88 116Z" fill="#f2f0ea" stroke="#9a9488" strokeWidth="0.8" />
+      <path d="M84 134 Q104 132 100 112" fill="none" stroke="#e8923a" strokeWidth="9" strokeLinecap="round" />
+      <ellipse cx="58" cy="118" rx="28" ry="22" fill="#f2f0ea" stroke="#9a9488" strokeWidth="0.9" />
+      <path d="M36 134 Q58 126 80 134 L80 142 H36Z" fill="#f2f0ea" stroke="#9a9488" strokeWidth="0.8" />
+      <path d="M42 70 L38 46 L54 62Z M78 70 L82 46 L66 62Z" fill="#f2f0ea" stroke="#9a9488" strokeWidth="0.9" />
+      <path d="M43 62 L41 52 L49 60Z M77 62 L79 52 L71 60Z" fill="#d8261b" />
+      <path d="M36 80 Q60 52 84 80 Q86 100 60 104 Q34 100 36 80Z" fill="#f2f0ea" stroke="#9a9488" strokeWidth="0.9" />
+      <path d="M48 82 Q51 79 54 82 M66 82 Q69 79 72 82" stroke="#2a1608" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      <path d="M56 92 L64 92 L60 97Z" fill="#2a1608" />
+      <path d="M42 94 Q60 118 78 94" fill="none" stroke="#d8261b" strokeWidth="3" strokeLinecap="round" opacity="0.9" />
+      <circle cx="60" cy="108" r="4" fill="#ffd34a" stroke="#8a5f12" strokeWidth="0.6" />
     </g>
   );
 }

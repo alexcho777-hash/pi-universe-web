@@ -5,9 +5,17 @@
  * varies a lot by temple and region — shown here for reference, not as doctrine.
  */
 
-export type GroupKey = 'guardian' | 'career' | 'wealth' | 'love' | 'study' | 'peace' | 'family' | 'mercy';
+import type { Look } from '../components/faith/DeityStatue';
 
-export const GROUPS: { key: GroupKey; icon: string; label: [string, string] }[] = [
+export type GroupKey = string;
+
+export interface PantheonGroup {
+  key: GroupKey;
+  icon: string;
+  label: [string, string];
+}
+
+export const GROUPS: PantheonGroup[] = [
   { key: 'guardian', icon: '👑', label: ['總鎮殿・庇佑', 'Chief guardians'] },
   { key: 'career', icon: '⚔️', label: ['事業忠義', 'Career'] },
   { key: 'wealth', icon: '💰', label: ['財運', 'Wealth'] },
@@ -31,6 +39,20 @@ export interface Deity {
   /** which of the 6 wish categories this deity's wishes are filed under (kept for the
    *  existing wishes API; the grouping above is only for display) */
   wishCategory: 'career' | 'love' | 'wealth' | 'health' | 'study' | 'other';
+  /** how the statue is drawn (omit for the Taiwan set, which is looked up by key) */
+  look?: Look;
+}
+
+/** A whole shrine hall: one set per sanctuary type */
+export interface PantheonSet {
+  id: string;
+  /** shown above the chips */
+  intro: [string, string];
+  /** shown at the foot of each deity dialog (omit for the default note) */
+  disclaimer?: [string, string];
+  /** e.g. ['尊神明','deities'] used for the activity card subtitle by the caller */
+  groups: PantheonGroup[];
+  deities: Deity[];
 }
 
 export const DEITIES: Deity[] = [
@@ -215,3 +237,13 @@ export const DEITIES: Deity[] = [
     wishCategory: 'other',
   },
 ];
+
+export const TAIWAN_SET: PantheonSet = {
+  id: 'taiwan_folk',
+  intro: [
+    '台灣廟宇經常合祀多位神明。這裡依照大家常去祈求的事項分類，方便您找到想拜的神明；同一座廟實際供奉哪些神明，各地不盡相同。',
+    'Taiwanese folk temples often enshrine many deities together. They are grouped here by what people most often go to each one for, to help you find the one you want; which deities any one temple actually enshrines varies by place.',
+  ],
+  groups: GROUPS,
+  deities: DEITIES,
+};

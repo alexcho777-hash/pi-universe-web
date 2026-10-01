@@ -33,6 +33,17 @@ import {
 import { LampPanel } from './LampPanel';
 import { WishVowPanel } from './WishVowPanel';
 import { PantheonPanel } from './Pantheon';
+import { BUDDHIST_SET } from '../../faith/pantheons/buddhist';
+import { HINDU_SET } from '../../faith/pantheons/hindu';
+import { CATHOLIC_SET } from '../../faith/pantheons/catholic';
+import { THAI_SET } from '../../faith/pantheons/thai';
+import { VIETNAMESE_SET } from '../../faith/pantheons/vietnamese';
+import { SHINTO_SET } from '../../faith/pantheons/shinto';
+import { BuddhistChantPanel } from './BuddhistChant';
+import { BuddhistDaysPanel } from './BuddhistDays';
+import { PsalmsPanel, SeasonsPanel, WatchPanel } from './ChristianExtras';
+import { QuranPanel, HajjPanel } from './IslamExtras';
+import { OmikujiPanel } from './Omikuji';
 import { ThanTaiInfoPanel, ThanTaiDayPanel } from './VietnameseFolk';
 import {
   AngelusPanel,
@@ -83,6 +94,9 @@ const VIETNAMESE_ALTAR: Activity[] = [
 
 const ACTIVITIES: Record<string, Activity[]> = {
   buddhist: [
+    { key: 'pantheonBuddhist', icon: '🪷', title: ['佛菩薩殿', 'Buddhas & Bodhisattvas'], minutes: ['9 尊聖像', '9 sacred images'] },
+    { key: 'chant', icon: '🔔', title: ['早晚課與心經', 'Morning & evening chanting'], minutes: ['約 10 分鐘', 'About 10 min'] },
+    { key: 'buddhistDays', icon: '📅', title: ['佛誕與齋日', 'Buddhist days & fasting'], minutes: ['自動倒數', 'Auto countdown'] },
     { key: 'beads', icon: '📿', title: ['念佛計數', 'Recite the Buddha’s name'], minutes: ['約 5–10 分鐘', '5–10 min'] },
     LAMP_ACTIVITY,
     ...HOME_ALTAR,
@@ -95,13 +109,20 @@ const ACTIVITIES: Record<string, Activity[]> = {
     ...HOME_ALTAR,
   ],
   thai_four_face: [
+    { key: 'pantheonThai', icon: '🛕', title: ['泰國神明殿', 'Thai deities & revered figures'], minutes: ['9 尊', '9 figures'] },
     { key: 'wishvow', icon: '🛕', title: ['許願還願', 'Wish & fulfil'], minutes: ['免費許願', 'Free to wish'] },
     { key: 'thaiVisit', icon: '🧭', title: ['四面參拜順序', 'How to visit the four faces'], minutes: ['約 3 分鐘', 'About 3 min'] },
     { key: 'thaiOffer', icon: '🌼', title: ['上香獻花', 'Incense, candles & garlands'], minutes: ['約 2 分鐘', 'About 2 min'] },
     { key: 'candleThai', icon: '🕯️', title: ['點燭祈福', 'Light a candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
   ],
-  vietnamese_folk: VIETNAMESE_ALTAR,
+  vietnamese_folk: [
+    { key: 'pantheonVietnamese', icon: '🏯', title: ['越南神明殿', 'Vietnamese pantheon'], minutes: ['9 尊神明', '9 deities'] },
+    ...VIETNAMESE_ALTAR,
+  ],
   christian: [
+    { key: 'psalms', icon: '📜', title: ['詩篇', 'Psalms'], minutes: ['12 篇', '12 psalms'] },
+    { key: 'seasons', icon: '✝️', title: ['教會年曆倒數', 'Church year countdown'], minutes: ['自動倒數', 'Auto countdown'] },
+    { key: 'watch', icon: '🕯️', title: ['守望禱告', 'Watch & vigil'], minutes: ['5–30 分鐘', '5–30 min'] },
     { key: 'verse', icon: '📖', title: ['每日經文', 'Verse of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
     { key: 'prayer', icon: '🙏', title: ['主禱文與默禱', "Lord's Prayer & quiet prayer"], minutes: ['約 4 分鐘', 'About 4 min'] },
     { key: 'candleChristian', icon: '🕯️', title: ['點蠟燭祈禱', 'Light a prayer candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
@@ -109,6 +130,7 @@ const ACTIVITIES: Record<string, Activity[]> = {
     { key: 'prayerList', icon: '🤲', title: ['代禱事項', 'Prayer list'], minutes: ['記錄與回顧', 'Keep and look back'] },
   ],
   catholic: [
+    { key: 'pantheonCatholic', icon: '😇', title: ['聖母與聖人殿', 'Our Lady & the Saints'], minutes: ['10 位', '10 figures'] },
     { key: 'rosary', icon: '📿', title: ['玫瑰經', 'Pray the Rosary'], minutes: ['約 20 分鐘', 'About 20 min'] },
     { key: 'candle', icon: '🕯️', title: ['點蠟燭祈禱', 'Light a prayer candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
     { key: 'verse', icon: '📖', title: ['每日經文', 'Verse of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
@@ -117,6 +139,8 @@ const ACTIVITIES: Record<string, Activity[]> = {
     { key: 'saint', icon: '😇', title: ['今日聖人', 'Feast of the day'], minutes: ['約 1 分鐘', 'About 1 min'] },
   ],
   islamic: [
+    { key: 'quran', icon: '📖', title: ['可蘭經選讀', 'Quran selections'], minutes: ['8 段', '8 passages'] },
+    { key: 'hajj', icon: '🕋', title: ['朝覲與副朝', 'Hajj & Umrah'], minutes: ['自動倒數', 'Auto countdown'] },
     { key: 'times', icon: '🕌', title: ['今日禮拜時間', "Today's prayer times"], minutes: ['即時計算', 'Calculated for you'] },
     { key: 'qibla', icon: '🧭', title: ['朝拜方向', 'Qibla direction'], minutes: ['約 1 分鐘', 'About 1 min'] },
     { key: 'beads', icon: '📿', title: ['讚念（Tasbih）', 'Tasbih (dhikr)'], minutes: ['約 3 分鐘', 'About 3 min'] },
@@ -124,6 +148,8 @@ const ACTIVITIES: Record<string, Activity[]> = {
     { key: 'ramadan', icon: '🌙', title: ['齋戒月倒數', 'Ramadan countdown'], minutes: ['自動倒數', 'Auto countdown'] },
   ],
   shinto: [
+    { key: 'omikuji', icon: '🎴', title: ['御神籤', 'Omikuji fortune'], minutes: ['每日一次', 'Once a day'] },
+    { key: 'pantheonShinto', icon: '⛩️', title: ['神明殿', 'Hall of kami'], minutes: ['9 柱神', '9 kami'] },
     { key: 'shrine', icon: '⛩️', title: ['參拜作法', 'How to visit a shrine'], minutes: ['約 2 分鐘', 'About 2 min'] },
     { key: 'ema', icon: '🪧', title: ['繪馬許願', 'Write an ema wish'], minutes: ['最多掛 20 個', 'Up to 20 wishes'] },
     { key: 'lantern', icon: '🏮', title: ['奉納燈籠', 'Offer a lantern'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
@@ -131,6 +157,7 @@ const ACTIVITIES: Record<string, Activity[]> = {
     { key: 'tsukinami', icon: '📅', title: ['月次祭提醒', 'Tsukinami-sai reminder'], minutes: ['每月 1 日、15 日', '1st & 15th monthly'] },
   ],
   hindu: [
+    { key: 'pantheonHindu', icon: '🕉️', title: ['印度教眾神殿', 'Hindu pantheon'], minutes: ['10 位神明', '10 deities'] },
     { key: 'beads', icon: '📿', title: ['108 念珠持咒', 'Japa mala (108)'], minutes: ['約 10 分鐘', 'About 10 min'] },
     { key: 'aarti', icon: '🪔', title: ['Aarti 獻燈', 'Aarti (offering light)'], minutes: ['約 2 分鐘', 'About 2 min'] },
     { key: 'gayatri', icon: '🕉️', title: ['Gayatri 咒語', 'Gayatri mantra'], minutes: ['108 遍一圈', '108 per round'] },
@@ -198,6 +225,34 @@ export function FaithActivities({
         return <WishVowPanel sanctuaryId={sanctuaryId} sanctuaryName={sanctuaryName} />;
       case 'pantheon':
         return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} />;
+      case 'pantheonBuddhist':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={BUDDHIST_SET} />;
+      case 'pantheonHindu':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={HINDU_SET} />;
+      case 'pantheonCatholic':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={CATHOLIC_SET} />;
+      case 'pantheonThai':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={THAI_SET} />;
+      case 'pantheonVietnamese':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={VIETNAMESE_SET} />;
+      case 'pantheonShinto':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={SHINTO_SET} />;
+      case 'chant':
+        return <BuddhistChantPanel tr={tr} lang={lang} />;
+      case 'buddhistDays':
+        return <BuddhistDaysPanel tr={tr} lang={lang} />;
+      case 'psalms':
+        return <PsalmsPanel tr={tr} lang={lang} />;
+      case 'seasons':
+        return <SeasonsPanel tr={tr} lang={lang} />;
+      case 'watch':
+        return <WatchPanel tr={tr} lang={lang} />;
+      case 'quran':
+        return <QuranPanel tr={tr} lang={lang} />;
+      case 'hajj':
+        return <HajjPanel tr={tr} lang={lang} />;
+      case 'omikuji':
+        return <OmikujiPanel tr={tr} lang={lang} />;
       case 'thantaiOfferings':
         return <OfferingsPanel tr={tr} />;
       case 'thantaiInfo':
