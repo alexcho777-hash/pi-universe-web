@@ -796,6 +796,9 @@ export const JA: Record<string, string> = {
   "Compassion and relief from hardship": "慈悲と苦難からの救い",
   "Guanyin, the Bodhisattva of Compassion, is venerated in Buddhism for hearing the cries of the suffering and coming to their aid, and is held in equally deep regard in Taiwanese folk religion — many temples enshrine Guanyin alongside Daoist deities, and she is prayed to for peace and relief from hardship.": "観音菩薩は、苦しむ人々の声を聞き救いの手を差し伸べる存在として仏教で崇敬されており、台湾の民間信仰においても同様に深く尊ばれている——多くの廟では観音を道教の神々と並んで祀っており、人々は安寧と苦難からの救いを願って観音に祈る。",
   "Dizang, the Earth Treasury Bodhisattva": "地蔵王菩薩(地藏王菩薩、地蔵菩薩)、地の蔵の菩薩",
+  "Tianpeng Yuanshuai, the Marshal of Heavenly Reeds": "天蓬元帥(テンポウ・ゲンスイ)、天の川水軍の元帥",
+  "Charm, popularity and smooth dealings": "人付き合い・商売繁盛",
+  "Tianpeng Yuanshuai is Zhu Bajie of Journey to the West — once a marshal commanding the Heavenly River's naval forces before being exiled to the mortal world. In Taiwan he is quietly venerated by some workers in nightlife and hospitality trades, who pray to him for charm, easy rapport with customers, and smooth business — a tradition seldom discussed openly but long kept within that circle.": "天蓬元帥は『西遊記』の猪八戒のこと。本来は天界で天の川の水軍を率いる元帥だったが、過ちにより人間界に追放された。台湾では、一部の夜の仕事や接客業に従事する人々がひそかに天蓬元帥を祀り、人付き合いの良さや商売繁盛を祈願する。あまり公には語られないが、古くから業界内で受け継がれてきた信仰である。",
   "Guides and comforts the departed": "死者を導き、慰める",
   "Dizang vowed not to achieve buddhahood \"until the hells are empty,\" and is the bodhisattva who guides and eases the suffering of the departed. He is commonly invoked during the Ghost Festival and memorial rites for the deceased, to comfort departed family and ease old grievances.": "地蔵は「地獄が空になるまで」仏にならないと誓った菩薩であり、死者を導きその苦しみを和らげる存在である。盂蘭盆(お盆、Ghost Festival)や故人を偲ぶ法要の際にしばしば祈願され、亡くなった家族を慰め、古い遺恨を和らげるために唱えられる。",
 };

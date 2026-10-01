@@ -191,6 +191,18 @@ export const DEITIES: Deity[] = [
     wishCategory: 'health',
   },
   {
+    key: 'tianpeng',
+    icon: '🐷',
+    group: 'career',
+    title: ['天蓬元帥', 'Tianpeng Yuanshuai, the Marshal of Heavenly Reeds'],
+    short: ['人緣・場面圓滿', 'Charm, popularity and smooth dealings'],
+    intro: [
+      '天蓬元帥即《西遊記》中的豬八戒，本為天界統領天河水兵的元帥，因故貶入凡間。台灣部分八大行業、特種行業從業人員會供奉天蓬元帥，祈求人緣旺、應對圓融、生意順利，是這類行業圈子裡較少被公開談起、卻流傳已久的信仰。',
+      "Tianpeng Yuanshuai is Zhu Bajie of Journey to the West — once a marshal commanding the Heavenly River's naval forces before being exiled to the mortal world. In Taiwan he is quietly venerated by some workers in nightlife and hospitality trades, who pray to him for charm, easy rapport with customers, and smooth business — a tradition seldom discussed openly but long kept within that circle.",
+    ],
+    wishCategory: 'career',
+  },
+  {
     key: 'dizang',
     icon: '🔔',
     group: 'mercy',

@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Box, Button, Card, CardActionArea, Chip, Dialog, DialogContent, DialogTitle, IconButton, Paper, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, CardActionArea, Chip, Dialog, DialogContent, IconButton, Paper, TextField, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { apiClient } from '../../api/ApiClient';
 import { Lang, tx } from '../../i18n/i18n';
@@ -112,13 +112,49 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose }: { deity: Deity; 
   const fulfilled = wishes.filter((w) => w.status === 'fulfilled');
 
   return (
-    <Dialog open onClose={onClose} fullWidth maxWidth="sm" scroll="body">
-      <DialogTitle sx={{ fontSize: '1.4rem', fontWeight: 800, pr: 6 }}>
-        {deity.icon} {pick(deity.title, lang)}
-        <IconButton aria-label={tr('關閉', 'Close')} onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
+    <Dialog open onClose={onClose} fullWidth maxWidth="sm" scroll="body" slotProps={{ paper: { sx: { backgroundImage: 'none', backgroundColor: '#140905' } } }}>
+      <Box
+        sx={{
+          position: 'relative',
+          background: 'linear-gradient(160deg, #3a140a 0%, #220b05 75%, #140905 100%)',
+          borderBottom: '1px solid rgba(228,193,112,.4)',
+          px: 3,
+          pt: 3,
+          pb: 2.4,
+          textAlign: 'center',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(circle at 50% 0%, rgba(244,163,0,.22), transparent 65%)',
+            pointerEvents: 'none',
+          },
+        }}
+      >
+        <IconButton aria-label={tr('關閉', 'Close')} onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8, color: 'rgba(240,219,168,.8)' }}>
           <CloseIcon />
         </IconButton>
-      </DialogTitle>
+        <Box
+          sx={{
+            width: 64,
+            height: 64,
+            mx: 'auto',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'radial-gradient(circle, rgba(244,163,0,.4) 0%, rgba(244,163,0,.1) 70%, transparent 100%)',
+            border: '1px solid rgba(228,193,112,.55)',
+            mb: 1,
+            position: 'relative',
+          }}
+        >
+          <Typography sx={{ fontSize: '2rem', lineHeight: 1 }}>{deity.icon}</Typography>
+        </Box>
+        <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#f4e2b5', letterSpacing: '0.02em', position: 'relative' }}>{pick(deity.title, lang)}</Typography>
+        <Box sx={{ width: 36, height: '1px', background: 'rgba(228,193,112,.5)', mx: 'auto', my: 1 }} />
+        <Typography sx={{ fontSize: '0.85rem', color: 'rgba(230,220,205,.8)', position: 'relative' }}>{pick(deity.short, lang)}</Typography>
+      </Box>
       <DialogContent>
         <Typography sx={{ color: 'text.secondary', mb: 2 }}>{pick(deity.intro, lang)}</Typography>
         <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', fontStyle: 'italic', mb: 2 }}>
@@ -149,7 +185,11 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose }: { deity: Deity; 
               {tr('尚未還願', 'Not yet fulfilled')} ({pending.length})
             </Typography>
             {pending.map((w) => (
-              <Paper key={w.id} variant="outlined" sx={{ p: 1.5, mb: 1 }}>
+              <Paper
+                key={w.id}
+                variant="outlined"
+                sx={{ p: 1.5, mb: 1, backgroundColor: 'rgba(244,163,0,.06)', borderColor: 'rgba(228,193,112,.3)' }}
+              >
                 {w.wish_text && <Typography sx={{ mb: 1 }}>{w.wish_text.slice(prefix.length)}</Typography>}
                 <Button size="small" variant="outlined" onClick={() => markFulfilled(w.id)}>
                   {tr('標記還願', 'Mark as fulfilled')}
@@ -206,13 +246,47 @@ export function PantheonPanel({ sanctuaryId, tr, lang }: { sanctuaryId: number; 
           />
         ))}
       </Box>
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.2 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.3 }}>
         {shown.map((d) => (
-          <Card key={d.key} variant="outlined">
-            <CardActionArea onClick={() => setSelected(d)} sx={{ py: 1.5, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <Typography sx={{ fontSize: '2rem' }}>{d.icon}</Typography>
-              <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, textAlign: 'center', mt: 0.4, lineHeight: 1.3 }}>{pick(d.title, lang)}</Typography>
-              <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', textAlign: 'center', mt: 0.2 }}>{pick(d.short, lang)}</Typography>
+          <Card
+            key={d.key}
+            sx={{
+              background: 'linear-gradient(160deg, #2a0f08 0%, #190805 70%, #120603 100%)',
+              border: '1px solid rgba(228,193,112,.35)',
+              borderRadius: 2.5,
+              boxShadow: '0 3px 10px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,220,150,.08)',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                inset: 0,
+                background: 'radial-gradient(circle at 50% -10%, rgba(244,163,0,.18), transparent 60%)',
+                pointerEvents: 'none',
+              },
+            }}
+          >
+            <CardActionArea onClick={() => setSelected(d)} sx={{ py: 1.8, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+              <Box
+                sx={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'radial-gradient(circle, rgba(244,163,0,.35) 0%, rgba(244,163,0,.08) 70%, transparent 100%)',
+                  border: '1px solid rgba(228,193,112,.5)',
+                  mb: 0.6,
+                }}
+              >
+                <Typography sx={{ fontSize: '1.6rem', lineHeight: 1 }}>{d.icon}</Typography>
+              </Box>
+              <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, color: '#f0dba8', letterSpacing: '0.02em' }}>
+                {pick(d.title, lang)}
+              </Typography>
+              <Box sx={{ width: 22, height: '1px', background: 'rgba(228,193,112,.45)', my: 0.6 }} />
+              <Typography sx={{ fontSize: '0.76rem', color: 'rgba(230,220,205,.75)', textAlign: 'center', px: 1 }}>{pick(d.short, lang)}</Typography>
             </CardActionArea>
           </Card>
         ))}
