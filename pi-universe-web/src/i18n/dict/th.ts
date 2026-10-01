@@ -1315,4 +1315,7 @@ export const TH: Record<string, string> = {
   "Replay welcome": "ดูพิธีต้อนรับอีกครั้ง",
   "Peace be with you": "ขอสันติสุขจงดำรงอยู่กับท่าน",
   "The Lord be with you": "พระเจ้าสถิตอยู่กับท่าน",
+  "Zhusheng Niangniang bestows a golden shovel upon you": "จู้เซิงเหนียงเหนียงประทานพลั่วทองคำแก่ท่าน",
+  "May your family be blessed with children, peace and good fortune": "ขอให้ครอบครัวของท่านมีบุตรหลาน สงบสุข และโชคดี",
+  "Accept with thanks": "รับด้วยความขอบพระคุณ",
 };

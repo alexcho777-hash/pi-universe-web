@@ -1348,4 +1348,7 @@ export const HI: Record<string, string> = {
   "Replay welcome": "स्वागत समारोह फिर देखें",
   "Peace be with you": "आपको शांति मिले",
   "The Lord be with you": "प्रभु आपके साथ हों",
+  "Zhusheng Niangniang bestows a golden shovel upon you": "ज़ुशेंग नियांगनियांग ने आपको सोने का फावड़ा भेंट किया",
+  "May your family be blessed with children, peace and good fortune": "आपके परिवार को संतान, शांति और सौभाग्य का आशीर्वाद मिले",
+  "Accept with thanks": "धन्यवाद सहित स्वीकार करें",
 };

@@ -1351,4 +1351,7 @@ export const AR: Record<string, string> = {
   "Replay welcome": "إعادة مراسم الاستقبال",
   "Peace be with you": "السلام معكم",
   "The Lord be with you": "الرب معكم",
+  "Zhusheng Niangniang bestows a golden shovel upon you": "تمنحك تشوشنغ نيانغ نيانغ مجرفة ذهبية",
+  "May your family be blessed with children, peace and good fortune": "نسأل أن تُرزق عائلتك بالأبناء والسلام والحظ السعيد",
+  "Accept with thanks": "أقبلها شاكرًا",
 };

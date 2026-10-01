@@ -15,6 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { apiClient } from '../../api/ApiClient';
 import { Lang, tx } from '../../i18n/i18n';
 import { DeityStatue } from './DeityStatue';
+import { GoldenShovelGift } from './GoldenShovel';
 import { Deity, GroupKey, PantheonSet, TAIWAN_SET } from '../../faith/pantheon';
 
 type TR = (zh: string, en: string) => string;
@@ -80,6 +81,8 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  // Zhusheng Niangniang gives a golden shovel after a wish (a moment only; nothing is saved)
+  const [gift, setGift] = useState(false);
 
   const loadWishes = async () => {
     const res: any = await apiClient.getWishes();
@@ -98,6 +101,14 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
     setLoading(false);
     if (res.success) {
       setNotice(tr('已記錄您的心願 🙏', 'Your wish has been recorded 🙏'));
+      if (deity.key === 'zhushengniangniang') {
+        // once a day per device: only today's date is remembered, never the gift itself
+        const giftKey = `pu-shovel-${today()}`;
+        if (!load(giftKey, false)) {
+          save(giftKey, true);
+          setGift(true);
+        }
+      }
       setText('');
       loadWishes();
     } else {
@@ -114,6 +125,7 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
 
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="sm" scroll="body" slotProps={{ paper: { sx: { backgroundImage: 'none', backgroundColor: '#140905' } } }}>
+      {gift && <GoldenShovelGift tr={tr} onClose={() => setGift(false)} />}
       <Box
         sx={{
           position: 'relative',

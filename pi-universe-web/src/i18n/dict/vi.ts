@@ -1315,4 +1315,7 @@ export const VI: Record<string, string> = {
   "Replay welcome": "Xem lại nghi lễ đón tiếp",
   "Peace be with you": "Bình an của Chúa ở cùng bạn",
   "The Lord be with you": "Chúa ở cùng bạn",
+  "Zhusheng Niangniang bestows a golden shovel upon you": "Chú Sinh Nương Nương ban tặng bạn chiếc xẻng vàng",
+  "May your family be blessed with children, peace and good fortune": "Chúc gia đình bạn con cái đề huề, bình an và may mắn",
+  "Accept with thanks": "Xin nhận, cảm tạ Nương Nương",
 };

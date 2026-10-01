@@ -14,7 +14,7 @@ import { keyframes } from '@mui/material/styles';
 import { useI18n, tx } from '../../i18n/i18n';
 
 /** Length of one ceremony, seconds (every animation below is scaled to this) */
-const T = 11;
+const T = 30;
 
 type Garment = 'robe' | 'flare' | 'pants';
 type Head = 'none' | 'conical' | 'turban' | 'kufi' | 'hijab' | 'veil' | 'eboshi' | 'crown' | 'bun';
@@ -303,13 +303,19 @@ function Person({ look }: { look: Look }) {
 
 const proc = keyframes`
   0%   { transform: translateX(var(--dx)); opacity: 0; filter: none; }
-  2%   { opacity: 1; }
-  18%  { transform: translateX(0) rotate(0) translateY(0); opacity: 1; filter: none; }
-  47%  { transform: translateX(0) rotate(0) translateY(0); }
-  53%  { transform: translateX(0) rotate(var(--bow)) translateY(3px); }
-  61%  { transform: translateX(0) rotate(0) translateY(0); }
-  78%  { transform: translateX(0) translateY(0); opacity: 1; filter: none; }
-  93%  { transform: translateX(0) translateY(-8px); opacity: 0; filter: blur(5px) brightness(2.2); }
+  1%   { opacity: 1; }
+  7%   { transform: translateX(0) rotate(0) translateY(0); opacity: 1; filter: none; }
+  21%  { transform: translateX(0) rotate(0) translateY(0); }
+  23%  { transform: translateX(0) rotate(var(--bow)) translateY(3px); }
+  26%  { transform: translateX(0) rotate(0) translateY(0); }
+  45%  { transform: translateX(0) rotate(0) translateY(0); }
+  47%  { transform: translateX(0) rotate(var(--bow)) translateY(3px); }
+  50%  { transform: translateX(0) rotate(0) translateY(0); }
+  68%  { transform: translateX(0) rotate(0) translateY(0); }
+  70%  { transform: translateX(0) rotate(var(--bow)) translateY(3px); }
+  73%  { transform: translateX(0) rotate(0) translateY(0); }
+  88%  { transform: translateX(0) translateY(0); opacity: 1; filter: none; }
+  98%  { transform: translateX(0) translateY(-8px); opacity: 0; filter: blur(5px) brightness(2.2); }
   100% { transform: translateX(0) translateY(-8px); opacity: 0; filter: blur(5px) brightness(2.2); }
 `;
 const bob = keyframes`
@@ -318,11 +324,11 @@ const bob = keyframes`
 `;
 const pop = keyframes`
   0%   { opacity: 0; transform: translate(-50%, -100%) scale(.82); }
-  47%  { opacity: 0; transform: translate(-50%, -100%) scale(.82); }
-  52%  { opacity: 1; transform: translate(-50%, -100%) scale(1.06); }
-  55%  { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-  80%  { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-  90%  { opacity: 0; transform: translate(-50%, -112%) scale(1); }
+  20%  { opacity: 0; transform: translate(-50%, -100%) scale(.82); }
+  23%  { opacity: 1; transform: translate(-50%, -100%) scale(1.06); }
+  24%  { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+  88%  { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+  95%  { opacity: 0; transform: translate(-50%, -112%) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -112%) scale(1); }
 `;
 const flick = keyframes`
@@ -330,16 +336,16 @@ const flick = keyframes`
   50%      { transform: scaleY(1.18) translateY(-.6px); }
 `;
 const spark = keyframes`
-  0%, 78% { opacity: 0; transform: translateY(0); }
-  82%     { opacity: 1; transform: translateY(0); }
-  96%     { opacity: 0; transform: translateY(-26px); }
+  0%, 88% { opacity: 0; transform: translateY(0); }
+  91%     { opacity: 1; transform: translateY(0); }
+  99%     { opacity: 0; transform: translateY(-26px); }
   100%    { opacity: 0; transform: translateY(-26px); }
 `;
 const rise = keyframes`
-  0%, 40% { opacity: 0; }
-  55%     { opacity: .8; }
-  78%     { opacity: .8; }
-  96%     { opacity: 0; }
+  0%, 12% { opacity: 0; }
+  24%     { opacity: .8; }
+  88%     { opacity: .8; }
+  99%     { opacity: 0; }
   100%    { opacity: 0; }
 `;
 
@@ -359,8 +365,19 @@ interface Fig {
   phase: number;
 }
 
-const ROWS_N = 22;
-const COLS_N = 7;
+/** How many rows and columns of people each hall holds: roomy halls get a bigger crowd */
+const DENSITY: Record<string, [number, number]> = {
+  vietnamese_folk: [11, 4],
+  thai_four_face: [22, 7],
+  taiwan_folk: [28, 8],
+  buddhist: [30, 9],
+  hindu: [30, 9],
+  christian: [34, 10],
+  catholic: [34, 10],
+  islamic: [34, 10],
+  shinto: [34, 10],
+};
+const densityFor = (religionType: string): [number, number] => DENSITY[religionType] || [28, 8];
 
 function rng(seed: number) {
   let a = seed >>> 0;
@@ -373,7 +390,7 @@ function rng(seed: number) {
   };
 }
 
-function buildCrowd(religionType: string): Fig[] {
+function buildCrowd(religionType: string, ROWS_N: number, COLS_N: number): Fig[] {
   const crew = crewFor(religionType);
   const rand = rng(religionType.length * 7919 + religionType.charCodeAt(0) * 131);
   const out: Fig[] = [];
@@ -388,9 +405,9 @@ function buildCrowd(religionType: string): Fig[] {
           p,
           col: c,
           jx: (rand() - 0.5) * 0.02,
-          startT: 1.2 + wave * 0.8 + rand() * 0.55,
-          bowT: 5.7 + rand() * 0.3,
-          vanT: 8.6 + rand() * 0.7,
+          startT: 1.2 + wave * 0.9 + rand() * 0.6,
+          bowT: 6.5 + rand() * 0.3,
+          vanT: 26.6 + rand() * 1.2,
           phase: rand() * 6.28,
         });
       }
@@ -513,7 +530,8 @@ function Crowd({ religionType }: { religionType: string }) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    const figs = buildCrowd(religionType);
+    const [ROWS_N, COLS_N] = densityFor(religionType);
+    const figs = buildCrowd(religionType, ROWS_N, COLS_N);
     let W = 0;
     let H = 0;
     const resize = () => {
@@ -536,7 +554,7 @@ function Crowd({ religionType }: { religionType: string }) {
       const r1 = ((i * 7919) % 1000) / 1000;
       const r2 = ((i * 104729) % 1000) / 1000;
       const r3 = ((i * 15485863) % 1000) / 1000;
-      return { x: r1, sway: r2 * 6.28, t0: 5.7 + r3 * 2.4, speed: 0.22 + r2 * 0.2, size: 3 + r3 * 4, color: COLORS[i % COLORS.length], spin: r1 * 6.28 };
+      return { x: r1, sway: r2 * 6.28, t0: 6.5 + r3 * 17, speed: 0.22 + r2 * 0.2, size: 3 + r3 * 4, color: COLORS[i % COLORS.length], spin: r1 * 6.28 };
     });
     const t0 = performance.now();
     let raf = 0;
@@ -558,8 +576,11 @@ function Crowd({ religionType }: { religionType: string }) {
         // outer columns stand on higher tiers, so the crowd rises like a wall on both sides
         const foot = H * (0.385 + 0.5 * f.p - f.col * 0.03 * (0.35 + 0.65 * f.p));
         const bobY = u < 1 ? Math.abs(Math.sin(t * 13 + f.phase)) * 2.2 * k : 0;
-        const bw = clamp01((t - f.bowT) / 0.9);
-        const bow = bw > 0 && bw < 1 ? Math.sin(bw * Math.PI) : 0;
+        const bw1 = clamp01((t - f.bowT) / 0.9);
+        const bw2 = clamp01((t - f.bowT - 7.2) / 0.9);
+        const bw3 = clamp01((t - f.bowT - 14.4) / 0.9);
+        const sn = (w: number) => (w > 0 && w < 1 ? Math.sin(w * Math.PI) : 0);
+        const bow = sn(bw1) + sn(bw2) + sn(bw3);
         const rot = -f.side * 0.2 * bow;
         const y = foot - bobY - v * 12 * k;
         ctx.save();
@@ -590,7 +611,7 @@ function Crowd({ religionType }: { religionType: string }) {
         const bx = (b.x + Math.sin(t * 1.6 + b.sway) * 0.025) * W;
         const by = (-0.08 + life * 1.1) * H;
         ctx.save();
-        ctx.globalAlpha = Math.min(1, life * 6) * (1 - clamp01((t - 9.2) / 1.2)) * 0.95;
+        ctx.globalAlpha = Math.min(1, life * 6) * (1 - clamp01((t - 26.8) / 1.6)) * 0.95;
         ctx.translate(bx, by);
         ctx.rotate(b.spin + t * 3 * (b.x > 0.5 ? 1 : -1));
         ctx.fillStyle = b.color;

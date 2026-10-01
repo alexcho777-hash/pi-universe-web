@@ -1348,4 +1348,7 @@ export const JA: Record<string, string> = {
   "Replay welcome": "歓迎の儀をもう一度見る",
   "Peace be with you": "主の平和があなたにありますように",
   "The Lord be with you": "主があなたとともに",
+  "Zhusheng Niangniang bestows a golden shovel upon you": "註生娘娘から金のシャベルが授けられました",
+  "May your family be blessed with children, peace and good fortune": "お子さまに恵まれ、ご家族に平穏と幸運がありますように",
+  "Accept with thanks": "ありがたく頂戴します",
 };
