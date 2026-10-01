@@ -28,8 +28,7 @@ function Block({ face, flip, tossing, delay }: { face: BlockFace; flip?: boolean
   // the domed back. Both have soft, blunt ends. The tilt and mirror live on the inner svg so the
   // toss animation on the wrapper never undoes them.
   const flat = face === 'flat';
-  const uid = flat ? 'jf' : 'jr';
-  return (
+    return (
     <Box
       sx={{
         animation: tossing ? `${toss} 1.1s ease-in-out ${delay}s both` : undefined,
@@ -48,26 +47,37 @@ function Block({ face, flip, tossing, delay }: { face: BlockFace; flip?: boolean
         }}
       >
         <defs>
-          <linearGradient id={`${uid}Fill`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor={flat ? '#E8574B' : '#F0584C'} />
-            <stop offset="1" stopColor={flat ? '#C6362E' : '#9E1A1C'} />
-          </linearGradient>
+          {/* the domed back is shaded like a rounded surface: bright crown, dark rim */}
+          <radialGradient id="jrDome" cx="0.62" cy="0.38" r="0.75">
+            <stop offset="0" stopColor="#F2564A" />
+            <stop offset="0.45" stopColor="#C42A2A" />
+            <stop offset="1" stopColor="#5E0A0E" />
+          </radialGradient>
+          <clipPath id="jfClip">
+            <path d="M20 15 Q21 9 26 11 Q66 24 66 58 Q66 92 26 105 Q21 107 20 101 Q41 58 20 15 Z" />
+          </clipPath>
         </defs>
         {/* both faces share one crescent outline, so the pair always looks symmetrical;
-            only the surface differs: flat = matte, round = glossy dome */}
+            only the surface differs: flat = one even matte colour, round = shaded dome */}
         <path
           d="M20 15 Q21 9 26 11 Q66 24 66 58 Q66 92 26 105 Q21 107 20 101 Q41 58 20 15 Z"
-          fill={`url(#${uid}Fill)`}
-          stroke={flat ? '#8E211B' : '#7A1214'}
-          strokeWidth="1.6"
+          fill={flat ? '#D44A40' : 'url(#jrDome)'}
+          stroke={flat ? '#A3322B' : '#4E080C'}
+          strokeWidth={flat ? 1.2 : 1.8}
           strokeLinejoin="round"
         />
-        {flat ? (
-          <path d="M30 26 Q44 58 30 90" stroke="rgba(255,255,255,.3)" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-        ) : (
+        {flat && (
+          // matte, a little worn: one or two fine scratches that run along the curve of the block
+          <g clipPath="url(#jfClip)" fill="none" strokeLinecap="round">
+            <path d="M32.2 32.2 L32.8 34.3 L33.4 36.5 L33.9 38.7 L34.3 40.8 L34.7 43.0 L35.1 45.1 L35.3 47.3 L35.6 49.4 L35.8 51.5 L35.9 53.7 L36.0 55.9 L36.0 58.0 L36.0 60.2 L35.9 62.3 L35.8 64.5 L35.6 66.6 L35.3 68.8 L35.1 70.9 L34.7 73.1 L34.3 75.2 L33.9 77.4 L33.4 79.5 L32.8 81.7 L32.2 83.8" stroke="rgba(120,30,28,.4)" strokeWidth=".8" strokeLinejoin="round" />
+            <path d="M33.1 32.2 L33.7 34.3 L34.3 36.5 L34.8 38.7 L35.2 40.8 L35.6 43.0 L36.0 45.1 L36.2 47.3 L36.5 49.4 L36.7 51.5 L36.8 53.7 L36.9 55.9 L36.9 58.0 L36.9 60.2 L36.8 62.3 L36.7 64.5 L36.5 66.6 L36.2 68.8 L36.0 70.9 L35.6 73.1 L35.2 75.2 L34.8 77.4 L34.3 79.5 L33.7 81.7 L33.1 83.8" stroke="rgba(255,220,210,.2)" strokeWidth=".5" strokeLinejoin="round" />
+            <path d="M37.7 35.6 L38.1 37.5 L38.5 39.4 L38.9 41.2 L39.2 43.1 L39.5 45.0 L39.8 46.8 L40.0 48.7 L40.2 50.5 L40.3 52.4 L40.4 54.3 L40.5 56.1 L40.5 58.0 L40.5 59.9 L40.4 61.7 L40.3 63.6 L40.2 65.5 L40.0 67.3 L39.8 69.2 L39.5 71.0 L39.2 72.9 L38.9 74.8 L38.5 76.6 L38.1 78.5 L37.7 80.4" stroke="rgba(120,30,28,.32)" strokeWidth=".7" strokeLinejoin="round" />
+          </g>
+        )}
+        {!flat && (
           <>
-            <path d="M33 26 Q54 38 56 58" stroke="rgba(255,255,255,.5)" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <circle cx="50" cy="72" r="2" fill="rgba(255,255,255,.35)" />
+            <path d="M34 24 Q57 36 59 58" stroke="rgba(255,255,255,.55)" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+            <circle cx="52" cy="73" r="2.2" fill="rgba(255,255,255,.4)" />
           </>
         )}
       </Box>
