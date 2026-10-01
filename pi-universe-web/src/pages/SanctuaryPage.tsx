@@ -255,7 +255,7 @@ export default function SanctuaryPage() {
                 boxShadow: '0 0 18px rgba(232,193,112,.5)',
               }}
             >
-              {tr('🎋 線上求籤・每日 3 次免費', '🎋 Temple Oracle · 3 free draws a day')}
+              {tr('🎋 線上求籤・每日可求 3 次', '🎋 Temple Oracle · up to 3 draws a day')}
             </Button>
           )}
           <Button

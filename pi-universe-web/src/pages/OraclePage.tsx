@@ -477,7 +477,7 @@ export default function OraclePage() {
           <Panel>
             <Title>{tr('求籤須知', 'Before you begin')}</Title>
             <Big>
-              {tr('線上求籤免費，每人每天可求 3 支籤。', 'The oracle is free: up to 3 lots per person per day.')}
+              {tr('每人每天可求 3 支籤。', 'Up to 3 lots per person per day.')}
               <br />
               {tr('籤詩與解說僅供參考，重大決定請審慎評估。', 'Poems and interpretations are for reference only; think carefully before big decisions.')}
               <br />
