@@ -59,9 +59,9 @@ function ShovelSvg() {
       {/* collar */}
       <rect x="49" y="82" width="22" height="10" rx="5" fill={`url(#${g2})`} stroke="#7a4e0c" strokeWidth="1" />
       {/* blade */}
-      <path d="M22 110 Q22 92 42 92 L78 92 Q98 92 98 110 Q98 138 74 156 Q64 164 60 168 Q56 164 46 156 Q22 138 22 110 Z" fill={`url(#${g})`} stroke="#7a4e0c" strokeWidth="1.2" />
-      <path d="M60 98 L60 158" stroke="#fff6cf" strokeOpacity=".55" strokeWidth="1.6" />
-      <path d="M32 104 Q30 128 46 148" stroke="#fff6cf" strokeOpacity=".45" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M22 108 Q22 92 40 92 L80 92 Q98 92 98 108 Q98 146 76 158 Q60 166 44 158 Q22 146 22 108 Z" fill={`url(#${g})`} stroke="#7a4e0c" strokeWidth="1.2" />
+      <path d="M60 98 L60 160" stroke="#fff6cf" strokeOpacity=".55" strokeWidth="1.6" />
+      <path d="M32 104 Q30 128 44 148" stroke="#fff6cf" strokeOpacity=".45" strokeWidth="2" fill="none" strokeLinecap="round" />
       {/* 福 on the blade */}
       <text x="60" y="132" textAnchor="middle" fontSize="30" fontWeight="700" fill="#9b1b1b" stroke="#6b0e0e" strokeWidth=".4" fontFamily="'Noto Serif TC','Songti TC','PMingLiU',serif">
         福

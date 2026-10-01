@@ -36,6 +36,7 @@ export default function AdminPage() {
   const [toss, setToss] = useState(false);
   const [admins, setAdmins] = useState<{ pi_username: string }[]>([]);
   const [owners, setOwners] = useState<string[]>([]);
+  const [max, setMax] = useState(3);
   const [name, setName] = useState('');
   const [msg, setMsg] = useState('');
 
@@ -44,6 +45,7 @@ export default function AdminPage() {
     if (res?.success) {
       setAdmins(res.data.admins || []);
       setOwners(res.data.owners || []);
+      if (res.data.max) setMax(res.data.max);
     }
   };
 
@@ -121,7 +123,9 @@ export default function AdminPage() {
             <Chip key={a.pi_username} label={a.pi_username} onDelete={role === 'owner' ? () => remove(a.pi_username) : undefined} />
           ))}
         </Box>
-        {role === 'owner' ? (
+        {owners.length + admins.length >= max ? (
+          <Typography sx={{ color: 'text.secondary' }}>{tr(`管理者已滿 ${max} 位，不能再新增。`, `The limit of ${max} administrators has been reached.`)}</Typography>
+        ) : role === 'owner' ? (
           <Box sx={{ display: 'flex', gap: 1 }}>
             <TextField size="small" fullWidth value={name} onChange={(e) => setName(e.target.value)} placeholder={tr('另一位管理者的 Pi 使用者名稱', 'Pi username of the other administrator')} />
             <Button variant="contained" disabled={!name.trim()} onClick={add}>{tr('新增', 'Add')}</Button>
