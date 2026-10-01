@@ -233,6 +233,19 @@ function Person({ look }: { look: Look }) {
       <rect x="27" y="43" width="6" height="10" fill={skin} />
       <ellipse cx="30" cy="34" rx={covered ? 6.9 : 8.6} ry={covered ? 8.7 : 10} fill={skin} />
       <ellipse cx="27" cy="31" rx="3" ry="4" fill="#fff" opacity=".1" />
+      {/* a calm, friendly face */}
+      <g>
+        <path d="M23.8 29.2 Q26.2 27.9 28.4 29" stroke="#3a2a20" strokeWidth=".9" fill="none" strokeLinecap="round" />
+        <path d="M31.6 29 Q33.8 27.9 36.2 29.2" stroke="#3a2a20" strokeWidth=".9" fill="none" strokeLinecap="round" />
+        <ellipse cx="26.2" cy="32.2" rx="1.25" ry="1.5" fill="#241812" />
+        <ellipse cx="33.8" cy="32.2" rx="1.25" ry="1.5" fill="#241812" />
+        <circle cx="26.6" cy="31.7" r=".4" fill="#fff" />
+        <circle cx="34.2" cy="31.7" r=".4" fill="#fff" />
+        <path d="M30 33.2 Q29 36 30.6 36.6" stroke="#000" strokeOpacity=".28" strokeWidth=".7" fill="none" strokeLinecap="round" />
+        <path d="M26.8 39.2 Q30 42.2 33.2 39.2" stroke="#8a2f2a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+        <ellipse cx="23.6" cy="37" rx="2" ry="1.2" fill="#e07a6a" opacity=".28" />
+        <ellipse cx="36.4" cy="37" rx="2" ry="1.2" fill="#e07a6a" opacity=".28" />
+      </g>
       {tilak && <circle cx="30" cy="29" r="1.1" fill="#c8102e" />}
 
       {/* hair / hats */}
@@ -304,16 +317,19 @@ function Person({ look }: { look: Look }) {
 const proc = keyframes`
   0%   { transform: translateX(var(--dx)); opacity: 0; filter: none; }
   1%   { opacity: 1; }
-  7%   { transform: translateX(0) rotate(0) translateY(0); opacity: 1; filter: none; }
-  21%  { transform: translateX(0) rotate(0) translateY(0); }
-  23%  { transform: translateX(0) rotate(var(--bow)) translateY(3px); }
-  26%  { transform: translateX(0) rotate(0) translateY(0); }
-  45%  { transform: translateX(0) rotate(0) translateY(0); }
-  47%  { transform: translateX(0) rotate(var(--bow)) translateY(3px); }
-  50%  { transform: translateX(0) rotate(0) translateY(0); }
-  68%  { transform: translateX(0) rotate(0) translateY(0); }
-  70%  { transform: translateX(0) rotate(var(--bow)) translateY(3px); }
-  73%  { transform: translateX(0) rotate(0) translateY(0); }
+  7%   { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); opacity: 1; filter: none; }
+  22%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
+  25.5%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  27%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  30.5%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
+  47%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
+  50.5%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  52%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  55.5%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
+  72%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
+  75.5%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  77%  { transform: translateX(0) perspective(520px) rotateX(-34deg) translateY(2px); }
+  80.5%  { transform: translateX(0) perspective(520px) rotateX(0) translateY(0); }
   88%  { transform: translateX(0) translateY(0); opacity: 1; filter: none; }
   98%  { transform: translateX(0) translateY(-8px); opacity: 0; filter: blur(5px) brightness(2.2); }
   100% { transform: translateX(0) translateY(-8px); opacity: 0; filter: blur(5px) brightness(2.2); }
@@ -482,6 +498,25 @@ function drawLook(ctx: CanvasRenderingContext2D, l: Look) {
   ctx.beginPath();
   ctx.ellipse(30, 34, covered ? 6.9 : 8.6, covered ? 8.7 : 10, 0, 0, 6.3);
   ctx.fill();
+  ctx.fillStyle = '#241812';
+  ctx.beginPath();
+  ctx.ellipse(26.2, 32.2, 1.3, 1.6, 0, 0, 6.3);
+  ctx.ellipse(33.8, 32.2, 1.3, 1.6, 0, 0, 6.3);
+  ctx.fill();
+  ctx.strokeStyle = '#3a2a20';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(23.8, 29.2);
+  ctx.quadraticCurveTo(26.2, 27.9, 28.4, 29);
+  ctx.moveTo(31.6, 29);
+  ctx.quadraticCurveTo(33.8, 27.9, 36.2, 29.2);
+  ctx.stroke();
+  ctx.strokeStyle = '#8a2f2a';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(26.8, 39.2);
+  ctx.quadraticCurveTo(30, 42.2, 33.2, 39.2);
+  ctx.stroke();
   if (l.hair && !covered && l.head !== 'turban' && l.head !== 'conical') {
     ctx.fillStyle = l.hair;
     ctx.fill(HAIR_CAP);
@@ -576,18 +611,16 @@ function Crowd({ religionType }: { religionType: string }) {
         // outer columns stand on higher tiers, so the crowd rises like a wall on both sides
         const foot = H * (0.385 + 0.5 * f.p - f.col * 0.03 * (0.35 + 0.65 * f.p));
         const bobY = u < 1 ? Math.abs(Math.sin(t * 13 + f.phase)) * 2.2 * k : 0;
-        const bw1 = clamp01((t - f.bowT) / 0.9);
-        const bw2 = clamp01((t - f.bowT - 7.2) / 0.9);
-        const bw3 = clamp01((t - f.bowT - 14.4) / 0.9);
-        const sn = (w: number) => (w > 0 && w < 1 ? Math.sin(w * Math.PI) : 0);
+        const bw1 = clamp01((t - f.bowT) / 3.2);
+        const bw2 = clamp01((t - f.bowT - 7.5) / 3.2);
+        const bw3 = clamp01((t - f.bowT - 15) / 3.2);
+        const sn = (w: number) => (w > 0 && w < 1 ? Math.min(1, Math.sin(w * Math.PI) * 1.6) : 0);
         const bow = sn(bw1) + sn(bw2) + sn(bw3);
-        const rot = -f.side * 0.2 * bow;
         const y = foot - bobY - v * 12 * k;
         ctx.save();
         ctx.globalAlpha = clamp01(u * 5) * (1 - v);
         ctx.translate(x, y);
-        ctx.rotate(rot);
-        ctx.scale(k, k);
+        ctx.scale(k, k * (1 - 0.14 * Math.min(1, bow)));
         ctx.translate(-30, -128);
         drawLook(ctx, f.look);
         ctx.restore();
@@ -703,7 +736,6 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
         const side = i < 4 ? -1 : 1;
         const row = ROWS[i % 4];
         const delay = ((i % 4) * 0.12 + (side === 1 ? 0.05 : 0)).toFixed(2);
-        const bow = side === -1 ? 11 : -11;
         return (
           <Box
             key={i}
@@ -721,9 +753,9 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
               sx={{
                 width: '100%',
                 height: '100%',
-                transformOrigin: '50% 100%',
+                transformOrigin: '50% 72%',
                 '--dx': `${side * (58 - row.d)}cqw`,
-                '--bow': `${bow}deg`,
+                
                 opacity: 0,
                 animation: `${proc} ${T}s cubic-bezier(.3,.6,.3,1) ${delay}s both`,
                 '& .sp .spk': { opacity: 0, animation: `${spark} ${T}s ease-out ${delay}s both`, animationDelay: `calc(${delay}s + var(--i) * .08s)` },

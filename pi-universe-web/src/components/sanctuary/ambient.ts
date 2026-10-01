@@ -8,6 +8,8 @@ import { AmbientKind } from './sceneConfig';
 
 export interface AmbientHandle {
   stop: () => void;
+  /** Re-try starting audio after a user gesture (browsers block autoplay) */
+  resume: () => void;
 }
 
 /**
@@ -339,6 +341,9 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
   return {
+    resume: () => {
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    },
     stop: () => {
       timers.forEach((t) => window.clearTimeout(t));
       try {

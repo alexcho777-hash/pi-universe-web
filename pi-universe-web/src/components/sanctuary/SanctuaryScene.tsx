@@ -116,17 +116,49 @@ export function SanctuaryScene({
     };
   }, [religionType]);
 
-  // Stop the sound when leaving the page
-  useEffect(() => () => ambient.current?.stop(), []);
+  // The speaker choice is remembered: once turned on, every sanctuary starts its sound by itself
+  const PREF = 'pu-sound';
+  const wantsSound = () => {
+    try {
+      return localStorage.getItem(PREF) === '1';
+    } catch {
+      return false;
+    }
+  };
+  const setPref = (on: boolean) => {
+    try {
+      localStorage.setItem(PREF, on ? '1' : '0');
+    } catch {
+      /* ignore */
+    }
+  };
+
+  useEffect(() => {
+    if (!wantsSound()) return;
+    const h = startAmbient(sceneFor(religionType).ambient);
+    ambient.current = h;
+    setSoundOn(!!h);
+    // if the browser blocked autoplay, the first touch lets it through
+    const kick = () => ambient.current?.resume();
+    window.addEventListener('pointerdown', kick, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', kick);
+      ambient.current?.stop();
+      ambient.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [religionType]);
 
   const toggleSound = () => {
     if (soundOn) {
       ambient.current?.stop();
       ambient.current = null;
       setSoundOn(false);
+      setPref(false);
     } else {
       ambient.current = startAmbient(sceneFor(religionType).ambient);
       setSoundOn(!!ambient.current);
+      setPref(!!ambient.current);
     }
   };
 

@@ -34,7 +34,7 @@ function ShovelSvg() {
   const g = `gs${uid}`;
   const g2 = `gh${uid}`;
   return (
-    <svg viewBox="0 0 120 230" width="100%" height="100%" aria-hidden="true" style={{ overflow: 'visible', display: 'block' }}>
+    <svg viewBox="0 0 120 172" width="100%" height="100%" aria-hidden="true" style={{ overflow: 'visible', display: 'block' }}>
       <defs>
         <linearGradient id={g} x1="0" x2="1" y1="0" y2="0">
           <stop offset="0" stopColor="#a8741a" />
@@ -51,19 +51,19 @@ function ShovelSvg() {
       {/* D-shaped grip */}
       <path d="M38 14 Q38 2 60 2 Q82 2 82 14 L82 26 L74 26 L74 15 Q74 9 60 9 Q46 9 46 15 L46 26 L38 26 Z" fill={`url(#${g2})`} stroke="#7a4e0c" strokeWidth="1" />
       {/* shaft */}
-      <rect x="55" y="24" width="10" height="96" rx="3" fill={`url(#${g2})`} stroke="#7a4e0c" strokeWidth="1" />
+      <rect x="55" y="24" width="10" height="62" rx="5" fill={`url(#${g2})`} stroke="#7a4e0c" strokeWidth="1" />
       {/* red ribbon with a knot */}
       <path d="M53 52 L67 52 L67 60 L53 60 Z" fill="#c8102e" />
       <path d="M60 60 Q50 76 44 92 L52 90 Q55 80 60 70 Q65 80 68 90 L76 92 Q70 76 60 60 Z" fill="#b30d27" />
       <circle cx="60" cy="56" r="4.2" fill="#e5334d" stroke="#8a0a1f" strokeWidth=".7" />
       {/* collar */}
-      <rect x="49" y="118" width="22" height="10" rx="2" fill={`url(#${g2})`} stroke="#7a4e0c" strokeWidth="1" />
+      <rect x="49" y="82" width="22" height="10" rx="5" fill={`url(#${g2})`} stroke="#7a4e0c" strokeWidth="1" />
       {/* blade */}
-      <path d="M26 132 Q26 126 34 126 L86 126 Q94 126 94 132 Q94 186 60 222 Q26 186 26 132 Z" fill={`url(#${g})`} stroke="#7a4e0c" strokeWidth="1.2" />
-      <path d="M60 130 L60 214" stroke="#fff6cf" strokeOpacity=".55" strokeWidth="1.6" />
-      <path d="M36 138 Q38 176 56 206" stroke="#fff6cf" strokeOpacity=".45" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M22 112 Q22 92 42 92 L78 92 Q98 92 98 112 Q98 162 60 166 Q22 162 22 112 Z" fill={`url(#${g})`} stroke="#7a4e0c" strokeWidth="1.2" />
+      <path d="M60 98 L60 158" stroke="#fff6cf" strokeOpacity=".55" strokeWidth="1.6" />
+      <path d="M32 104 Q30 136 46 154" stroke="#fff6cf" strokeOpacity=".45" strokeWidth="2" fill="none" strokeLinecap="round" />
       {/* 福 on the blade */}
-      <text x="60" y="176" textAnchor="middle" fontSize="30" fontWeight="700" fill="#9b1b1b" stroke="#6b0e0e" strokeWidth=".4" fontFamily="'Noto Serif TC','Songti TC','PMingLiU',serif">
+      <text x="60" y="132" textAnchor="middle" fontSize="30" fontWeight="700" fill="#9b1b1b" stroke="#6b0e0e" strokeWidth=".4" fontFamily="'Noto Serif TC','Songti TC','PMingLiU',serif">
         福
       </text>
     </svg>
@@ -107,7 +107,7 @@ export function GoldenShovelGift({ tr, onClose }: { tr: (zh: string, en: string)
             left: '50%',
             top: 10,
             width: 300,
-            height: 300,
+            height: 240,
             ml: '-150px',
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(255,214,120,.55), rgba(255,214,120,0) 68%)',
@@ -115,7 +115,7 @@ export function GoldenShovelGift({ tr, onClose }: { tr: (zh: string, en: string)
             pointerEvents: 'none',
           }}
         />
-        <Box sx={{ position: 'relative', width: 140, height: 290, mx: 'auto', animation: `${descend} 1.5s cubic-bezier(.2,.8,.3,1) both` }}>
+        <Box sx={{ position: 'relative', width: 140, height: 205, mx: 'auto', animation: `${descend} 1.5s cubic-bezier(.2,.8,.3,1) both` }}>
           <Box sx={{ width: '100%', height: '100%', animation: `${bob} 3.2s ease-in-out 1.5s infinite`, filter: 'drop-shadow(0 8px 14px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(255,208,100,.7))' }}>
             <ShovelSvg />
           </Box>
