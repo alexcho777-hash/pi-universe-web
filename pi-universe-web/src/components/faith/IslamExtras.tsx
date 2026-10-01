@@ -371,15 +371,16 @@ const HAJJ_STEPS: { title: Pair; body: Pair; when: Pair }[] = [
 const TALBIYAH = 'لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ';
 
 export function HajjPanel({ tr }: { tr: TR; lang: Lang }) {
-  const targets = useMemo(() => {
+  const dates = useMemo(() => {
     const now = new Date();
-    return [
-      { name: tr('開齋節（1 Shawwal）', 'Eid al-Fitr (1 Shawwal)'), r: daysToHijri(10, 1, now) },
-      { name: tr('阿拉法特日（9 Dhul Hijjah）', 'Day of Arafah (9 Dhul Hijjah)'), r: daysToHijri(12, 9, now) },
-      { name: tr('宰牲節（10 Dhul Hijjah）', 'Eid al-Adha (10 Dhul Hijjah)'), r: daysToHijri(12, 10, now) },
-    ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return [daysToHijri(10, 1, now), daysToHijri(12, 9, now), daysToHijri(12, 10, now)];
   }, []);
+  // names computed per render so they follow language switches
+  const targets = [
+    { name: tr('開齋節（1 Shawwal）', 'Eid al-Fitr (1 Shawwal)'), r: dates[0] },
+    { name: tr('阿拉法特日（9 Dhul Hijjah）', 'Day of Arafah (9 Dhul Hijjah)'), r: dates[1] },
+    { name: tr('宰牲節（10 Dhul Hijjah）', 'Eid al-Adha (10 Dhul Hijjah)'), r: dates[2] },
+  ];
   const [open, setOpen] = useState<number | null>(null);
   const [mode, setMode] = useState<'hajj' | 'umrah'>('hajj');
   const steps = HAJJ_STEPS.map((s, i) => ({ s, i }));

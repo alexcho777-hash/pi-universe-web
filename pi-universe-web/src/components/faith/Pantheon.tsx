@@ -157,7 +157,7 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
           minRows={2}
           label={tr('心願內容（可留空）', 'What you wish for (optional)')}
           value={text}
-          onChange={(e) => setText(e.target.value.slice(0, 200))}
+          onChange={(e) => setText(e.target.value.slice(0, Math.max(0, 200 - prefix.length)))}
           sx={{ mb: 1.5 }}
         />
         <Button variant="contained" fullWidth disabled={loading} onClick={submit} sx={{ backgroundColor: '#F4A300', mb: 1.5 }}>
@@ -206,6 +206,11 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
 export function PantheonPanel({ sanctuaryId, tr, lang, set = TAIWAN_SET }: { sanctuaryId: number; tr: TR; lang: Lang; set?: PantheonSet }) {
   const [group, setGroup] = useState<GroupKey | 'all'>('all');
   const [selected, setSelected] = useState<Deity | null>(null);
+  // reset filter/dialog if the caller swaps in a different set
+  useEffect(() => {
+    setGroup('all');
+    setSelected(null);
+  }, [set.id]);
   const shown = useMemo(() => (group === 'all' ? set.deities : set.deities.filter((d) => d.group === group)), [group, set]);
 
   return (
@@ -261,7 +266,7 @@ export function PantheonPanel({ sanctuaryId, tr, lang, set = TAIWAN_SET }: { san
           </Card>
         ))}
       </Box>
-      {selected && <DeityDialog deity={selected} sanctuaryId={sanctuaryId} tr={tr} lang={lang} disclaimer={set.disclaimer} onClose={() => setSelected(null)} />}
+      {selected && <DeityDialog key={selected.key} deity={selected} sanctuaryId={sanctuaryId} tr={tr} lang={lang} disclaimer={set.disclaimer} onClose={() => setSelected(null)} />}
     </Box>
   );
 }
