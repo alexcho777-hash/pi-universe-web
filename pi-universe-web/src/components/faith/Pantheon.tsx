@@ -16,6 +16,7 @@ import { apiClient } from '../../api/ApiClient';
 import { Lang, tx } from '../../i18n/i18n';
 import { DeityStatue } from './DeityStatue';
 import { GoldenShovelGift } from './GoldenShovel';
+import { useAdminStore } from '../../stores/adminStore';
 import { Deity, GroupKey, PantheonSet, TAIWAN_SET } from '../../faith/pantheon';
 
 type TR = (zh: string, en: string) => string;
@@ -83,6 +84,7 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
   const [loading, setLoading] = useState(false);
   // Zhusheng Niangniang gives a golden shovel after a wish (a moment only; nothing is saved)
   const [gift, setGift] = useState(false);
+  const isAdmin = !!useAdminStore((s) => s.role);
 
   const loadWishes = async () => {
     const res: any = await apiClient.getWishes();
@@ -104,8 +106,8 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
       if (deity.key === 'zhushengniangniang') {
         // once a day per device: only today's date is remembered, never the gift itself
         const giftKey = `pu-shovel-${today()}`;
-        if (!load(giftKey, false)) {
-          save(giftKey, true);
+        if (isAdmin || !load(giftKey, false)) {
+          if (!isAdmin) save(giftKey, true);
           setGift(true);
         }
       }

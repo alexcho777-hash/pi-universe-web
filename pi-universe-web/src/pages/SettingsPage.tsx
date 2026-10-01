@@ -6,6 +6,7 @@ import { Container, Paper, Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useI18n, Lang } from '../i18n/i18n';
+import { useAdminStore } from '../stores/adminStore';
 
 const LANGS: [Lang, string][] = [
   ['zh', '中文'],
@@ -21,6 +22,7 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   const { logout } = useAuthStore();
   const { lang, setLang, tr, tr4 } = useI18n();
+  const adminRole = useAdminStore((s) => s.role);
 
   const handleLogout = async () => {
     if (window.confirm(tr('確定要登出嗎？', 'Are you sure you want to sign out?'))) {
@@ -54,6 +56,12 @@ export default function SettingsPage() {
           ))}
         </Box>
       </Paper>
+
+      {adminRole && (
+        <Paper sx={{ p: 2, mb: 2 }}>
+          <Button fullWidth variant="contained" onClick={() => navigate('/admin')}>{tr('管理者工具', 'Admin tools')}</Button>
+        </Paper>
+      )}
 
       <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, mt: 3, mb: 1 }}>{tr('隱私與安全', 'Privacy & security')}</Typography>
       <Paper sx={{ p: 2, mb: 2 }}>

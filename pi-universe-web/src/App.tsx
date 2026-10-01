@@ -10,6 +10,8 @@ import HomePage from './pages/HomePage';
 import AcknowledgmentsPage from './pages/AcknowledgmentsPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
+import AdminPage from './pages/AdminPage';
+import { useAdminStore } from './stores/adminStore';
 import LoginPage from './pages/LoginPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import SanctuaryPage from './pages/SanctuaryPage';
@@ -62,6 +64,14 @@ export default function App() {
     initialize();
   }, [initialize]);
 
+  // Ask the server whether this user is the owner / an administrator (it decides, not the app)
+  const refreshAdmin = useAdminStore((s) => s.refresh);
+  const clearAdmin = useAdminStore((s) => s.clear);
+  useEffect(() => {
+    if (isAuthenticated) refreshAdmin();
+    else clearAdmin();
+  }, [isAuthenticated, refreshAdmin, clearAdmin]);
+
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -92,6 +102,7 @@ export default function App() {
                 <Route path="/acknowledgments" element={<AcknowledgmentsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/admin" element={<AdminPage />} />
                 <Route path="/calendar" element={calendarRoute} />
                 <Route path="/sanctuary/:id" element={<SanctuaryPage />} />
                 <Route
