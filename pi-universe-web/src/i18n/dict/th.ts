@@ -714,7 +714,7 @@ export const TH: Record<string, string> = {
   "Counting by itself — it stops when the round is complete": "กำลังนับอัตโนมัติ — จะหยุดเองเมื่อครบหนึ่งรอบ",
   "Known as Kau Cim, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.": "เรียกว่า Kau Cim (เซียมซี) เป็นประเพณีของศาลเจ้าไต้หวันที่มีมาหลายร้อยปี: คุณถามคำถามต่อเจ้าแม่หม่าจู่ โยนไม้ปวยเพื่อขออนุญาต เขย่ากระบอกไม้ไผ่จนมีไม้ติ้วหล่นออกมาหนึ่งอัน แล้วรับบทกวีโบราณเป็นคำชี้แนะ",
   "Pantheon": "เทวสภา",
-  "14 deities": "14 เทพเจ้า",
+  "15 deities": "15 เทพเจ้า",
   "Incense lit — burns until midnight": "จุดธูปแล้ว — ไหม้จนถึงเที่ยงคืน",
   "Traditions and customs vary by temple and region — shown here for reference only.": "ธรรมเนียมและประเพณีแตกต่างกันไปตามศาลเจ้าและภูมิภาค — ข้อมูลนี้มีไว้เพื่อการอ้างอิงเท่านั้น",
   "Make a wish": "ขอพร",

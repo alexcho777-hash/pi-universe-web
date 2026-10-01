@@ -714,7 +714,7 @@ export const VI: Record<string, string> = {
   "Counting by itself — it stops when the round is complete": "Đang tự động đếm — sẽ dừng khi đủ một vòng",
   "Known as Kau Cim, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.": "Gọi là Kau Cim (xin xăm), đây là truyền thống hàng trăm năm của các đền miếu Đài Loan: bạn hỏi Mẫu Tổ (Mazu) một điều, gieo keo để xin phép, lắc ống xăm cho đến khi một quẻ rơi ra, rồi nhận một bài thơ cổ làm lời chỉ dẫn.",
   "Pantheon": "Điện Thần",
-  "14 deities": "14 vị thần",
+  "15 deities": "15 vị thần",
   "Incense lit — burns until midnight": "Nhang đã thắp — cháy đến nửa đêm",
   "Traditions and customs vary by temple and region — shown here for reference only.": "Truyền thống và phong tục khác nhau theo từng chùa/miếu và vùng miền — nội dung ở đây chỉ mang tính tham khảo.",
   "Make a wish": "Cầu nguyện",

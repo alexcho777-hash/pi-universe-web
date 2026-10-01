@@ -752,7 +752,7 @@ export const AR: Record<string, string> = {
   "Counting by itself — it stops when the round is complete": "العدّ يعمل تلقائيًا — ويتوقف عند اكتمال الدورة",
   "Known as Kau Cim, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.": "تُعرف باسم «كاو تشيم»، وهي تقليد عريق في المعابد التايوانية منذ قرون: تطرح سؤالك على الإلهة ماتسو، وترمي قطعتي القمر لتستأذنها، ثم تهزّ أسطوانة الخيزران حتى تسقط منها عصا واحدة، فتنال قصيدة كلاسيكية للإرشاد.",
   "Pantheon": "مجمع الآلهة",
-  "14 deities": "14 إلهًا",
+  "15 deities": "15 إلهًا",
   "Incense lit — burns until midnight": "تم إشعال البخور — يحترق حتى منتصف الليل",
   "Traditions and customs vary by temple and region — shown here for reference only.": "تختلف التقاليد والعادات باختلاف المعبد والمنطقة — المعلومات هنا لأغراض مرجعية فقط.",
   "Make a wish": "اطلب أمنية",

@@ -749,7 +749,7 @@ export const JA: Record<string, string> = {
   "Counting by itself — it stops when the round is complete": "自動でカウント中 — 一周すると自動で止まります",
   "Known as Kau Cim, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.": "「カウチム（求籤）」と呼ばれる、台湾の廟で何百年も続く伝統です。媽祖に問いかけ、ポエ（筊杯）を投げてお許しを確かめ、竹筒を振って一本の籤を引き、古い詩を導きとして受け取ります。",
   "Pantheon": "神々",
-  "14 deities": "14体の神々",
+  "15 deities": "15体の神々",
   "Incense lit — burns until midnight": "線香を点火 — 深夜まで燃焼します",
   "Traditions and customs vary by temple and region — shown here for reference only.": "伝統や習慣は寺院や地域によって異なります — ここでの内容はあくまで参考情報です。",
   "Make a wish": "願いを込める",

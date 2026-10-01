@@ -10,11 +10,56 @@ export interface AmbientHandle {
   stop: () => void;
 }
 
+/**
+ * iPhones route Web Audio through the "ringer" channel, so it stays silent when the side
+ * switch is on silent (and some iOS versions stay silent regardless). Telling the page to use
+ * the "playback" audio session and keeping a silent <audio> element looping makes iOS treat
+ * this as media playback. Must be called from the tap that starts the sound.
+ */
+function unlockIosAudio(): HTMLAudioElement | null {
+  try {
+    const nav: any = navigator;
+    if (nav.audioSession) nav.audioSession.type = 'playback';
+  } catch {
+    /* not supported */
+  }
+  try {
+    // 0.1 s of silence, 8-bit mono 8 kHz WAV
+    const n = 800;
+    const bytes = new Uint8Array(44 + n);
+    const dv = new DataView(bytes.buffer);
+    const w = (o: number, t: string) => [...t].forEach((c, i) => dv.setUint8(o + i, c.charCodeAt(0)));
+    w(0, 'RIFF');
+    dv.setUint32(4, 36 + n, true);
+    w(8, 'WAVEfmt ');
+    dv.setUint32(16, 16, true);
+    dv.setUint16(20, 1, true);
+    dv.setUint16(22, 1, true);
+    dv.setUint32(24, 8000, true);
+    dv.setUint32(28, 8000, true);
+    dv.setUint16(32, 1, true);
+    dv.setUint16(34, 8, true);
+    w(36, 'data');
+    dv.setUint32(40, n, true);
+    bytes.fill(128, 44);
+    let bin = '';
+    bytes.forEach((b) => (bin += String.fromCharCode(b)));
+    const a = new Audio('data:audio/wav;base64,' + btoa(bin));
+    a.loop = true;
+    a.setAttribute('playsinline', '');
+    a.play().catch(() => {});
+    return a;
+  } catch {
+    return null;
+  }
+}
+
 const midi = (n: number) => 440 * Math.pow(2, (n - 69) / 12);
 
 export function startAmbient(kind: AmbientKind): AmbientHandle | null {
   const AC: typeof AudioContext | undefined = (window as any).AudioContext || (window as any).webkitAudioContext;
   if (!AC) return null;
+  const keepAlive = unlockIosAudio();
   const ctx = new AC();
   const timers: number[] = [];
   const nodes: AudioScheduledSourceNode[] = [];
@@ -312,6 +357,11 @@ export function startAmbient(kind: AmbientKind): AmbientHandle | null {
           }
         });
         ctx.close().catch(() => {});
+        try {
+          keepAlive?.pause();
+        } catch {
+          /* ignore */
+        }
       }, 700);
     },
   };

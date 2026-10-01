@@ -749,7 +749,7 @@ export const HI: Record<string, string> = {
   "Counting by itself — it stops when the round is complete": "अपने-आप गिनती हो रही है — एक चक्र पूरा होने पर रुक जाएगी",
   "Known as Kau Cim, this is a centuries-old Taiwanese temple tradition: you ask the goddess Mazu a question, cast moon blocks to ask her permission, shake a bamboo cylinder until one stick falls out, and receive a classical poem as guidance.": "इसे काउ चिम कहते हैं — ताइवानी मंदिरों की सदियों पुरानी परंपरा: आप देवी माज़ू से एक प्रश्न पूछते हैं, अनुमति के लिए चंद्र-खंड फेंकते हैं, बाँस की नली को तब तक हिलाते हैं जब तक एक छड़ी न गिर जाए, और मार्गदर्शन के रूप में एक प्राचीन कविता पाते हैं।",
   "Pantheon": "देवगण",
-  "14 deities": "14 देवता",
+  "15 deities": "15 देवता",
   "Incense lit — burns until midnight": "अगरबत्ती जलाई गई — आधी रात तक जलेगी",
   "Traditions and customs vary by temple and region — shown here for reference only.": "परंपराएँ और रीति-रिवाज मंदिर और क्षेत्र के अनुसार भिन्न होते हैं — यहाँ दी गई जानकारी केवल संदर्भ हेतु है।",
   "Make a wish": "मनोकामना करें",

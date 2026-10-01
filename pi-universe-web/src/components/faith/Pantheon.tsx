@@ -14,6 +14,7 @@ import { Alert, Box, Button, Card, CardActionArea, Chip, Dialog, DialogContent, 
 import CloseIcon from '@mui/icons-material/Close';
 import { apiClient } from '../../api/ApiClient';
 import { Lang, tx } from '../../i18n/i18n';
+import { DeityStatue } from './DeityStatue';
 import { DEITIES, Deity, GROUPS, GroupKey } from '../../faith/pantheon';
 
 type TR = (zh: string, en: string) => string;
@@ -134,22 +135,8 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose }: { deity: Deity; 
         <IconButton aria-label={tr('關閉', 'Close')} onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8, color: 'rgba(240,219,168,.8)' }}>
           <CloseIcon />
         </IconButton>
-        <Box
-          sx={{
-            width: 64,
-            height: 64,
-            mx: 'auto',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'radial-gradient(circle, rgba(244,163,0,.4) 0%, rgba(244,163,0,.1) 70%, transparent 100%)',
-            border: '1px solid rgba(228,193,112,.55)',
-            mb: 1,
-            position: 'relative',
-          }}
-        >
-          <Typography sx={{ fontSize: '2rem', lineHeight: 1 }}>{deity.icon}</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1, position: 'relative' }}>
+          <DeityStatue deityKey={deity.key} size={150} />
         </Box>
         <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, color: '#f4e2b5', letterSpacing: '0.02em', position: 'relative' }}>{pick(deity.title, lang)}</Typography>
         <Box sx={{ width: 36, height: '1px', background: 'rgba(228,193,112,.5)', mx: 'auto', my: 1 }} />
@@ -267,21 +254,7 @@ export function PantheonPanel({ sanctuaryId, tr, lang }: { sanctuaryId: number; 
             }}
           >
             <CardActionArea onClick={() => setSelected(d)} sx={{ py: 1.8, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-              <Box
-                sx={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'radial-gradient(circle, rgba(244,163,0,.35) 0%, rgba(244,163,0,.08) 70%, transparent 100%)',
-                  border: '1px solid rgba(228,193,112,.5)',
-                  mb: 0.6,
-                }}
-              >
-                <Typography sx={{ fontSize: '1.6rem', lineHeight: 1 }}>{d.icon}</Typography>
-              </Box>
+              <DeityStatue deityKey={d.key} size={92} />
               <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, color: '#f0dba8', letterSpacing: '0.02em' }}>
                 {pick(d.title, lang)}
               </Typography>

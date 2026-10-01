@@ -88,7 +88,7 @@ const ACTIVITIES: Record<string, Activity[]> = {
     ...HOME_ALTAR,
   ],
   taiwan_folk: [
-    { key: 'pantheon', icon: '🏯', title: ['眾神殿', 'Pantheon'], minutes: ['14 尊神明', '14 deities'] },
+    { key: 'pantheon', icon: '🏯', title: ['眾神殿', 'Pantheon'], minutes: ['15 尊神明', '15 deities'] },
     { key: 'oracle', icon: '🎋', title: ['線上求籤', 'Temple oracle'], minutes: ['約 3 分鐘', 'About 3 min'], href: '/oracle' },
     { key: 'jiao', icon: '🌙', title: ['擲筊問事', 'Ask with moon blocks'], minutes: ['約 1 分鐘', 'About 1 min'] },
     LAMP_ACTIVITY,
