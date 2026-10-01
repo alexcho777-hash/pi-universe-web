@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Button, Chip, Paper, Typography } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
-import type { Lang } from '../../i18n/i18n';
+import { tx, type Lang } from '../../i18n/i18n';
 import { easter, daysUntil } from '../../faith/festivals';
 
 type TR = (zh: string, en: string) => string;
@@ -184,7 +184,7 @@ export function PsalmsPanel({ tr, lang }: Props) {
   const [slow, setSlow] = useState(false);
   const [shown, setShown] = useState(1);
   const p = PSALMS[idx];
-  const pick = (pair: Pair) => (lang === 'zh' ? pair[0] : pair[1]);
+  const pick = (pair: Pair) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
 
   const open = (i: number) => {
     setIdx(i);
@@ -323,7 +323,7 @@ export function SeasonsPanel({ tr, lang }: Props) {
       .sort((a, b) => a.ev.date.getTime() - b.ev.date.getTime())
       .slice(0, 5);
   }, []);
-  const pick = (pair: Pair) => (lang === 'zh' ? pair[0] : pair[1]);
+  const pick = (pair: Pair) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
 
   return (
     <Paper elevation={0} sx={cardSx}>
@@ -396,7 +396,7 @@ export function WatchPanel({ tr, lang }: Props) {
   const [count, setCount] = useState(readCount);
   const [finished, setFinished] = useState(false);
   const doneRef = useRef(false);
-  const pick = (pair: Pair) => (lang === 'zh' ? pair[0] : pair[1]);
+  const pick = (pair: Pair) => (lang === 'zh' ? pair[0] : tx(pair[1], lang));
 
   const running = endAt !== null;
 

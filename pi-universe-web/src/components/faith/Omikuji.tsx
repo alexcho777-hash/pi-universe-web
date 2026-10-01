@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Box, Button, Chip, Typography, keyframes } from '@mui/material';
-import { Lang } from '../../i18n/i18n';
+import { Lang, tx } from '../../i18n/i18n';
 
 type TR = (zh: string, en: string) => string;
 type Pair = [string, string];
@@ -239,7 +239,7 @@ function Rack({ count, folding }: { count: number; folding: boolean }) {
 export function OmikujiPanel({ tr, lang }: { tr: (zh: string, en: string) => string; lang: Lang }) {
   const zh = lang === 'zh';
   const t: TR = tr;
-  const pair = (p: Pair) => (zh ? p[0] : p[1]);
+  const pair = (p: Pair) => (zh ? p[0] : tx(p[1], lang));
 
   const [slip, setSlip] = useState<Slip | null>(() => {
     const s = load<Slip | null>(todayKey(), null);
@@ -394,12 +394,12 @@ export function OmikujiPanel({ tr, lang }: { tr: (zh: string, en: string) => str
                   </Box>
                 </Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ fontStyle: zh ? 'normal' : 'italic', lineHeight: 1.8, fontSize: '1.02rem', pb: 1, borderBottom: '1px solid #c9b07a', mb: 1 }}>
+                  <Typography sx={{ fontStyle: lang === 'en' ? 'italic' : 'normal', lineHeight: 1.8, fontSize: '1.02rem', pb: 1, borderBottom: '1px solid #c9b07a', mb: 1 }}>
                     {pair(rank.verses[slip.v])}
                   </Typography>
                   {LABELS.map((l, i) => (
                     <Box key={i} sx={{ display: 'flex', gap: 1, py: 0.35 }}>
-                      <Typography sx={{ flex: '0 0 auto', width: zh ? '3em' : '4.6em', fontWeight: 800, color: '#7a1810', fontSize: '.92rem' }}>{pair(l)}</Typography>
+                      <Typography sx={{ flex: '0 0 auto', width: lang === 'en' ? '4.6em' : '4em', fontWeight: 800, color: '#7a1810', fontSize: '.92rem' }}>{pair(l)}</Typography>
                       <Typography sx={{ fontSize: '.92rem', lineHeight: 1.55 }}>{pair(rank.items[i])}</Typography>
                     </Box>
                   ))}
