@@ -1310,4 +1310,9 @@ export const VI: Record<string, string> = {
   "Blessing": "Cát (phúc lành)",
   "Future blessing": "Mạt cát (phúc về sau)",
   "Caution": "Cẩn trọng",
+  "Welcome": "Kính chào quý khách",
+  "Skip": "Bỏ qua",
+  "Replay welcome": "Xem lại nghi lễ đón tiếp",
+  "Peace be with you": "Bình an của Chúa ở cùng bạn",
+  "The Lord be with you": "Chúa ở cùng bạn",
 };

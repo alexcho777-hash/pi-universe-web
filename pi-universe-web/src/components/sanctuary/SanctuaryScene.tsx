@@ -6,6 +6,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { sceneFor } from './sceneConfig';
 import { Camera, Particle, renderScene, spawnParticle, stepParticles } from './renderScene';
 import { AmbientHandle, startAmbient } from './ambient';
@@ -16,6 +17,10 @@ export function SanctuaryScene({
   altar,
   soundOnLabel,
   soundOffLabel,
+  overlay,
+  dimText,
+  onReplay,
+  replayLabel,
 }: {
   religionType: string;
   children?: ReactNode;
@@ -23,6 +28,12 @@ export function SanctuaryScene({
   altar?: ReactNode;
   soundOnLabel: string;
   soundOffLabel: string;
+  /** Drawn over the hall, under the welcome text (the welcome ceremony) */
+  overlay?: ReactNode;
+  /** Fade the welcome text out while the overlay is playing */
+  dimText?: boolean;
+  onReplay?: () => void;
+  replayLabel?: string;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -145,6 +156,26 @@ export function SanctuaryScene({
       {altar && (
         <Box sx={{ position: 'absolute', left: 0, right: 0, top: { xs: 14, sm: 18 }, display: 'flex', justifyContent: 'center' }}>{altar}</Box>
       )}
+      {overlay}
+      {onReplay && !overlay && (
+        <Tooltip title={replayLabel || ''}>
+          <IconButton
+            onClick={onReplay}
+            aria-label={replayLabel}
+            sx={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              color: '#fff',
+              backgroundColor: 'rgba(0,0,0,.35)',
+              border: '1px solid rgba(255,255,255,.35)',
+              '&:hover': { backgroundColor: 'rgba(0,0,0,.5)' },
+            }}
+          >
+            <ReplayIcon />
+          </IconButton>
+        </Tooltip>
+      )}
       <Tooltip title={soundOn ? soundOffLabel : soundOnLabel}>
         <IconButton
           onClick={toggleSound}
@@ -177,6 +208,8 @@ export function SanctuaryScene({
           background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.75) 100%)',
           textShadow: '0 2px 8px rgba(0,0,0,.6)',
           pointerEvents: 'none',
+          opacity: dimText ? 0 : 1,
+          transition: 'opacity .9s ease',
         }}
       >
         {children}

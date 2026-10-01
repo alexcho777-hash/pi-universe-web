@@ -1346,4 +1346,9 @@ export const AR: Record<string, string> = {
   "Blessing": "بركة",
   "Future blessing": "بركة آتية",
   "Caution": "تنبيه وحذر",
+  "Welcome": "أهلاً وسهلاً",
+  "Skip": "تخطّي",
+  "Replay welcome": "إعادة مراسم الاستقبال",
+  "Peace be with you": "السلام معكم",
+  "The Lord be with you": "الرب معكم",
 };

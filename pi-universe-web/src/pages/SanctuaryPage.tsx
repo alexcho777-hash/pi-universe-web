@@ -32,6 +32,7 @@ import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import DonateDialog from '../components/DonateDialog';
 import { SanctuaryScene } from '../components/sanctuary/SanctuaryScene';
+import { WelcomeCeremony } from '../components/sanctuary/Welcome';
 import { altarFor } from '../components/sanctuary/Altars';
 import { FaithActivities, FestivalList } from '../components/faith/FaithActivities';
 import { BoardPanel } from '../components/faith/BoardPanel';
@@ -130,6 +131,9 @@ export default function SanctuaryPage() {
   const [tab, setTab] = useState(0);
   const [donating, setDonating] = useState(false);
   const [toast, setToast] = useState<{ msg: string; severity: 'success' | 'info' | 'error' } | null>(null);
+  // Welcome ceremony: 0 = not playing, otherwise a counter so a replay restarts it
+  const [ceremony, setCeremony] = useState(0);
+  const endCeremony = useCallback(() => setCeremony(0), []);
 
   const loadMerit = useCallback(async () => {
     const r = await apiClient.getSanctuaryMerit(sanctuaryId);
@@ -151,6 +155,22 @@ export default function SanctuaryPage() {
       setLoading(false);
     })();
   }, [sanctuaryId, navigate, loadMerit]);
+
+  // Play the welcome when the sanctuary has loaded, unless the visitor was welcomed here a moment ago
+  const loadedId = merit?.sanctuary?.id;
+  useEffect(() => {
+    if (loadedId == null) return;
+    try {
+      if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+      const key = `pi-welcome-${loadedId}`;
+      const last = Number(sessionStorage.getItem(key) || 0);
+      if (Date.now() - last < 10 * 60 * 1000) return;
+      sessionStorage.setItem(key, String(Date.now()));
+    } catch {
+      /* storage unavailable: just play it */
+    }
+    setCeremony(1);
+  }, [loadedId]);
 
   if (loading) {
     return (
@@ -184,6 +204,10 @@ export default function SanctuaryPage() {
             altar={altarFor(s.religion_type)}
             soundOnLabel={tr('播放環境音', 'Play ambient sound')}
             soundOffLabel={tr('關閉環境音', 'Turn off ambient sound')}
+            overlay={ceremony ? <WelcomeCeremony key={ceremony} religionType={s.religion_type} onDone={endCeremony} /> : undefined}
+            dimText={ceremony > 0}
+            onReplay={() => setCeremony((c) => c + 1)}
+            replayLabel={tr('重看迎賓儀式', 'Replay welcome')}
           >
             {!altarFor(s.religion_type) && <Typography sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>}
             <Typography sx={{ fontSize: { xs: '1.15rem', sm: '1.4rem' }, fontWeight: 600, mt: 0.5, color: '#F3E3C0' }}>

@@ -1343,4 +1343,9 @@ export const HI: Record<string, string> = {
   "Blessing": "आशीर्वाद",
   "Future blessing": "भविष्य का आशीर्वाद",
   "Caution": "सावधानी",
+  "Welcome": "स्वागत है",
+  "Skip": "छोड़ें",
+  "Replay welcome": "स्वागत समारोह फिर देखें",
+  "Peace be with you": "आपको शांति मिले",
+  "The Lord be with you": "प्रभु आपके साथ हों",
 };

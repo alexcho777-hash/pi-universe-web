@@ -1310,4 +1310,9 @@ export const TH: Record<string, string> = {
   "Blessing": "โชคดี",
   "Future blessing": "โชคดีในภายภาคหน้า",
   "Caution": "ควรระวัง",
+  "Welcome": "ยินดีต้อนรับ",
+  "Skip": "ข้าม",
+  "Replay welcome": "ดูพิธีต้อนรับอีกครั้ง",
+  "Peace be with you": "ขอสันติสุขจงดำรงอยู่กับท่าน",
+  "The Lord be with you": "พระเจ้าสถิตอยู่กับท่าน",
 };

@@ -1343,4 +1343,9 @@ export const JA: Record<string, string> = {
   "Blessing": "吉",
   "Future blessing": "末の吉",
   "Caution": "慎み",
+  "Welcome": "ようこそ",
+  "Skip": "スキップ",
+  "Replay welcome": "歓迎の儀をもう一度見る",
+  "Peace be with you": "主の平和があなたにありますように",
+  "The Lord be with you": "主があなたとともに",
 };
