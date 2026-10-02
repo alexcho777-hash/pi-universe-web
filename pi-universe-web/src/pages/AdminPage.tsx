@@ -12,6 +12,7 @@ import { useAdminStore } from '../stores/adminStore';
 import { GoldenShovelGift } from '../components/faith/GoldenShovel';
 import { WelcomeCeremony } from '../components/sanctuary/Welcome';
 import { MoonBlocks, ThrowResult } from '../oracle/OracleArt';
+import A2UPanel from '../components/admin/A2UPanel';
 
 const HALLS: [string, string][] = [
   ['buddhist', '佛寺 Buddhist'],
@@ -114,6 +115,8 @@ export default function AdminPage() {
           ))}
         </Box>
       </Paper>
+
+      <A2UPanel />
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, mb: 1 }}>{tr('管理者名單', 'Administrators')}</Typography>
