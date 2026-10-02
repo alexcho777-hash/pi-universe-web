@@ -45,7 +45,7 @@ let pendingAuth: Promise<any> | null = null;
 const authenticateWithTimeout = (timeoutMs: number): Promise<any> => {
   if (!pendingAuth) {
     pendingAuth = Promise.resolve()
-      .then(() => window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound))
+      .then(() => window.Pi.authenticate(['username', 'payments', 'wallet_address'], onIncompletePaymentFound))
       .finally(() => {
         pendingAuth = null;
       });
