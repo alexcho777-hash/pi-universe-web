@@ -43,6 +43,8 @@ export function SanctuaryScene({
   const target = useRef({ x: 0, y: 0 });
   const [soundOn, setSoundOn] = useState(false);
   const ambient = useRef<AmbientHandle | null>(null);
+  // 使用者按過喇叭關掉後，迎賓結束時不可再自動開聲音
+  const mutedByUser = useRef(false);
   // 真實大殿照片載入完成前先顯示暗色底，不露出手繪 3D 大殿（避免「閃一下卡通就跳走」）
   const [bdReady, setBdReady] = useState(false);
   useEffect(() => {
@@ -184,7 +186,12 @@ export function SanctuaryScene({
     }
     if (!hadOverlay.current) return;
     hadOverlay.current = false;
-    if (ambient.current) return;
+    if (ambient.current || mutedByUser.current) return;
+    try {
+      if (localStorage.getItem('pu-sound') === '0') return;
+    } catch {
+      /* ignore */
+    }
     const h = startAmbient(sceneFor(religionType).ambient);
     if (h) {
       ambient.current = h;
@@ -196,14 +203,25 @@ export function SanctuaryScene({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overlay]);
 
+  // 離開道場（或換道場）時，不論聲音是怎麼開的，一律關掉
+  useEffect(
+    () => () => {
+      ambient.current?.stop();
+      ambient.current = null;
+    },
+    [religionType]
+  );
+
   const toggleSound = () => {
     if (soundOn) {
+      mutedByUser.current = true;
       ambient.current?.stop();
       stopAllAmbient();
       ambient.current = null;
       setSoundOn(false);
       setPref(false);
     } else {
+      mutedByUser.current = false;
       ambient.current = startAmbient(sceneFor(religionType).ambient);
       setSoundOn(!!ambient.current);
       setPref(!!ambient.current);
