@@ -30,7 +30,7 @@ export function useVoiceAvailable(tag: string): boolean {
 
 export const NO_VOICE_NOTE: [string, string] = ['這個裝置沒有此語言的語音，目前無法朗讀（尚無錄音檔）。', 'This device has no voice for this language, so it cannot be read aloud (no recordings yet).'];
 
-export function ListenButton({ lines, voice, label, stopLabel, slow = true, sx, noVoiceText }: { lines: string[]; voice: string; label: string; stopLabel: string; slow?: boolean; sx?: object; noVoiceText?: string }) {
+export function ListenButton({ lines, voice, label, stopLabel, slow = true, sx, noVoiceText, onLine }: { lines: string[]; voice: string; label: string; stopLabel: string; slow?: boolean; sx?: object; noVoiceText?: string; /** called with the line index as each line starts being read */ onLine?: (i: number) => void }) {
   const hasVoiceForLang = useVoiceAvailable(voice);
   const [playing, setPlaying] = useState(false);
   const run = useRef(0);
@@ -69,10 +69,14 @@ export function ListenButton({ lines, voice, label, stopLabel, slow = true, sx, 
         setPlaying(false);
         return;
       }
+      onLine?.(i);
       const u = new SpeechSynthesisUtterance(lines[i]);
       u.lang = voice;
       if (v) u.voice = v;
       u.rate = slow ? 0.7 : 0.9;
+      u.onstart = () => {
+        if (my === run.current) onLine?.(i);
+      };
       u.onend = () => window.setTimeout(() => next(i + 1), 300);
       u.onerror = () => {
         if (my === run.current) setPlaying(false);

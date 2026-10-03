@@ -6,7 +6,7 @@
 
 import { ListenButton, NO_VOICE_NOTE } from './ListenButton';
 import { SCRIPTURES } from '../../faith/scriptures';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button, Chip, Collapse, Paper, Switch, FormControlLabel, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import type { Lang } from '../../i18n/i18n';
 
@@ -125,16 +125,25 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
     });
   };
 
+  const startPos = readAlong ? 0 : -1;
+
   const toggle = (id: string) => {
     setOpen((o) => (o === id ? null : id));
-    setPos(-1);
+    setPos(startPos);
   };
+
+  // keep the highlighted line in view (long sutras scroll past the screen)
+  useEffect(() => {
+    if (!readAlong || pos < 0 || !open) return;
+    const el = document.querySelector(`[data-chant-line="${open}-${pos}"]`);
+    (el as HTMLElement | null)?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+  }, [pos, readAlong, open]);
 
   const advance = (item: Item) => {
     const next = pos + 1;
     if (next >= item.lines.length) {
       bump(item.id);
-      setPos(-1);
+      setPos(0);
     } else setPos(next);
   };
 
@@ -157,7 +166,7 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
           if (v) {
             setSession(v);
             setOpen(null);
-            setPos(-1);
+            setPos(startPos);
           }
         }}
         sx={{
@@ -177,7 +186,7 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         />
         <FormControlLabel
           sx={{ mr: 0, '& .MuiTypography-root': { fontSize: '0.95rem' } }}
-          control={<Switch checked={readAlong} onChange={(e) => { setReadAlong(e.target.checked); setPos(-1); }} sx={{ '& .Mui-checked': { color: GOLD }, '& .Mui-checked + .MuiSwitch-track': { bgcolor: AMBER } }} />}
+          control={<Switch checked={readAlong} onChange={(e) => { setReadAlong(e.target.checked); setPos(e.target.checked ? 0 : -1); }} sx={{ '& .Mui-checked': { color: GOLD }, '& .Mui-checked + .MuiSwitch-track': { bgcolor: AMBER } }} />}
           label={tr('跟讀模式', 'Read-along')}
         />
       </Box>
@@ -219,12 +228,18 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
                     onClick={readAlong ? () => advance(item) : undefined}
                     sx={{ cursor: readAlong ? 'pointer' : 'default', userSelect: 'none', py: 0.5 }}
                   >
+                    {readAlong && (
+                      <Typography sx={{ color: GOLD, fontSize: '0.95rem', mb: 1, p: 1, textAlign: 'center', border: `1px dashed ${GOLD}77`, borderRadius: 1 }}>
+                        {tr('跟讀中：金色那一句就是現在要念的。點一下經文換下一句，或按「聽」讓它自動跟著唸。', 'Read-along: the gold line is the one to recite. Tap the text for the next line, or press Listen to follow along automatically.')}
+                      </Typography>
+                    )}
                     {item.lines.map((ln, li) => {
                       const active = readAlong && li === pos;
                       const past = readAlong && li < pos;
                       return (
                         <Typography
                           key={li}
+                          data-chant-line={`${item.id}-${li}`}
                           sx={{
                             fontSize: '1.4rem',
                             lineHeight: 2,
@@ -234,7 +249,9 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
                             borderRadius: 1,
                             color: active ? '#120603' : past ? '#a8946c' : '#f3e3c3',
                             bgcolor: active ? GOLD : 'transparent',
-                            transition: 'background-color .2s, color .2s',
+                            opacity: readAlong && !active && !past ? 0.55 : 1,
+                            fontWeight: active ? 700 : 400,
+                            transition: 'background-color .2s, color .2s, opacity .2s',
                           }}
                         >
                           {ln}
@@ -243,7 +260,7 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
                     })}
                     {readAlong && (
                       <Typography sx={{ color: '#d9c39a', fontSize: '0.85rem', mt: 1, textAlign: 'center' }}>
-                        {pos < 0 ? tr('輕點經文，逐行跟讀', 'Tap the text to move line by line') : tr('再點一下進入下一行；讀完最後一行自動 +1', 'Tap for the next line; finishing the last line adds +1')}
+                        {tr('點一下進入下一句；讀完最後一句再點，自動 +1 遍', 'Tap for the next line; tap after the last line to add +1')}
                       </Typography>
                     )}
                   </Box>
@@ -257,10 +274,10 @@ export function BuddhistChantPanel({ tr, lang }: { tr: TR; lang: Lang }) {
                     {item.counterOnly || item.id === 'name' ? tr('＋1 遍', '+1') : tr('讀完一遍 ＋1', 'Completed once +1')}
                   </Button>
                   {!item.counterOnly && (
-                    <ListenButton lines={item.lines} voice="zh-TW" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} />
+                    <ListenButton lines={item.lines} voice="zh-TW" onLine={readAlong ? setPos : undefined} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} />
                   )}
-                  {readAlong && pos >= 0 && (
-                    <Button variant="outlined" onClick={() => setPos(-1)} sx={{ color: GOLD, borderColor: `${GOLD}77` }}>
+                  {readAlong && pos > 0 && (
+                    <Button variant="outlined" onClick={() => setPos(0)} sx={{ color: GOLD, borderColor: `${GOLD}77` }}>
                       {tr('重頭', 'Restart')}
                     </Button>
                   )}
