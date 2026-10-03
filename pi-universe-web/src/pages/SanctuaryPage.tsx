@@ -166,18 +166,14 @@ export default function SanctuaryPage() {
     })();
   }, [sanctuaryId, navigate, loadMerit]);
 
-  // Play the welcome when the sanctuary has loaded, unless the visitor was welcomed here a moment ago
+  // 每次進入聖地都播放迎賓（可按「略過」；進入後也能按右上角 ↻ 重看）
   const loadedId = merit?.sanctuary?.id;
   useEffect(() => {
     if (loadedId == null) return;
     try {
       if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-      const key = `pi-welcome-${loadedId}`;
-      const last = Number(sessionStorage.getItem(key) || 0);
-      if (Date.now() - last < 10 * 60 * 1000) return;
-      sessionStorage.setItem(key, String(Date.now()));
     } catch {
-      /* storage unavailable: just play it */
+      /* ignore */
     }
     setCeremony(1);
   }, [loadedId]);
