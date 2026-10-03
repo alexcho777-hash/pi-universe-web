@@ -134,7 +134,14 @@ export default function SanctuaryPage() {
   const [donating, setDonating] = useState(false);
   const [toast, setToast] = useState<{ msg: string; severity: 'success' | 'info' | 'error' } | null>(null);
   // Welcome ceremony: 0 = not playing, otherwise a counter so a replay restarts it
-  const [ceremony, setCeremony] = useState(0);
+  const [ceremony, setCeremony] = useState(() => {
+    // 一開始就讓迎賓蓋住畫面，避免先露出大殿再跳成人群
+    try {
+      return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 1;
+    } catch {
+      return 1;
+    }
+  });
   const endCeremony = useCallback(() => setCeremony(0), []);
 
   const loadMerit = useCallback(async () => {
@@ -175,7 +182,7 @@ export default function SanctuaryPage() {
     } catch {
       /* ignore */
     }
-    setCeremony(1);
+    setCeremony((c) => c || 1);
   }, [loadedId]);
 
   if (loading) {

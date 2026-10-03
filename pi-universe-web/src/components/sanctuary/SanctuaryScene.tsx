@@ -43,11 +43,29 @@ export function SanctuaryScene({
   const target = useRef({ x: 0, y: 0 });
   const [soundOn, setSoundOn] = useState(false);
   const ambient = useRef<AmbientHandle | null>(null);
+  // 真實大殿照片載入完成前先顯示暗色底，不露出手繪 3D 大殿（避免「閃一下卡通就跳走」）
+  const [bdReady, setBdReady] = useState(false);
+  useEffect(() => {
+    setBdReady(false);
+    if (!backdropUrl) return;
+    let alive = true;
+    const im = new Image();
+    const done = () => alive && setBdReady(true);
+    im.onload = done;
+    im.onerror = done;
+    im.src = backdropUrl;
+    const t = window.setTimeout(done, 6000);
+    return () => {
+      alive = false;
+      window.clearTimeout(t);
+    };
+  }, [backdropUrl]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
     if (!canvas || !wrap) return;
+    if (backdropUrl) return; // 有真實大殿照片就不畫手繪 3D 大殿
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const cfg = sceneFor(religionType);
@@ -117,7 +135,7 @@ export function SanctuaryScene({
       document.removeEventListener('visibilitychange', kick);
       window.removeEventListener('deviceorientation', onTilt);
     };
-  }, [religionType]);
+  }, [religionType, backdropUrl]);
 
   // The speaker choice is remembered: once turned on, every sanctuary starts its sound by itself
   const PREF = 'pu-sound';
@@ -214,7 +232,7 @@ export function SanctuaryScene({
         touchAction: 'pan-y',
       }}
     >
-      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: 'block' }} aria-hidden="true" />
+      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: backdropUrl ? 'none' : 'block' }} aria-hidden="true" />
       {/* 該宗教真實的大殿內景：畫在 3D 大殿之上，緩慢推進，讓人感覺站在殿內 */}
       {backdropUrl && (
         <Box
@@ -227,6 +245,8 @@ export function SanctuaryScene({
             backgroundPosition: 'center 40%',
             transformOrigin: 'center 55%',
             animation: 'pu-scene-zoom 30s ease-in-out infinite alternate',
+            opacity: bdReady ? 1 : 0,
+            transition: 'opacity .8s ease',
             pointerEvents: 'none',
           }}
         />

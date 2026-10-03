@@ -6,7 +6,7 @@
  * 各自緩慢推進形成視差縱深感——不用數百個 DOM 或 Canvas 節點，手機不卡。
  * 先前的扁平 SVG 小人已移除，改以真實莊嚴的人群質感呈現。
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, ButtonBase } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
 import { useI18n, tx } from '../../i18n/i18n';
@@ -49,8 +49,7 @@ function greeting(religionType: string, lang: string): string {
 
 /** 全場生命週期：開場淡入，尾聲隨金光散去 */
 const life = keyframes`
-  0%   { opacity: 0; }
-  3%   { opacity: 1; }
+  0%   { opacity: 1; }
   90%  { opacity: 1; }
   98%  { opacity: 0; }
   100% { opacity: 0; }
@@ -137,18 +136,39 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
   // welcomehold=1：把儀式「停格」在中段（截圖／設計檢視用），只對帶此參數的頁面生效
   const hold = typeof window !== 'undefined' && window.location.href.includes('welcomehold=1');
 
+  // 先等該宗教的列隊照片載入完，再開始播放，避免一開始閃出空白或半張圖
+  const own = crowdFor(religionType);
+  const [ready, setReady] = useState(!own);
   useEffect(() => {
-    if (hold) return;
+    if (!own) return;
+    let alive = true;
+    const im = new Image();
+    const done = () => alive && setReady(true);
+    im.onload = done;
+    im.onerror = done;
+    im.src = own;
+    const t = window.setTimeout(done, 6000);
+    return () => {
+      alive = false;
+      window.clearTimeout(t);
+    };
+  }, [own]);
+
+  useEffect(() => {
+    if (hold || !ready) return;
     const id = window.setTimeout(onDone, (T + 0.5) * 1000);
     return () => window.clearTimeout(id);
-  }, [onDone, hold]);
+  }, [onDone, hold, ready]);
 
-  const own = crowdFor(religionType);
   const layers = [
     { src: crowdFar, anim: farIn, delay: hold ? 0 : 0, staticOpacity: 0.88, pos: 'center 42%', z: 1 },
     { src: crowdMid, anim: midIn, delay: hold ? 0 : 1.6, staticOpacity: 0.9, pos: 'center 52%', z: 2 },
     { src: crowdNear, anim: nearIn, delay: hold ? 0 : 3.6, staticOpacity: 0.95, pos: 'center 62%', z: 3 },
   ];
+
+  if (!ready) {
+    return <Box aria-hidden="true" sx={{ position: 'absolute', inset: 0, backgroundColor: '#0c0703', zIndex: 1 }} />;
+  }
 
   return (
     <Box
@@ -162,6 +182,9 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
         animation: hold ? 'none' : `${life} ${T}s ease-in-out both`,
       }}
     >
+      {/* 不透明暗底：從第一格就蓋住後面的大殿，列隊照片才在它上面淡入（不會先閃出大殿） */}
+      <Box aria-hidden="true" sx={{ position: 'absolute', inset: 0, zIndex: 0, backgroundColor: '#0c0703' }} />
+
       {/* 中央走道的柔金光，把隊伍「請」出來 */}
       <Box
         aria-hidden="true"
