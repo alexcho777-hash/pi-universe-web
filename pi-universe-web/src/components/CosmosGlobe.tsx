@@ -24,8 +24,8 @@ const AUTO_SPIN = 0.18; // radians per second
 const TAP_SLOP = 8; // px of movement still treated as a tap
 
 const pulse = keyframes`
-  0%, 100% { box-shadow: 0 0 40px 8px rgba(157,107,255,.55), inset -18px -22px 40px rgba(20,0,50,.65); }
-  50% { box-shadow: 0 0 70px 18px rgba(157,107,255,.75), inset -18px -22px 40px rgba(20,0,50,.65); }
+  0%, 100% { box-shadow: 0 0 40px 8px rgba(212,175,55,.55), inset -18px -22px 40px rgba(40,26,6,.65); }
+  50% { box-shadow: 0 0 70px 18px rgba(212,175,55,.75), inset -18px -22px 40px rgba(40,26,6,.65); }
 `;
 const sheen = keyframes`
   from { transform: rotate(0deg); }
@@ -235,8 +235,8 @@ export default function CosmosGlobe({ sanctuaries, lang, onSelect }: Props) {
         cursor: 'grab',
         '&:active': { cursor: 'grabbing' },
         background:
-          'radial-gradient(ellipse at 20% 15%, rgba(120,60,200,.35), transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(40,90,200,.3), transparent 55%), linear-gradient(180deg, #0B0620 0%, #170B35 60%, #0B0620 100%)',
-        boxShadow: '0 6px 24px rgba(20,0,60,.35)',
+          'radial-gradient(ellipse at 50% 42%, rgba(212,175,55,.22), transparent 60%), radial-gradient(ellipse at 15% 90%, rgba(150,90,30,.25), transparent 55%), linear-gradient(180deg, #120c05 0%, #1d1409 60%, #0e0904 100%)',
+        boxShadow: '0 6px 24px rgba(212,175,55,.18)',
       }}
     >
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
@@ -263,7 +263,7 @@ export default function CosmosGlobe({ sanctuaries, lang, onSelect }: Props) {
             borderRadius: '50%',
             position: 'relative',
             overflow: 'hidden',
-            background: 'radial-gradient(circle at 35% 30%, #B98CFF 0%, #7A3FD0 38%, #45198A 70%, #230A4D 100%)',
+            background: 'radial-gradient(circle at 35% 30%, #FBEBB0 0%, #E0B84A 38%, #A97C16 70%, #5E440A 100%)',
             animation: `${pulse} 6s ease-in-out infinite`,
             display: 'flex',
             alignItems: 'center',
@@ -348,7 +348,7 @@ export default function CosmosGlobe({ sanctuaries, lang, onSelect }: Props) {
                 color: '#fff',
                 textAlign: 'center',
                 lineHeight: 1.25,
-                backgroundColor: 'rgba(10,4,30,.55)',
+                backgroundColor: 'rgba(18,10,2,.62)',
                 textShadow: '0 1px 4px rgba(0,0,0,.8)',
               }}
             >
