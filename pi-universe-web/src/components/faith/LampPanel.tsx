@@ -70,15 +70,18 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
               variant="outlined"
               sx={{
                 height: '100%',
-                borderColor: lampType === l.key ? '#8B4513' : undefined,
+                borderColor: lampType === l.key ? '#F5D67B' : '#3a2f1d',
                 borderWidth: lampType === l.key ? 2 : 1,
-                bgcolor: lampType === l.key ? '#FBF6EC' : undefined,
+                bgcolor: lampType === l.key ? 'rgba(212,175,55,.10)' : '#17130d',
+                borderRadius: 3,
+                boxShadow: lampType === l.key ? '0 0 22px rgba(245,214,123,.28)' : 'none',
+                transition: 'box-shadow .2s ease',
               }}
             >
               <CardActionArea onClick={() => setLampType(l.key)} sx={{ height: '100%', py: 1.5, display: 'flex', flexDirection: 'column' }}>
-                <Typography sx={{ fontSize: '1.6rem' }}>{l.icon}</Typography>
-                <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, textAlign: 'center' }}>{tr(l.label[0], l.label[1])}</Typography>
-                <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary' }}>
+                <Typography sx={{ fontSize: '1.7rem', textShadow: lampType === l.key ? '0 0 14px rgba(245,214,123,.7)' : undefined }}>{l.icon}</Typography>
+                <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, textAlign: 'center', color: '#f2ead9' }}>{tr(l.label[0], l.label[1])}</Typography>
+                <Typography sx={{ fontSize: '0.78rem', color: '#c9a24b' }}>
                   {tr('目前', 'Now')} {counts[l.key] || 0}
                 </Typography>
               </CardActionArea>
@@ -87,7 +90,7 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
         ))}
       </Grid>
 
-      <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: '#FBF6EC' }}>
+      <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: 'rgba(212,175,55,.10)' }}>
         <Typography sx={{ fontWeight: 700 }}>
           {selected.icon} {tr(selected.label[0], selected.label[1])}
         </Typography>
@@ -113,7 +116,7 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
         </Alert>
       )}
 
-      <Button variant="contained" fullWidth size="large" onClick={submit} disabled={paying} sx={{ backgroundColor: '#8B4513' }}>
+      <Button variant="contained" fullWidth size="large" onClick={submit} disabled={paying} sx={{ backgroundColor: '#B8912F' }}>
         {paying ? <CircularProgress size={22} sx={{ color: 'white' }} /> : tr(`用 Pi 點燈 ${LAMP_PRICE} π`, `Light with ${LAMP_PRICE} π`)}
       </Button>
     </Box>

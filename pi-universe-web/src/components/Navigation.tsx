@@ -52,14 +52,14 @@ export default function Navigation() {
             icon={<item.icon />}
             sx={{
               // Dark enough to read easily (older eyes, bright screens); the current page is purple and bold
-              color: currentPath === item.path ? '#5B2A93' : '#3d3d3d',
+              color: currentPath === item.path ? '#D4AF37' : '#9c8b64',
               minWidth: 0,
               px: 0.25,
               py: 0.8,
               '& .MuiSvgIcon-root': { fontSize: '1.75rem' },
               '& .MuiBottomNavigationAction-label': { fontSize: '0.9rem', fontWeight: 600, mt: 0.2, lineHeight: 1.15, textAlign: 'center', wordBreak: 'keep-all' },
               '&.Mui-selected': {
-                color: '#5B2A93',
+                color: '#D4AF37',
               },
               '&.Mui-selected .MuiBottomNavigationAction-label': { fontSize: '0.95rem', fontWeight: 800 },
             }}

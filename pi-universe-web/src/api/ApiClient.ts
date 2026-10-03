@@ -5,6 +5,7 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { ApiResponse } from '../types';
+import { PREVIEW } from '../preview/demoData';
 
 /** localStorage key used by the auth store (zustand persist). */
 export const AUTH_STORAGE_KEY = 'pi-universe-auth';
@@ -49,7 +50,8 @@ class ApiClientClass {
       (error) => {
         const url: string = error.config?.url || '';
         const isLoginCall = /\/api\/users\/(sync|pi-signin)/.test(url);
-        if (error.response?.status === 401 && !isLoginCall) {
+        // Design preview: never redirect away, it has no session by design
+        if (error.response?.status === 401 && !isLoginCall && !PREVIEW) {
           try {
             localStorage.removeItem(AUTH_STORAGE_KEY);
           } catch {

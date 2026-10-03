@@ -49,7 +49,7 @@ export default function LanguageSwitch() {
           borderRadius: 999,
           fontSize: '0.9rem',
           fontWeight: 700,
-          color: '#5B2A93',
+          color: '#D4AF37',
           backgroundColor: 'rgba(255,255,255,.92)',
           boxShadow: '0 1px 6px rgba(0,0,0,.25)',
         }}

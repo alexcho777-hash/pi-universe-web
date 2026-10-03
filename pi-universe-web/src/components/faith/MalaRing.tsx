@@ -307,7 +307,7 @@ export function MalaRing({
         userSelect: 'none',
         WebkitUserSelect: 'none',
         touchAction: 'manipulation',
-        '&:focus-visible': { outline: '3px solid #5B2A93', outlineOffset: 4, borderRadius: 3 },
+        '&:focus-visible': { outline: '3px solid #D4AF37', outlineOffset: 4, borderRadius: 3 },
       }}
     >
       <canvas ref={canvasRef} style={{ display: 'block', width: '100%', aspectRatio: '1 / 0.9' }} aria-hidden="true" />

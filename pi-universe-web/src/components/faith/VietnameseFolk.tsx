@@ -28,7 +28,7 @@ export function ThanTaiDayPanel() {
           'วันเทศกาลเทพเจ้าแห่งโชคลาภ (ทานไท่) ตรงกับวันขึ้น 10 ค่ำ เดือน 1 ตามปฏิทินจันทรคติ หลายคนนิยมซื้อทองในวันนี้เพื่อความเป็นสิริมงคล'
         )}
       </Typography>
-      <Paper sx={{ p: 2, textAlign: 'center', bgcolor: days === 0 ? '#FFF6DD' : undefined }}>
+      <Paper sx={{ p: 2, textAlign: 'center', bgcolor: days === 0 ? 'rgba(212,175,55,.14)' : undefined }}>
         <Typography sx={{ fontWeight: 700, mb: 0.5 }}>
           {T('距離財神爺聖誕', "Until Thần Tài's Day", 'Còn lại đến ngày vía Thần Tài', 'นับถอยหลังถึงวันเทพเจ้าแห่งโชคลาภ')}
         </Typography>

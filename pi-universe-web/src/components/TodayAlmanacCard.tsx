@@ -20,7 +20,7 @@ export default function TodayAlmanacCard() {
   const jp = japanDay(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const jpKyu = jp.kyureki.startsWith('旧暦') ? jp.kyureki : `旧暦${jp.kyureki}`;
   const jpInfo = (
-    <Typography component="span" sx={{ fontSize: '1.05rem', fontWeight: 700, color: '#8B4513' }}>
+    <Typography component="span" sx={{ fontSize: '1.05rem', fontWeight: 700, color: '#B8912F' }}>
       日本の暦　<span style={{ color: jp.rokuyo === '大安' ? '#2E7D32' : jp.rokuyo === '仏滅' || jp.rokuyo === '赤口' ? '#C62828' : 'inherit' }}>{jp.rokuyo}</span>　{jpKyu}
     </Typography>
   );
@@ -39,7 +39,7 @@ export default function TodayAlmanacCard() {
             <Typography sx={{ fontSize: '1.3rem', fontWeight: 800 }}>{tx("Today's almanac", lang)}</Typography>
             <Typography sx={{ fontSize: '1.1rem', fontWeight: 700, color }}>{tx(d.huangDao ? 'Auspicious day' : 'Inauspicious day', lang)}</Typography>
           </Box>
-          <Typography sx={{ fontSize: '1.15rem', color: '#8B4513', fontWeight: 700, mt: 0.5 }}>
+          <Typography sx={{ fontSize: '1.15rem', color: '#B8912F', fontWeight: 700, mt: 0.5 }}>
             {lunarDateEn(d)} · {chongEn(d)}
           </Typography>
           <Box sx={{ mt: 0.3 }}>{jpInfo}</Box>
@@ -79,7 +79,7 @@ export default function TodayAlmanacCard() {
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', columnGap: 3, rowGap: 0.3, mt: 0.5 }}>
-        <Typography sx={{ fontSize: '1.2rem', color: '#8B4513', fontWeight: 700 }}>
+        <Typography sx={{ fontSize: '1.2rem', color: '#B8912F', fontWeight: 700 }}>
           農曆{lunarMonthName(d.lunarMonth)}月{d.lunarDay}　{d.chong}
         </Typography>
         {jpInfo}

@@ -71,7 +71,7 @@ const ACTIVITY_EN: Record<string, string> = {
 };
 const GOOD = '#2E7D32';
 const BAD = '#C62828';
-const GOLD = '#8B4513';
+const GOLD = '#B8912F';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const toParts = (dt: Date) => [dt.getFullYear(), dt.getMonth() + 1, dt.getDate()] as const;

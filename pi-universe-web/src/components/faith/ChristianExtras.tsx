@@ -18,7 +18,7 @@ interface Props {
 }
 
 const GOLD = '#e8c170';
-const AMBER = '#F4A300';
+const AMBER = '#B8912F';
 const cardSx = { p: 2.5, bgcolor: '#2a0f08', color: '#f3e6d0', border: `1px solid ${GOLD}33`, borderRadius: 3 } as const;
 
 const pad2 = (n: number) => String(n);

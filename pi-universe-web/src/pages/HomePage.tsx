@@ -25,7 +25,9 @@ import DonateDialog from '../components/DonateDialog';
 import { BrandLogo, BrandWordmark } from '../components/BrandLogo';
 import CosmosGlobe from '../components/CosmosGlobe';
 import { useI18n } from '../i18n/i18n';
-import { faithName, sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
+import { sanctuaryName, sanctuaryDescription, faithName } from '../i18n/sanctuaries';
+import { PREVIEW, DEMO_SANCTUARIES, DEMO_SUMMARY } from '../preview/demoData';
+import heroPortal from '../assets/hero-portal.jpg';
 
 const TodayAlmanacCard = lazy(() => import('../components/TodayAlmanacCard'));
 
@@ -71,6 +73,13 @@ export default function HomePage() {
   };
 
   const loadAll = async () => {
+    // Design preview (URL has "preview=1"): no backend, show demo data
+    if (PREVIEW) {
+      setSanctuaries(DEMO_SANCTUARIES as Sanctuary[]);
+      setSummary(DEMO_SUMMARY);
+      setIsLoading(false);
+      return;
+    }
     try {
       setIsLoading(true);
       const response = await apiClient.getSanctuaries();
@@ -138,27 +147,87 @@ export default function HomePage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
-      {/* Welcome Section */}
-      <Paper elevation={1} sx={{ p: 3, pr: { xs: 3, sm: 3 }, mt: 3, mb: 2, backgroundColor: '#F5E6D3' }}>
-        <Typography sx={{ fontSize: { xs: '1.9rem', sm: '2.3rem' }, fontWeight: 800, color: '#8B4513', lineHeight: 1.3 }}>
-          {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}`)}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
-          <BrandLogo size={64} />
-          <Box>
-            <BrandWordmark fontSize="1.9rem" />
-            <Typography sx={{ fontSize: '1.05rem', color: '#5a3a1a' }}>{tr('多元信仰心靈聖地', 'A home for many faiths')}</Typography>
-          </Box>
-        </Box>
-        {summary && (
-          <Typography sx={{ mt: 1, color: '#5a3a1a', fontSize: '1.1rem' }}>
+      {/* Hero: the grand entrance — six faiths along one golden avenue */}
+      <Box
+        sx={{
+          position: 'relative',
+          mt: 3,
+          mb: 2,
+          borderRadius: 4,
+          overflow: 'hidden',
+          height: { xs: 320, sm: 400 },
+          boxShadow: '0 10px 40px rgba(20,12,2,.45)',
+        }}
+      >
+        {/* 慢推進：背景像走進去的鏡頭般緩慢放大 */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${heroPortal})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            transformOrigin: 'center',
+            animation: 'pu-hero-zoom 36s ease-in-out infinite alternate',
+          }}
+        />
+        {/* 薄雜杋動的霧光 */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: '-12%',
+            background: 'radial-gradient(ellipse at 50% 62%, rgba(255,240,200,.10), rgba(0,0,0,0) 62%)',
+            animation: 'pu-hero-mist 22s ease-in-out infinite alternate',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            px: { xs: 3, sm: 4 },
+            pb: { xs: 3, sm: 4 },
+            background: 'linear-gradient(to top, rgba(8,6,3,.88) 0%, rgba(8,6,3,.38) 45%, rgba(8,6,3,.05) 75%)',
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: '"Noto Serif TC", serif',
+              fontWeight: 900,
+              color: '#f5d67b',
+              fontSize: { xs: '2.2rem', sm: '3rem' },
+              lineHeight: 1.15,
+              textShadow: '0 2px 16px rgba(0,0,0,.65)',
+            }}
+          >
+            {tr('六聖地·一大道', 'Six Sanctuaries, One Avenue')}
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: '"Noto Serif TC", serif',
+              color: '#f2ead9',
+              fontSize: { xs: '1.15rem', sm: '1.35rem' },
+              mt: 0.5,
+              textShadow: '0 1px 8px rgba(0,0,0,.6)',
+            }}
+          >
             {tr(
-              `簽到 ${summary.checkins} 次 · 靜坐 ${summary.meditation_minutes} 分鐘 · 捐獻 ${summary.donated} π`,
-              `Check-ins ${summary.checkins} · Meditation ${summary.meditation_minutes} min · Donated ${summary.donated} π`
+              `歡迎 ${user?.username || (PREVIEW ? '示範善信' : '善信')} 蒞臨·多元信仰心靈聖地`,
+              `Welcome, ${user?.username || (PREVIEW ? 'guest' : 'friend')} · A home for many faiths`,
             )}
           </Typography>
-        )}
-      </Paper>
+          {summary && (
+            <Typography sx={{ mt: 1, color: '#d8cdb6', fontSize: '1.02rem' }}>
+              {tr(
+                `簽到 ${summary.checkins} 次 · 靜坐 ${summary.meditation_minutes} 分鐘 · 捐獻 ${summary.donated} π`,
+                `Check-ins ${summary.checkins} · Meditation ${summary.meditation_minutes} min · Donated ${summary.donated} π`,
+              )}
+            </Typography>
+          )}
+        </Box>
+      </Box>
 
       {sanctuaries.length > 0 && (
         <CosmosGlobe sanctuaries={sanctuaries} lang={lang} onSelect={(sanctuary) => navigate(`/sanctuary/${sanctuary.id}`)} />
@@ -176,7 +245,7 @@ export default function HomePage() {
 
       {/* Daily practice */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" gutterBottom sx={{ color: '#333', fontWeight: 600 }}>
+        <Typography variant="h6" gutterBottom sx={{ fontFamily: '"Noto Serif TC", serif', color: '#f5d67b', fontWeight: 600 }}>
           {tr('每日修行', 'Daily practice')}
         </Typography>
         <Grid container spacing={2}>
@@ -202,7 +271,7 @@ export default function HomePage() {
             <Card>
               <CardContent>
                 {meditationStart === null ? (
-                  <Button variant="contained" fullWidth sx={{ backgroundColor: '#5B2A93' }} onClick={startMeditation}>
+                  <Button variant="contained" fullWidth sx={{ backgroundColor: '#D4AF37' }} onClick={startMeditation}>
                     {tr('開始靜坐', 'Start meditation')}
                   </Button>
                 ) : (
@@ -223,32 +292,50 @@ export default function HomePage() {
 
       {/* Sanctuaries */}
       <Box>
-        <Typography variant="h6" gutterBottom sx={{ color: '#333', fontWeight: 600 }}>
+        <Typography variant="h6" gutterBottom sx={{ fontFamily: '"Noto Serif TC", serif', color: '#f5d67b', fontWeight: 600 }}>
           {tr('聖地一覽', 'Sanctuaries')}（{sanctuaries.length}）
         </Typography>
         <Grid container spacing={2}>
           {sanctuaries.map((sanctuary) => (
             <Grid size={12} key={sanctuary.id}>
-              <Card elevation={1} sx={{ borderLeft: `6px solid ${sanctuary.color || '#D4AF37'}` }}>
+              <Card
+                elevation={2}
+                sx={{
+                  backgroundColor: '#17130d',
+                  color: '#f2ead9',
+                  border: '1px solid #3a2f1d',
+                  borderLeft: `6px solid ${sanctuary.color || '#D4AF37'}`,
+                  borderRadius: 3,
+                  transition: 'transform .25s ease, box-shadow .25s ease',
+                  '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 10px 30px rgba(20,12,2,.5)' },
+                }}
+              >
                 <CardContent>
-                  <Typography variant="h6">
+                  <Typography
+                    variant="h6"
+                    sx={{ fontFamily: '"Noto Serif TC", serif', color: '#f5d67b', fontWeight: 700 }}
+                  >
                     {sanctuary.icon} {sanctuaryName(sanctuary, lang)}
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" gutterBottom>
+                  <Typography variant="body2" sx={{ color: '#c9a24b', letterSpacing: '.02em' }} gutterBottom>
                     {faithName(sanctuary.religion_type, lang)}
                   </Typography>
-                  <Typography variant="body2" sx={{ my: 1 }}>
+                  <Typography variant="body2" sx={{ my: 1, color: '#d8cdb6' }}>
                     {sanctuaryDescription(sanctuary, lang)}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
                     <Button
                       variant="contained"
-                      sx={{ backgroundColor: '#5B2A93', fontSize: '1.05rem' }}
+                      sx={{ backgroundColor: '#D4AF37', color: '#241a08', fontSize: '1.05rem', fontWeight: 600, '&:hover': { backgroundColor: '#c9a24b' } }}
                       onClick={() => navigate(`/sanctuary/${sanctuary.id}`)}
                     >
                       {tr('進入參拜・功德簿', 'Enter · Merit book')}
                     </Button>
-                    <Button variant="outlined" sx={{ color: '#8B4513', borderColor: '#8B4513', fontSize: '1.05rem' }} onClick={() => setDonateTo(sanctuary)}>
+                    <Button
+                      variant="outlined"
+                      sx={{ color: '#f5d67b', borderColor: '#8a6f2a', fontSize: '1.05rem', '&:hover': { borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,.08)' } }}
+                      onClick={() => setDonateTo(sanctuary)}
+                    >
                       {tr('捐獻 Pi', 'Donate Pi')}
                     </Button>
                   </Box>

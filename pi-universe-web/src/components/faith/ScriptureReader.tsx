@@ -135,7 +135,7 @@ export function ScriptureReader({ scripture, tr }: { scripture: Scripture; tr: T
                 ⏸ {tr('停止', 'Stop')}
               </Button>
             ) : (
-              <Button size="small" variant="contained" onClick={start} sx={{ backgroundColor: '#F4A300' }}>
+              <Button size="small" variant="contained" onClick={start} sx={{ backgroundColor: '#B8912F' }}>
                 ▶ {tr('跟著念', 'Read along')}
               </Button>
             )}

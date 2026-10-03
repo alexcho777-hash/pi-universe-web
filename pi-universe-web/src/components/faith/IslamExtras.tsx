@@ -236,7 +236,7 @@ export function QuranPanel({ tr }: { tr: TR; lang: Lang }) {
                 −
               </Button>
               <Typography sx={{ minWidth: 36, textAlign: 'center', fontWeight: 800, color: GOLD }}>×{counts[v.id] || 0}</Typography>
-              <Button size="small" variant="contained" onClick={() => bump(v.id, 1)} sx={{ minWidth: 36, bgcolor: '#F4A300', color: DARK, '&:hover': { bgcolor: GOLD } }}>
+              <Button size="small" variant="contained" onClick={() => bump(v.id, 1)} sx={{ minWidth: 36, bgcolor: '#B8912F', color: DARK, '&:hover': { bgcolor: GOLD } }}>
                 +
               </Button>
             </Box>

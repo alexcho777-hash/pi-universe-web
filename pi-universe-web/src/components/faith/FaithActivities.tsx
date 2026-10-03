@@ -355,7 +355,7 @@ export function FestivalList({ religionType }: { religionType: string }) {
               ? `${f.date.getFullYear()}年${f.date.getMonth() + 1}月${f.date.getDate()}日（${'日一二三四五六'[f.date.getDay()]}）`
               : f.date.toLocaleDateString(localeOf(lang), { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
           return (
-            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.6, borderTop: i ? '1px solid #eee' : 'none', bgcolor: n === 0 ? '#FFF6DD' : undefined }}>
+            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.6, borderTop: i ? '1px solid #eee' : 'none', bgcolor: n === 0 ? 'rgba(212,175,55,.14)' : undefined }}>
               <Box sx={{ flex: 1 }}>
                 <Typography sx={{ fontSize: '1.12rem', fontWeight: 700 }}>{tr(f.name[0], f.name[1])}</Typography>
                 <Typography sx={{ fontSize: '0.98rem', color: 'text.secondary' }}>
@@ -364,7 +364,7 @@ export function FestivalList({ religionType }: { religionType: string }) {
                 </Typography>
               </Box>
               <Box sx={{ textAlign: 'center', minWidth: 64 }}>
-                <Typography sx={{ fontSize: '1.35rem', fontWeight: 800, color: n === 0 ? '#C62828' : '#5B2A93' }}>{n === 0 ? tr('今天', 'Today') : n}</Typography>
+                <Typography sx={{ fontSize: '1.35rem', fontWeight: 800, color: n === 0 ? '#C62828' : '#D4AF37' }}>{n === 0 ? tr('今天', 'Today') : n}</Typography>
                 {n > 0 && <Typography sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>{tr('天後', n === 1 ? 'day' : 'days')}</Typography>}
               </Box>
             </Box>

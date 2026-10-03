@@ -32,11 +32,13 @@ import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import DonateDialog from '../components/DonateDialog';
 import { SanctuaryScene } from '../components/sanctuary/SanctuaryScene';
+import { backdropFor } from '../components/sanctuary/backdrops';
 import { WelcomeCeremony } from '../components/sanctuary/Welcome';
 import { altarFor } from '../components/sanctuary/Altars';
 import { FaithActivities, FestivalList } from '../components/faith/FaithActivities';
 import { BoardPanel } from '../components/faith/BoardPanel';
 import { useI18n, Lang, tx } from '../i18n/i18n';
+import { PREVIEW, demoSanctuaryMerit } from '../preview/demoData';
 import { sanctuaryDescription, sanctuaryName } from '../i18n/sanctuaries';
 import {
   RankRow,
@@ -79,7 +81,7 @@ function RankList({ rows, empty, lang }: { rows: RankRow[]; empty: string; lang:
       {rows.map((r) => (
         <ListItem
           key={`${r.rank}-${r.name}`}
-          sx={{ backgroundColor: r.is_me ? '#FFF6DD' : undefined }}
+          sx={{ backgroundColor: r.is_me ? 'rgba(212,175,55,.14)' : undefined }}
           secondaryAction={<Typography sx={{ fontSize: '1.1rem', fontWeight: 600 }}>{piAmount(r.total)}</Typography>}
         >
           <ListItemText
@@ -104,7 +106,7 @@ function RecentList({ rows, empty, lang }: { rows: RecentRow[]; empty: string; l
       {rows.map((r, i) => (
         <ListItem
           key={i}
-          sx={{ backgroundColor: r.is_me ? '#FFF6DD' : undefined }}
+          sx={{ backgroundColor: r.is_me ? 'rgba(212,175,55,.14)' : undefined }}
           secondaryAction={<Typography sx={{ fontSize: '1.1rem' }}>{piAmount(r.amount)}</Typography>}
         >
           <ListItemText
@@ -148,6 +150,14 @@ export default function SanctuaryPage() {
       return;
     }
     (async () => {
+      // Design preview (URL has "preview=1"): no backend, demo merit data
+      if (PREVIEW) {
+        const m: any = demoSanctuaryMerit(sanctuaryId);
+        setMerit(m);
+        setVisit({ visitor_number: m.visits.today, first_visit_today: true, visits: m.visits });
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       const v = await apiClient.visitSanctuary(sanctuaryId);
       if (v.success) setVisit(v.data as VisitResult);
@@ -202,6 +212,7 @@ export default function SanctuaryPage() {
           <SanctuaryScene
             religionType={s.religion_type}
             altar={altarFor(s.religion_type)}
+            backdropUrl={backdropFor(s.religion_type)}
             soundOnLabel={tr('播放環境音', 'Play ambient sound')}
             soundOffLabel={tr('關閉環境音', 'Turn off ambient sound')}
             overlay={ceremony ? <WelcomeCeremony key={ceremony} religionType={s.religion_type} onDone={endCeremony} /> : undefined}
@@ -263,7 +274,7 @@ export default function SanctuaryPage() {
             fullWidth
             size="large"
             onClick={() => setDonating(true)}
-            sx={{ backgroundColor: '#8B4513', fontSize: '1.25rem', py: 1.5, mb: 3 }}
+            sx={{ backgroundColor: '#B8912F', fontSize: '1.25rem', py: 1.5, mb: 3 }}
           >
             🙏 {tr(`${word}護持 ${name}`, `${donateVerb(s.religion_type, 'en')} to the ${name}`)}
           </Button>

@@ -105,7 +105,7 @@ export default function DonateDialog({ sanctuary, onClose, onResult }: Props) {
           onChange={(e) => setAmount(e.target.value)}
           slotProps={{ htmlInput: { min: 0.01, step: 0.01, inputMode: 'decimal' } }}
         />
-        <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: '#FBF6EC' }}>
+        <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: 'rgba(212,175,55,.10)' }}>
           <FormControlLabel
             control={<Checkbox checked={anonymous} onChange={(e) => setAnonymous(e.target.checked)} />}
             label={<Typography sx={{ fontSize: '1.1rem' }}>{tr(`隱名${verb}（不公開我的名字）`, "Give anonymously (don't show my name)")}</Typography>}
@@ -126,7 +126,7 @@ export default function DonateDialog({ sanctuary, onClose, onResult }: Props) {
           variant="contained"
           onClick={handleDonate}
           disabled={paying}
-          sx={{ backgroundColor: '#8B4513', fontSize: '1.05rem' }}
+          sx={{ backgroundColor: '#B8912F', fontSize: '1.05rem' }}
         >
           {paying ? <CircularProgress size={22} sx={{ color: 'white' }} /> : tr(`用 Pi ${verb} ${amount || 0} π`, `${verb} ${amount || 0} π with Pi`)}
         </Button>

@@ -143,10 +143,10 @@ export function BoardPanel({ religionType, tr, lang }: { religionType: string; t
           )}
 
           {official.map((p) => (
-            <Paper key={p.id} sx={{ p: 1.6, mb: 1, bgcolor: '#FFF6DD', border: '1px solid #F4C152' }}>
+            <Paper key={p.id} sx={{ p: 1.6, mb: 1, bgcolor: 'rgba(212,175,55,.14)', border: '1px solid #F4C152' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.4 }}>
                 <PushPinIcon sx={{ fontSize: '1.1rem', color: '#B8860B' }} />
-                <Chip label={tr('官方公告', 'Official')} size="small" sx={{ bgcolor: '#5B2A93', color: '#fff', fontWeight: 700 }} />
+                <Chip label={tr('官方公告', 'Official')} size="small" sx={{ bgcolor: '#D4AF37', color: '#fff', fontWeight: 700 }} />
                 <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', ml: 'auto' }}>{timeAgo(p.created_at, lang)}</Typography>
               </Box>
               <Typography sx={{ whiteSpace: 'pre-wrap', fontSize: '1.02rem' }}>{p.content}</Typography>

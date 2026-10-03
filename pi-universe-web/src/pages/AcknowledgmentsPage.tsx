@@ -72,8 +72,8 @@ export default function AcknowledgmentsPage() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 7, pb: 3 }}>
-      <Paper elevation={1} sx={{ p: 3, mb: 2, backgroundColor: '#F5E6D3', textAlign: 'center' }}>
-        <Typography sx={{ fontSize: '2.2rem', fontWeight: 800, color: '#8B4513' }}>{tr('功德簿', 'Merit Book')}</Typography>
+      <Paper elevation={1} sx={{ p: 3, mb: 2, backgroundColor: '#17130d', textAlign: 'center' }}>
+        <Typography sx={{ fontSize: '2.2rem', fontWeight: 800, color: '#B8912F' }}>{tr('功德簿', 'Merit Book')}</Typography>
         <Typography sx={{ fontSize: '1.15rem', color: '#5a3a1a' }}>
           {tr(`全站累計 ${piAmount(totalAmount)}　·　今日參訪 ${todayVisits} 人`, `Total given ${piAmount(totalAmount)}  ·  Visitors today ${todayVisits}`)}
         </Typography>
@@ -90,14 +90,14 @@ export default function AcknowledgmentsPage() {
         <Grid container spacing={1.5}>
           {(overview || []).map((r) => (
             <Grid size={12} key={r.id}>
-              <Card sx={{ borderLeft: `6px solid ${r.color && r.color !== '#FFFFFF' ? r.color : '#8B4513'}` }}>
+              <Card sx={{ borderLeft: `6px solid ${r.color && r.color !== '#FFFFFF' ? r.color : '#B8912F'}` }}>
                 <CardActionArea onClick={() => navigate(`/sanctuary/${r.id}`)}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1 }}>
                       <Typography sx={{ fontSize: '1.3rem', fontWeight: 700 }}>
                         {r.icon} {sanctuaryName(r, lang)}
                       </Typography>
-                      <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#8B4513', whiteSpace: 'nowrap' }}>
+                      <Typography sx={{ fontSize: '1.2rem', fontWeight: 700, color: '#B8912F', whiteSpace: 'nowrap' }}>
                         {piAmount(r.total_amount)}
                       </Typography>
                     </Box>

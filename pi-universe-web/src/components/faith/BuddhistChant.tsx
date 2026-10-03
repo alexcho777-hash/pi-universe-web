@@ -23,7 +23,7 @@ interface Item {
 }
 
 const GOLD = '#e8c170';
-const AMBER = '#F4A300';
+const AMBER = '#B8912F';
 
 const todayKey = () => {
   const d = new Date();

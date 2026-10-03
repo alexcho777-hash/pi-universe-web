@@ -142,7 +142,7 @@ export function WishVowPanel({ sanctuaryId, sanctuaryName: name }: { sanctuaryId
             <Card
               variant="outlined"
               sx={{
-                borderColor: category === c.key ? '#F4A300' : undefined,
+                borderColor: category === c.key ? '#B8912F' : undefined,
                 borderWidth: category === c.key ? 2 : 1,
                 bgcolor: category === c.key ? '#FFF6E0' : undefined,
               }}
@@ -164,7 +164,7 @@ export function WishVowPanel({ sanctuaryId, sanctuaryName: name }: { sanctuaryId
         onChange={(e) => setWishText(e.target.value.slice(0, 200))}
         sx={{ mb: 1.5 }}
       />
-      <Button variant="contained" fullWidth onClick={submitWish} sx={{ backgroundColor: '#F4A300', mb: 2 }}>
+      <Button variant="contained" fullWidth onClick={submitWish} sx={{ backgroundColor: '#B8912F', mb: 2 }}>
         🙏 {T('許願', 'Make this wish', 'Khấn nguyện', 'อธิษฐานขอพร')}
       </Button>
 
@@ -206,7 +206,7 @@ export function WishVowPanel({ sanctuaryId, sanctuaryName: name }: { sanctuaryId
                         <Card
                           variant="outlined"
                           sx={{
-                            borderColor: offering === o.key ? '#F4A300' : undefined,
+                            borderColor: offering === o.key ? '#B8912F' : undefined,
                             borderWidth: offering === o.key ? 2 : 1,
                             bgcolor: offering === o.key ? '#FFF6E0' : undefined,
                           }}
@@ -226,7 +226,7 @@ export function WishVowPanel({ sanctuaryId, sanctuaryName: name }: { sanctuaryId
                       variant="contained"
                       disabled={paying}
                       onClick={() => payOffering(w.id)}
-                      sx={{ backgroundColor: '#8B4513', flex: 1 }}
+                      sx={{ backgroundColor: '#B8912F', flex: 1 }}
                     >
                       {paying ? <CircularProgress size={18} sx={{ color: 'white' }} /> : `${T('供養還願', 'Give offering', 'Cúng dường tạ lễ', 'ถวายแก้บน')} ${OFFERINGS.find(o=>o.key===offering)?.price} π`}
                     </Button>

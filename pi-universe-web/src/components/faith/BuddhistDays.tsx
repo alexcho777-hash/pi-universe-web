@@ -17,7 +17,7 @@ type Mode = 'two' | 'six' | 'ten';
 
 const MODE_KEY = 'pu-buddhist-fast-mode';
 const GOLD = '#e8c170';
-const AMBER = '#F4A300';
+const AMBER = '#B8912F';
 const CARD = '#2a0f08';
 
 const DAYS: Record<Mode, number[]> = {

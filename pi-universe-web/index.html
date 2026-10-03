@@ -10,7 +10,15 @@
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+      /* 首頁主視覺：鏡頭慢推進＋薄霧霧光（尊重 prefers-reduced-motion） */
+      @keyframes pu-hero-zoom { from { transform: scale(1); } to { transform: scale(1.08); } }
+      @keyframes pu-hero-mist { 0% { transform: translateX(-6%); opacity: .5; } 50% { opacity: .35; } 100% { transform: translateX(6%); opacity: .5; } }
+      @media (prefers-reduced-motion: reduce) { .pu-hero-zoom, .pu-hero-mist { animation: none !important; } }
+      /* 大殿內部疊圖：跟著鏡頭一起慢慢推進，強化「人站在殿內」 */
+      @keyframes pu-scene-zoom { from { transform: scale(1.02); } to { transform: scale(1.1); } }
+    </style>
   </head>
   <body>
     <div id="root"></div>

@@ -3,7 +3,7 @@
  */
 
 import React, { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CircularProgress, Box, CssBaseline, GlobalStyles, ThemeProvider, createTheme } from '@mui/material';
 import { useAuthStore } from './stores/authStore';
 import HomePage from './pages/HomePage';
@@ -18,6 +18,7 @@ import SanctuaryPage from './pages/SanctuaryPage';
 import Navigation from './components/Navigation';
 import LanguageSwitch from './components/LanguageSwitch';
 import { useI18n } from './i18n/i18n';
+import { PREVIEW } from './preview/demoData';
 
 // The almanac engine is large, so the calendar page loads only when opened
 const CalendarPage = lazy(() => import('./pages/CalendarPage'));
@@ -33,15 +34,23 @@ const calendarRoute = (
 const makeTheme = (rtl: boolean) =>
   createTheme({
     direction: rtl ? 'rtl' : 'ltr',
-    palette: {
+      palette: {
+      // 夜色莊準主題：全站每一頁共享深色炭黑＋燸金蠟光的廟宇氣勢
+      mode: 'dark',
       primary: {
-        main: '#5B2A93', // π Universe primary blue
+        main: '#D4AF37', // temple gold
+        contrastText: '#241a08',
       },
       secondary: {
-        main: '#D4AF37', // Gold
+        main: '#F5D67B', // warm glow gold
       },
       background: {
-        default: '#f5f5f5',
+        default: '#100c07',
+        paper: '#17130d',
+      },
+      text: {
+        primary: '#f2ead9',
+        secondary: '#d8cdb6',
       },
     },
     typography: {
@@ -56,10 +65,14 @@ const THEMES = { ltr: makeTheme(false), rtl: makeTheme(true) };
 
 export default function App() {
   const { isAuthenticated, isLoading, initialize } = useAuthStore();
+  // Design preview (URL contains "preview=1"): browse with demo data, no login needed
+  const authed = PREVIEW || isAuthenticated;
   const { tr, rtl } = useI18n();
   const theme = rtl ? THEMES.rtl : THEMES.ltr;
 
   useEffect(() => {
+    // Design preview (URL has "preview=1"): skip Pi authentication entirely
+    if (PREVIEW) return;
     // Initialize auth on app load
     initialize();
   }, [initialize]);
@@ -72,7 +85,7 @@ export default function App() {
     else clearAdmin();
   }, [isAuthenticated, refreshAdmin, clearAdmin]);
 
-  if (isLoading) {
+  if (isLoading && !PREVIEW) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <CircularProgress />
@@ -93,7 +106,7 @@ export default function App() {
       />
       <LanguageSwitch />
       <Router>
-        {isAuthenticated ? (
+        {authed ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             {/* Main content */}
             <Box sx={{ flex: 1, overflow: 'auto', pb: 11 }}>

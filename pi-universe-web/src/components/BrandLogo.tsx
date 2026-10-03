@@ -4,7 +4,7 @@
  */
 import { Box, Typography } from '@mui/material';
 
-export const BRAND_PURPLE = '#5B2A93';
+export const BRAND_PURPLE = '#D4AF37';
 export const BRAND_PURPLE_LIGHT = '#8B5CF6';
 export const BRAND_GOLD = '#F4C152';
 

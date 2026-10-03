@@ -12,7 +12,7 @@ export default function ProfilePage() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 7, pb: 3 }}>
-      <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#F5E6D3' }}>
+      <Paper elevation={1} sx={{ p: 3, mb: 3, backgroundColor: '#17130d' }}>
         <Typography sx={{ fontSize: '2rem', fontWeight: 700 }}>{user?.username || tr('信眾', 'Visitor')}</Typography>
       </Paper>
 

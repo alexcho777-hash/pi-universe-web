@@ -355,7 +355,7 @@ export function OmikujiPanel({ tr, lang }: { tr: (zh: string, en: string) => str
             size="large"
             onClick={draw}
             disabled={phase !== 'idle'}
-            sx={{ mt: 2, px: 5, fontSize: '1.1rem', bgcolor: '#F4A300', color: '#2a0f08', fontWeight: 800, '&:hover': { bgcolor: '#e8c170' } }}
+            sx={{ mt: 2, px: 5, fontSize: '1.1rem', bgcolor: '#B8912F', color: '#2a0f08', fontWeight: 800, '&:hover': { bgcolor: '#e8c170' } }}
           >
             {phase === 'idle' ? t('搖一搖', 'Shake') : t('搖動中…', 'Shaking…')}
           </Button>
@@ -418,7 +418,7 @@ export function OmikujiPanel({ tr, lang }: { tr: (zh: string, en: string) => str
 
           {!slip.tied && (
             <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
-              <Button variant="contained" onClick={tie} disabled={folding} sx={{ flex: 1, minWidth: 140, bgcolor: '#F4A300', color: '#2a0f08', fontWeight: 800, '&:hover': { bgcolor: '#e8c170' } }}>
+              <Button variant="contained" onClick={tie} disabled={folding} sx={{ flex: 1, minWidth: 140, bgcolor: '#B8912F', color: '#2a0f08', fontWeight: 800, '&:hover': { bgcolor: '#e8c170' } }}>
                 {t('結ぶ — 結在神社籤架', '結ぶ — tie it at the shrine')}
               </Button>
               <Button variant="outlined" onClick={keep} disabled={folding} sx={{ flex: 1, minWidth: 140, color: '#e8c170', borderColor: 'rgba(232,193,112,.6)' }}>

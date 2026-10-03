@@ -5,6 +5,8 @@
  * attributes: Guan Gong's red face and long blade, Wenchang's brush, Nezha's spear and wheels…
  */
 import { useId } from 'react';
+import { deityArtFor } from './deityArt';
+import { Box } from '@mui/material';
 
 export type Body = 'seated' | 'standing' | 'armor' | 'child' | 'tiger' | 'buddha' | 'fox';
 export type Head =
@@ -56,7 +58,40 @@ export const LOOKS: Record<string, Look> = {
 };
 
 export function DeityStatue({ deityKey, size = 120, look }: { deityKey: string; size?: number; look?: Look }) {
+  const art = deityArtFor(deityKey);
+  if (art) {
+    return (
+      <img
+        src={art}
+        alt=""
+        aria-hidden="true"
+        style={{ display: 'block', width: size, height: size, objectFit: 'cover', borderRadius: 8, boxShadow: '0 2px 10px rgba(0,0,0,.45)' }}
+      />
+    );
+  }
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const artUrl = deityArtFor(deityKey);
+  if (artUrl) {
+    return (
+      <Box
+        component="img"
+        src={artUrl}
+        alt=""
+        aria-hidden="true"
+        sx={{
+          display: 'block',
+          width: size,
+          height: (size * 164) / 120,
+          objectFit: 'cover',
+          borderRadius: 2,
+          border: '1px solid rgba(228,193,112,.35)',
+          background: '#120804',
+          boxShadow: 'inset 0 0 18px rgba(0,0,0,.55)',
+        }}
+      />
+    );
+  }
+
   const L = look || LOOKS[deityKey] || LOOKS.mazu;
   const skin = L.skin || SKIN;
   const trim = L.trim || GOLD;
