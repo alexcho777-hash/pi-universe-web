@@ -18,14 +18,25 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  keyframes,
 } from '@mui/material';
 import { Sanctuary } from '../types';
 import { usePiPayment, PaymentCancelledError } from '../hooks/usePiPayment';
 import { anonymousName, bookTitle, donateVerb, giftWord } from '../merit/merit';
 import { useI18n } from '../i18n/i18n';
 import { sanctuaryName } from '../i18n/sanctuaries';
+import meritBoxImg from '../assets/ritual/meritbox.jpg';
 
 const PRESET_AMOUNTS = [1, 3.14, 10];
+
+/** 功德箱照片只用在適合的聖地（香火、燭光、供桌的傳統場景）；其他宗教不放，以示尊重 */
+const MERIT_BOX_FAITHS = ['buddhist', 'taiwan_folk', 'thai_four_face', 'vietnamese_folk'];
+
+/** 正在隨喜時，功德箱的燭光與金光輕輕呼吸 */
+const boxGlow = keyframes`
+  0%, 100% { box-shadow: 0 0 0 rgba(255,200,110,0); }
+  50% { box-shadow: 0 0 26px 6px rgba(255,200,110,.55); }
+`;
 
 interface Props {
   sanctuary: Pick<Sanctuary, 'id' | 'name' | 'icon' | 'religion_type'> | null;
@@ -81,6 +92,39 @@ export default function DonateDialog({ sanctuary, onClose, onResult }: Props) {
         {tr(`${verb}給`, `${verb} to`)} {sanctuary?.icon} {name}
       </DialogTitle>
       <DialogContent>
+        {sanctuary && MERIT_BOX_FAITHS.includes(sanctuary.religion_type) && (
+          <Box
+            sx={{
+              position: 'relative',
+              mb: 2,
+              height: { xs: 150, sm: 170 },
+              borderRadius: 2,
+              overflow: 'hidden',
+              backgroundImage: `url(${meritBoxImg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center 55%',
+              animation: paying ? `${boxGlow} 1.6s ease-in-out infinite` : 'none',
+            }}
+          >
+            <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(8,4,0,.75) 100%)' }} />
+            <Typography
+              sx={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 8,
+                textAlign: 'center',
+                color: '#f7dd9a',
+                fontFamily: '"Noto Serif TC", Georgia, serif',
+                fontWeight: 700,
+                letterSpacing: '.12em',
+                textShadow: '0 1px 8px rgba(0,0,0,.9)',
+              }}
+            >
+              {tr('功德箱', 'Merit box')}
+            </Typography>
+          </Box>
+        )}
         <Typography sx={{ mb: 2, color: 'text.secondary' }}>
           {tr(`自願隨喜，將記錄在${bookTitle(sanctuary?.religion_type)}。`, `Give what you wish. It will be recorded in the ${bookTitle(sanctuary?.religion_type, 'en')}.`)}
         </Typography>
