@@ -13,6 +13,7 @@ import { useI18n, tx } from '../../i18n/i18n';
 import crowdFar from '../../assets/crowd/c_far.jpg';
 import crowdMid from '../../assets/crowd/c_mid.jpg';
 import crowdNear from '../../assets/crowd/c_near.jpg';
+import { crowdFor } from './backdrops';
 
 /** 一次儀式的長度（秒），以下所有動畫都以此為刻度 */
 const T = 30;
@@ -91,6 +92,15 @@ const nearIn = keyframes`
   100% { opacity: 0; transform: scale(1.55); }
 `;
 
+/** 該宗教專屬的迎賓人群照：淡入、緩慢推進、尾聲隨金光散去 */
+const ownIn = keyframes`
+  0%   { opacity: 0; transform: scale(1.03); }
+  9%   { opacity: 1; transform: scale(1.05); }
+  90%  { opacity: 1; transform: scale(1.22); }
+  97%  { opacity: 0; transform: scale(1.25); }
+  100% { opacity: 0; transform: scale(1.25); }
+`;
+
 /** 歡祝詞浮現 */
 const pop = keyframes`
   0%   { opacity: 0; transform: translate(-50%, -100%) scale(.82); }
@@ -116,6 +126,7 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
     return () => window.clearTimeout(id);
   }, [onDone, hold]);
 
+  const own = crowdFor(religionType);
   const layers = [
     { src: crowdFar, anim: farIn, delay: hold ? 0 : 0, staticOpacity: 0.88, pos: 'center 42%', z: 1 },
     { src: crowdMid, anim: midIn, delay: hold ? 0 : 1.6, staticOpacity: 0.9, pos: 'center 52%', z: 2 },
@@ -148,8 +159,27 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
         }}
       />
 
-      {/* 三層寫實人群：遠 → 中 → 近，逐一現身、緩慢推進（screen 疊光融入殿內黑暗） */}
-      {layers.map((L, i) => (
+      {/* 該宗教專屬的迎賓人群照（有的話就用它，不再每個聖地都一樣） */}
+      {own && (
+        <Box
+          aria-hidden="true"
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 2,
+            backgroundImage: `url(${own})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 55%',
+            opacity: hold ? 1 : 0,
+            transform: hold ? 'scale(1.12)' : undefined,
+            animation: hold ? 'none' : `${ownIn} ${T}s cubic-bezier(.25,.6,.35,1) both`,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      {/* 通用三層人群（只有找不到專屬照片時才用）：遠 → 中 → 近 */}
+      {!own && layers.map((L, i) => (
         <Box
           key={i}
           aria-hidden="true"

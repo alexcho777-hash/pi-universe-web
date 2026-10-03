@@ -211,7 +211,7 @@ export default function SanctuaryPage() {
           {/* Big welcome, over the sanctuary's 3D hall */}
           <SanctuaryScene
             religionType={s.religion_type}
-            altar={altarFor(s.religion_type)}
+            altar={backdropFor(s.religion_type) ? undefined : altarFor(s.religion_type)}
             backdropUrl={backdropFor(s.religion_type)}
             soundOnLabel={tr('播放環境音', 'Play ambient sound')}
             soundOffLabel={tr('關閉環境音', 'Turn off ambient sound')}
@@ -220,7 +220,7 @@ export default function SanctuaryPage() {
             onReplay={() => setCeremony((c) => c + 1)}
             replayLabel={tr('重看迎賓儀式', 'Replay welcome')}
           >
-            {!altarFor(s.religion_type) && <Typography sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>}
+            {!altarFor(s.religion_type) && !backdropFor(s.religion_type) && <Typography sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>}
             <Typography sx={{ fontSize: { xs: '1.15rem', sm: '1.4rem' }, fontWeight: 600, mt: 0.5, color: '#F3E3C0' }}>
               {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}, to the`)}
             </Typography>

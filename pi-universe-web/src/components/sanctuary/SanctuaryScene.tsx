@@ -205,7 +205,7 @@ export function SanctuaryScene({
       onPointerLeave={() => (target.current = { x: 0, y: 0 })}
       sx={{
         position: 'relative',
-        height: altar ? { xs: 530, sm: 560 } : { xs: 360, sm: 420 },
+        height: backdropUrl ? { xs: 470, sm: 500 } : altar ? { xs: 530, sm: 560 } : { xs: 360, sm: 420 },
         borderRadius: 2,
         overflow: 'hidden',
         mb: 2,
@@ -214,7 +214,8 @@ export function SanctuaryScene({
         touchAction: 'pan-y',
       }}
     >
-      {/* 近景磅礴圖：疊在大殿繪圖之上，加強「走向建築」的臨場感 */}
+      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: 'block' }} aria-hidden="true" />
+      {/* 該宗教真實的大殿內景：畫在 3D 大殿之上，緩慢推進，讓人感覺站在殿內 */}
       {backdropUrl && (
         <Box
           aria-hidden="true"
@@ -223,16 +224,13 @@ export function SanctuaryScene({
             inset: 0,
             backgroundImage: `url(${backdropUrl})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: { xs: 0.5, sm: 0.58 },
-            mixBlendMode: 'screen',
-            transformOrigin: 'center',
+            backgroundPosition: 'center 40%',
+            transformOrigin: 'center 55%',
             animation: 'pu-scene-zoom 30s ease-in-out infinite alternate',
             pointerEvents: 'none',
           }}
         />
       )}
-      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: 'block' }} aria-hidden="true" />
       {altar && (
         <Box sx={{ position: 'absolute', left: 0, right: 0, top: { xs: 14, sm: 18 }, display: 'flex', justifyContent: 'center' }}>{altar}</Box>
       )}
