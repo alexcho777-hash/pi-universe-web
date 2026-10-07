@@ -147,7 +147,7 @@ export default function HomePage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
-      {/* Hero: the grand entrance — six faiths along one golden avenue */}
+      {/* Hero: the grand entrance — the world's faiths along one golden avenue */}
       <Box
         sx={{
           position: 'relative',
@@ -202,7 +202,7 @@ export default function HomePage() {
               textShadow: '0 2px 16px rgba(0,0,0,.65)',
             }}
           >
-            {tr('六聖地·一大道', 'Six Sanctuaries, One Avenue')}
+            {tr('世界宗教·一大道', 'World Faiths, One Avenue')}
           </Typography>
           <Typography
             sx={{
