@@ -464,8 +464,19 @@ export function PrayerTimesPanel({ lang, tr }: { lang: Lang; tr: TR }) {
   );
 }
 
+/** Phones and tablets have a compass; computers do not */
+function hasCompassDevice(): boolean {
+  try {
+    const ua = navigator.userAgent || '';
+    return /Android|iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+  } catch {
+    return false;
+  }
+}
+
 export function QiblaPanel({ lang, tr }: { lang: Lang; tr: TR }) {
   const loc = usePlace(tr);
+  const phone = hasCompassDevice();
   const [heading, setHeading] = useState<number | null>(null);
   const bearing = loc.place ? qiblaBearing(loc.place.lat, loc.place.lng) : null;
 
@@ -566,28 +577,32 @@ export function QiblaPanel({ lang, tr }: { lang: Lang; tr: TR }) {
           </Typography>
           {heading === null ? (
             <>
-              <Typography sx={{ color: 'text.secondary', mt: 1 }}>
-                {tr('圖上的北方為正北。手機有指南針時，箭頭會跟著手機轉動。', 'North on the dial is true north. On phones with a compass, the arrow turns with the phone.')}
-              </Typography>
+              {phone ? (
+                <Typography sx={{ color: 'text.secondary', mt: 1 }}>
+                  {tr('圖上的北方為正北。按下方按鈕，並把手機平放，箭頭就會跟著手機轉動。', 'North on the dial is true north. Tap the button below and hold the phone flat; the arrow will turn with the phone.')}
+                </Typography>
+              ) : (
+                <Alert severity="info" sx={{ mt: 1.5, textAlign: 'left', fontSize: '1.05rem' }}>
+                  {tr(
+                    `電腦沒有指南針。請這樣做：①面向正北　②順時針轉 ${bearing.toFixed(0)}°，大約是${directionWords(bearing)}。或用手機打開這個網址，箭頭會自動轉動。`,
+                    `Computers have no compass. Face north, then turn ${bearing.toFixed(0)}° clockwise (roughly ${directionWords(bearing)}). Or open this page on your phone and the arrow will turn by itself.`
+                  )}
+                </Alert>
+              )}
               {compass === 'waiting' && (
                 <Alert severity="info" sx={{ mt: 1.5, textAlign: 'left' }}>
                   {tr('正在讀取指南針… 請把手機平放，並在空中畫幾次「8」字校正。', 'Waiting for the compass… hold the phone flat and move it in a figure 8 a few times.')}
                 </Alert>
               )}
-              {compass === 'none' && (
-                <Alert severity="warning" sx={{ mt: 1.5, textAlign: 'left' }}>
+              {phone && (compass === 'none' || compass === 'denied') && (
+                <Alert severity="warning" sx={{ mt: 1.5, textAlign: 'left', fontSize: '1.05rem' }}>
                   {tr(
-                    `這台裝置沒有偵測到指南針（電腦通常沒有）。請先面向正北，再順時針轉 ${bearing.toFixed(0)}°，大約是${directionWords(bearing)}；或用手機開啟這一頁。`,
-                    `No compass was detected on this device (computers usually don't have one). Face north, then turn ${bearing.toFixed(0)}° clockwise — roughly ${directionWords(bearing)} — or open this page on your phone.`
+                    `這個瀏覽器無法使用指南針。兩個辦法：①改用 Safari（iPhone）或 Chrome（Android）打開本頁，按「啟用指南針」並選「允許」；②打開手機內建的「指南針」App，轉到 ${bearing.toFixed(0)}° 的方向（大約是${directionWords(bearing)}）。`,
+                    `This browser cannot use the compass. Either (1) open this page in Safari (iPhone) or Chrome (Android), tap "Enable compass" and choose Allow, or (2) open your phone's built-in Compass app and turn to ${bearing.toFixed(0)}° (roughly ${directionWords(bearing)}).`
                   )}
                 </Alert>
               )}
-              {compass === 'denied' && (
-                <Alert severity="warning" sx={{ mt: 1.5, textAlign: 'left' }}>
-                  {tr('沒有取得指南針權限。請到瀏覽器設定中允許「動作與方向」存取，再按一次。', 'Compass access was not allowed. Allow "Motion & Orientation" access in your browser settings, then try again.')}
-                </Alert>
-              )}
-              {compass !== 'waiting' && (
+              {phone && compass !== 'waiting' && (
                 <Button onClick={enableCompass} sx={{ mt: 1 }}>
                   🧭 {tr('啟用指南針', 'Enable compass')}
                 </Button>

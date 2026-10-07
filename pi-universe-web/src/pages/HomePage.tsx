@@ -29,6 +29,25 @@ import { sanctuaryName, sanctuaryDescription, faithName } from '../i18n/sanctuar
 import { PREVIEW, DEMO_SANCTUARIES, DEMO_SUMMARY } from '../preview/demoData';
 import heroPortal from '../assets/hero-portal.jpg';
 
+/**
+ * 聖地排列順序：信仰相近、地區相近的排在一起（西方一神教 → 南亞 → 高原與草原 → 東南亞 → 東亞）。
+ * 只影響顯示順序（首頁列表與 3D 星球上的位置），不影響聖地編號與其他功能。
+ * 之後新增的聖地若不在表內，會排在最後。
+ */
+const FAITH_ORDER = [
+  'christian', 'catholic', 'orthodox', 'islamic',
+  'hindu', 'tibetan_buddhist', 'mongol_shaman',
+  'theravada', 'thai_four_face', 'vietnamese_folk',
+  'buddhist', 'taiwan_folk', 'shinto',
+];
+function sortSanctuaries<T extends { religion_type?: string }>(list: T[]): T[] {
+  const rank = (t?: string) => {
+    const i = FAITH_ORDER.indexOf(t || '');
+    return i < 0 ? FAITH_ORDER.length : i;
+  };
+  return list.map((s, i) => ({ s, i })).sort((a, b) => rank(a.s.religion_type) - rank(b.s.religion_type) || a.i - b.i).map((x) => x.s);
+}
+
 const TodayAlmanacCard = lazy(() => import('../components/TodayAlmanacCard'));
 
 interface PracticeSummary {
@@ -75,7 +94,7 @@ export default function HomePage() {
   const loadAll = async () => {
     // Design preview (URL has "preview=1"): no backend, show demo data
     if (PREVIEW) {
-      setSanctuaries(DEMO_SANCTUARIES as Sanctuary[]);
+      setSanctuaries(sortSanctuaries(DEMO_SANCTUARIES as Sanctuary[]));
       setSummary(DEMO_SUMMARY);
       setIsLoading(false);
       return;
@@ -84,7 +103,7 @@ export default function HomePage() {
       setIsLoading(true);
       const response = await apiClient.getSanctuaries();
       if (response.success && response.data) {
-        setSanctuaries(Array.isArray(response.data) ? (response.data as Sanctuary[]) : []);
+        setSanctuaries(Array.isArray(response.data) ? sortSanctuaries(response.data as Sanctuary[]) : []);
       } else {
         setError(response.error || 'Failed to load sanctuaries');
       }
