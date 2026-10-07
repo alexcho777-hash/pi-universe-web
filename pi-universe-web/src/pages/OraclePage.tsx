@@ -32,6 +32,7 @@ import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import { LIUSHI_JIAZI, Lot } from '../oracle/liushiJiazi';
 import { LotCylinder, MoonBlocks, SacredGlow, ThrowResult } from '../oracle/OracleArt';
+import { castBlocks, dropStick, rattleLots } from '../oracle/oracleSound';
 import { useI18n, Lang, tx } from '../i18n/i18n';
 
 type Step = 'loading' | 'age' | 'ask' | 'pray' | 'permit' | 'shake' | 'verify' | 'poem' | 'limit';
@@ -354,6 +355,7 @@ export default function OraclePage() {
   };
 
   const permitThrow = () => {
+    castBlocks(650);
     setTossing(true);
     setThrowResult(null);
     const r = randomThrow();
@@ -369,12 +371,14 @@ export default function OraclePage() {
     setVerifyMsg(null);
     setDraw(null);
     setShaking(true);
+    rattleLots(1800);
     const started = Date.now();
     const r: any = await apiClient.drawLot(sanctuaryId);
     const wait = Math.max(0, 1800 - (Date.now() - started));
     window.setTimeout(() => {
       setShaking(false);
       if (r.success) {
+        dropStick();
         setDraw({ id: r.data.draw_id, lot: findLot(r.data.lot_no) });
       } else if (r.code === 'DAILY_LIMIT') {
         setStep('limit');
@@ -391,6 +395,7 @@ export default function OraclePage() {
   const verifyLot = async () => {
     if (!draw) return;
     setStep('verify');
+    castBlocks(650);
     setTossing(true);
     setThrowResult(null);
     setVerifyMsg(null);
