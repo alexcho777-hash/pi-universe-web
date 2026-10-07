@@ -173,5 +173,6 @@ import { INFO as SH } from './info/shinto';
 import { INFO as TH } from './info/thai';
 import { INFO as VN } from './info/vietnamese';
 import { INFO as OR } from './info/orthodox';
+import { INFO as TB } from './info/tibetan';
 
-export const DEITY_INFO: Record<string, DeityInfo> = { ...BUDDHIST_INFO, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR };
+export const DEITY_INFO: Record<string, DeityInfo> = { ...BUDDHIST_INFO, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR, ...TB };

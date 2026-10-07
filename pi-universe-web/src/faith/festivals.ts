@@ -275,7 +275,17 @@ const orthodox: Maker = (year) => {
   ] as Festival[];
 };
 
-const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox };
+/** 藏傳佛教節日：藏曆與農曆多半相同，但偶爾差一天或閏月不同，僅供參考，請以寺院公告為準。 */
+const tibetan: Maker = fromLunar([
+  [1, 1, '藏曆新年（洛薩）', 'Losar (Tibetan New Year)', '日期與農曆新年可能差一天或一個月', 'May differ from Chinese New Year by a day or a month'],
+  [1, 15, '神變節（曲果節）', 'Choetrul Duchen (Day of Miracles)', '藏曆正月初一至十五的法會期', 'Culmination of the first fortnight of prayers'],
+  [4, 15, '薩嘎達瓦節', 'Saga Dawa Düchen', '佛陀誕生、成道與涅槃紀念', 'Buddha’s birth, awakening and parinirvana'],
+  [6, 4, '初轉法輪節（曲果節）', 'Chokhor Düchen', '紀念佛陀在鹿野苑初轉法輪', 'First sermon at Sarnath'],
+  [9, 22, '天降節（拉巴節）', 'Lhabab Düchen', '紀念佛陀從三十三天返回人間', 'Buddha’s descent from the heaven of the Thirty-Three'],
+  [10, 25, '甘丹燃燈節', 'Ganden Ngamchoe', '紀念宗喀巴大師圓寂', 'Lamp festival for Tsongkhapa'],
+]);
+
+const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox, tibetan_buddhist: tibetan };
 
 /** Festivals from `from` (inclusive) for the next `days` days, sorted by date */
 export function upcomingFestivals(religionType: string, from = new Date(), days = 365): Festival[] {
