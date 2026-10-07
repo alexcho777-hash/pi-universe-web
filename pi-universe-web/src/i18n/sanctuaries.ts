@@ -26,6 +26,10 @@ const EN: Record<string, { name: string; description: string; faith: string }> =
     description: 'Thần Tài — God of Wealth, worshipped daily at the home altar',
     faith: 'Vietnamese folk religion',
   },
+  theravada: { name: 'Theravada Buddhist Temple', description: 'Southeast Asian and Sri Lankan Theravada Buddhism', faith: 'Theravada Buddhism' },
+  tibetan_buddhist: { name: 'Tibetan Buddhist Temple', description: 'Prayer flags, butter lamps and mantras of Tibetan Buddhism', faith: 'Tibetan Buddhism' },
+  mongol_shaman: { name: 'Mongolian Shamanic Sanctuary', description: 'Eternal Blue Sky, the ovoo and the ancestors', faith: 'Mongolian shamanism' },
+  orthodox: { name: 'Russian Orthodox Church', description: 'Icons, candles and prayer in the Orthodox tradition', faith: 'Eastern Orthodoxy' },
 };
 
 const VI: Record<string, { name: string; description: string; faith: string }> = {
@@ -86,6 +90,10 @@ const ZH_FAITH: Record<string, string> = {
   taiwan_folk: '台灣民間信仰',
   thai_four_face: '泰國民間信仰',
   vietnamese_folk: '越南民間信仰',
+  theravada: '南傳佛教',
+  tibetan_buddhist: '藏傳佛教',
+  mongol_shaman: '蒙古薩滿信仰',
+  orthodox: '東正教',
 };
 
 const JA: Record<string, { name: string; description: string; faith: string }> = {

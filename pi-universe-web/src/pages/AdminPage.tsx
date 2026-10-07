@@ -24,6 +24,10 @@ const HALLS: [string, string][] = [
   ['islamic', '伊斯蘭 Islamic'],
   ['shinto', '神道 Shinto'],
   ['hindu', '印度教 Hindu'],
+  ['theravada', '南傳佛教 Theravada'],
+  ['tibetan_buddhist', '藏傳佛教 Tibetan'],
+  ['mongol_shaman', '蒙古薩滿 Shaman'],
+  ['orthodox', '東正教 Orthodox'],
 ];
 
 export default function AdminPage() {

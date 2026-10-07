@@ -38,6 +38,7 @@ import { HINDU_SET } from '../../faith/pantheons/hindu';
 import { CATHOLIC_SET } from '../../faith/pantheons/catholic';
 import { THAI_SET } from '../../faith/pantheons/thai';
 import { VIETNAMESE_SET } from '../../faith/pantheons/vietnamese';
+import { THERAVADA_SET, TIBETAN_SET, SHAMAN_SET, ORTHODOX_SET } from '../../faith/pantheons/newfaiths';
 import { SHINTO_SET } from '../../faith/pantheons/shinto';
 import { BuddhistChantPanel } from './BuddhistChant';
 import { BuddhistDaysPanel } from './BuddhistDays';
@@ -102,7 +103,7 @@ const ACTIVITIES: Record<string, Activity[]> = {
     ...HOME_ALTAR,
   ],
   taiwan_folk: [
-    { key: 'pantheon', icon: '🏯', title: ['眾神殿', 'Pantheon'], minutes: ['15 尊神明', '15 deities'] },
+    { key: 'pantheon', icon: '🏯', title: ['眾神殿', 'Pantheon'], minutes: ['18 尊神明', '18 deities'] },
     { key: 'oracle', icon: '🎋', title: ['線上求籤', 'Temple oracle'], minutes: ['約 3 分鐘', 'About 3 min'], href: '/oracle' },
     { key: 'jiao', icon: '🌙', title: ['擲筊問事', 'Ask with moon blocks'], minutes: ['約 1 分鐘', 'About 1 min'] },
     LAMP_ACTIVITY,
@@ -114,6 +115,26 @@ const ACTIVITIES: Record<string, Activity[]> = {
     { key: 'thaiVisit', icon: '🧭', title: ['四面參拜順序', 'How to visit the four faces'], minutes: ['約 3 分鐘', 'About 3 min'] },
     { key: 'thaiOffer', icon: '🌼', title: ['上香獻花', 'Incense, candles & garlands'], minutes: ['約 2 分鐘', 'About 2 min'] },
     { key: 'candleThai', icon: '🕯️', title: ['點燭祈福', 'Light a candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+  ],
+  theravada: [
+    { key: 'pantheonTheravada', icon: '☸️', title: ['南傳佛教聖像', 'Theravada figures'], minutes: ['7 尊', '7 figures'] },
+    { key: 'candleThai', icon: '🕯️', title: ['點燭祈福', 'Light a candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+    { key: 'incense', icon: '🪔', title: ['上香', 'Light incense'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+  ],
+  tibetan_buddhist: [
+    { key: 'pantheonTibetan', icon: '🏔️', title: ['藏傳佛教聖像', 'Tibetan Buddhist figures'], minutes: ['9 尊', '9 figures'] },
+    { key: 'candle', icon: '🕯️', title: ['點酥油燈', 'Light a lamp'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+    { key: 'incense', icon: '🪔', title: ['上香', 'Light incense'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+  ],
+  mongol_shaman: [
+    { key: 'pantheonShaman', icon: '🌌', title: ['天地與祖靈', 'Sky, earth & ancestors'], minutes: ['7 位', '7 figures'] },
+    { key: 'candle', icon: '🕯️', title: ['點燈祈福', 'Light a lamp'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+  ],
+  orthodox: [
+    { key: 'pantheonOrthodox', icon: '☦️', title: ['聖像殿', 'Icons & saints'], minutes: ['8 位', '8 icons'] },
+    { key: 'candleChristian', icon: '🕯️', title: ['點蠟燭祈禱', 'Light a prayer candle'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
+    { key: 'prayer', icon: '🙏', title: ['主禱文與默禱', "Lord's Prayer & quiet prayer"], minutes: ['約 4 分鐘', 'About 4 min'] },
+    { key: 'psalms', icon: '📜', title: ['詩篇', 'Psalms'], minutes: ['12 篇', '12 psalms'] },
   ],
   vietnamese_folk: [
     { key: 'pantheonVietnamese', icon: '🏯', title: ['越南神明殿', 'Vietnamese pantheon'], minutes: ['9 尊神明', '9 deities'] },
@@ -235,6 +256,14 @@ export function FaithActivities({
         return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={THAI_SET} />;
       case 'pantheonVietnamese':
         return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={VIETNAMESE_SET} />;
+      case 'pantheonTheravada':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={THERAVADA_SET} />;
+      case 'pantheonTibetan':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={TIBETAN_SET} />;
+      case 'pantheonShaman':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={SHAMAN_SET} />;
+      case 'pantheonOrthodox':
+        return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={ORTHODOX_SET} />;
       case 'pantheonShinto':
         return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={SHINTO_SET} />;
       case 'chant':

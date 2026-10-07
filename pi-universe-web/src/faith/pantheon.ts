@@ -24,6 +24,7 @@ export const GROUPS: PantheonGroup[] = [
   { key: 'peace', icon: '🛡️', label: ['平安除煞', 'Protection'] },
   { key: 'family', icon: '👶', label: ['求子婦幼', 'Family'] },
   { key: 'mercy', icon: '🪷', label: ['慈悲消災', 'Mercy'] },
+  { key: 'yiguandao', icon: '🏵️', label: ['一貫道', 'Yiguandao'] },
 ];
 
 export interface Deity {
@@ -233,6 +234,42 @@ export const DEITIES: Deity[] = [
     intro: [
       '地藏王菩薩發願「地獄不空，誓不成佛」，是超度亡者、救度幽冥眾生的菩薩，民間常在中元節、做七等法事中祈請地藏王菩薩，庇佑先人與化解冤結。',
       'Dizang vowed not to achieve buddhahood "until the hells are empty," and is the bodhisattva who guides and eases the suffering of the departed. He is commonly invoked during the Ghost Festival and memorial rites for the deceased, to comfort departed family and ease old grievances.',
+    ],
+    wishCategory: 'other',
+  },
+  {
+    key: 'wushenglaomu',
+    icon: '🏵️',
+    group: 'yiguandao',
+    title: ['無生老母（無極老母）', 'Wusheng Laomu, the Eternal Mother'],
+    short: ['一貫道的至尊・慈母', 'The supreme Mother in Yiguandao'],
+    intro: [
+      '一貫道奉無生老母（亦稱無極老母）為至高的慈母，相信眾生皆是她的兒女，並盼望大家返回本源。一貫道的佛堂中常供奉「明明上帝」之位。（初稿，待審核）',
+      'Yiguandao venerates Wusheng Laomu (also Wuji Laomu) as the supreme, compassionate Mother, holding that all beings are her children and hoping they will return to their origin. Its halls often enshrine the tablet of "Ming Ming Shangdi." (draft, pending review)',
+    ],
+    wishCategory: 'health',
+  },
+  {
+    key: 'jigong',
+    icon: '🪭',
+    group: 'yiguandao',
+    title: ['濟公活佛', 'Jigong, the Living Buddha'],
+    short: ['濟世救人・一貫道常見聖尊', 'Merciful helper, often honoured in Yiguandao halls'],
+    intro: [
+      '濟公為南宋高僧，傳說他行事瘋癲而救助貧苦，民間尊為「濟公活佛」。一貫道也敬奉濟公活佛，視為濟世的救星。（初稿，待審核）',
+      'Jigong was a Southern Song monk who, tradition says, behaved eccentrically while helping the poor, and folk religion honours him as the "Living Buddha." Yiguandao also reveres him as a helper of the world. (draft, pending review)',
+    ],
+    wishCategory: 'health',
+  },
+  {
+    key: 'milezushi',
+    icon: '😄',
+    group: 'yiguandao',
+    title: ['彌勒祖師', 'Patriarch Maitreya'],
+    short: ['一貫道奉的祖師', 'A patriarch honoured in Yiguandao'],
+    intro: [
+      '一貫道奉彌勒祖師為道統傳承中的重要祖師之一，與彌勒佛在民間的歡喜形象相連。（初稿，待審核）',
+      'Yiguandao honours Patriarch Maitreya as one of the key patriarchs of its lineage, linked to the cheerful Maitreya image familiar in folk religion. (draft, pending review)',
     ],
     wishCategory: 'other',
   },

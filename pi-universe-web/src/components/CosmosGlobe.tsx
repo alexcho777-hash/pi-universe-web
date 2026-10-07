@@ -146,7 +146,7 @@ export default function CosmosGlobe({ sanctuaries, lang, onSelect }: Props) {
       }
 
       // Sanctuaries on the sphere
-      const R = Math.min(w, h) * 0.4;
+      const R = Math.min(w, h) * (points.length > 10 ? 0.42 : 0.4);
       const cx = w / 2;
       const cy = h / 2;
       const cyaw = Math.cos(st.yaw), syaw = Math.sin(st.yaw);
@@ -226,7 +226,7 @@ export default function CosmosGlobe({ sanctuaries, lang, onSelect }: Props) {
       onPointerCancel={endDrag}
       sx={{
         position: 'relative',
-        height: { xs: 440, sm: 520 },
+        height: { xs: 480, sm: 540 },
         borderRadius: 3,
         overflow: 'hidden',
         mb: 2,

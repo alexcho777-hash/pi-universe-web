@@ -34,6 +34,14 @@ function greeting(religionType: string, lang: string): string {
       return lang === 'zh' ? '願主賜你平安' : tx('Peace be with you', lang as never);
     case 'catholic':
       return lang === 'zh' ? '願主與你同在' : tx('The Lord be with you', lang as never);
+    case 'theravada':
+      return 'สาธุ 🙏';
+    case 'tibetan_buddhist':
+      return 'Tashi Delek 🙏';
+    case 'mongol_shaman':
+      return 'Сайн байна уу 🌌';
+    case 'orthodox':
+      return lang === 'zh' ? '願主賜你平安 ☦️' : 'Peace be with you ☦️';
     case 'islamic':
       return 'السلام عليكم';
     case 'shinto':

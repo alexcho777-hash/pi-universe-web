@@ -25,6 +25,10 @@ export const DEMO_SANCTUARIES: DemoSanctuary[] = [
   { id: 7, name: '台灣宮廟（媽祖）', description: '鑼鼓木魚與籤詩，安太歲點燈', religion_type: 'taiwan_folk', icon: '🏮', color: '#B3261E' },
   { id: 8, name: '四面佛神殿', description: '許願還願之處，泰式風鈴相伴', religion_type: 'thai_four_face', icon: '🌸', color: '#E0A028' },
   { id: 9, name: '越南土地公堂', description: '招財進寶，鐘磬與琵琶聲', religion_type: 'vietnamese_folk', icon: '🧧', color: '#C8A02E' },
+  { id: 10, name: '南傳佛教寺院', description: '斯里蘭卡、緬甸、泰國、柬埔寨的上座部傳統', religion_type: 'theravada', icon: '☸️', color: '#D4881C' },
+  { id: 11, name: '藏傳佛教寺院', description: '經幡、酥油燈與六字大明咒', religion_type: 'tibetan_buddhist', icon: '🏔️', color: '#9B2335' },
+  { id: 12, name: '蒙古薩滿聖地', description: '長生天、敖包與祖靈', religion_type: 'mongol_shaman', icon: '🦅', color: '#2F6EA5' },
+  { id: 13, name: '東正教堂', description: '聖像、蠟燭與祈禱', religion_type: 'orthodox', icon: '☦️', color: '#8E6B1F' },
 ];
 
 export const DEMO_SUMMARY = {

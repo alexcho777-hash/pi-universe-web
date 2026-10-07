@@ -30,7 +30,7 @@ import meritBoxImg from '../assets/ritual/meritbox.jpg';
 const PRESET_AMOUNTS = [1, 3.14, 10];
 
 /** 功德箱照片只用在適合的聖地（香火、燭光、供桌的傳統場景）；其他宗教不放，以示尊重 */
-const MERIT_BOX_FAITHS = ['buddhist', 'taiwan_folk', 'thai_four_face', 'vietnamese_folk'];
+const MERIT_BOX_FAITHS = ['buddhist', 'taiwan_folk', 'thai_four_face', 'vietnamese_folk', 'theravada', 'tibetan_buddhist'];
 
 /** 正在隨喜時，功德箱的燭光與金光輕輕呼吸 */
 const boxGlow = keyframes`

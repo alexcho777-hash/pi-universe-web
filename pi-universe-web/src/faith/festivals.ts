@@ -245,7 +245,37 @@ const hindu: Maker = (year) =>
     return { date: d(y, m, day), name: [zh, en], note: ['日期依各地曆法可能略有不同', 'Dates can vary slightly by region'] } as Festival;
   });
 
-const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu };
+/** Orthodox Easter (Julian computus, +13 days for 1900–2099) and fixed feasts, given in the civil (Gregorian) calendar. */
+function orthodoxEaster(year: number): Date {
+  const a = year % 4, b = year % 7, c = year % 19;
+  const dd = (19 * c + 15) % 30;
+  const e = (2 * a + 4 * b - dd + 34) % 7;
+  const month = Math.floor((dd + e + 114) / 31);
+  const day = ((dd + e + 114) % 31) + 1;
+  return addDays(d(year, month, day), 13);
+}
+
+const orthodox: Maker = (year) => {
+  const easter = orthodoxEaster(year);
+  return [
+    { date: d(year, 1, 7), name: ['聖誕節（東正教）', 'Nativity of Christ (Orthodox)'] },
+    { date: d(year, 1, 19), name: ['主受洗節（主顯節）', 'Theophany'] },
+    { date: addDays(easter, -7), name: ['棕枝主日', 'Palm Sunday'] },
+    { date: d(year, 4, 7), name: ['聖母領報節', 'Annunciation'] },
+    { date: easter, name: ['復活節（東正教）', 'Pascha (Orthodox Easter)'], note: ['依儒略曆推算', 'Calculated by the Julian calendar'] },
+    { date: addDays(easter, 39), name: ['主升天節', 'Ascension'] },
+    { date: addDays(easter, 49), name: ['聖靈降臨節', 'Pentecost'] },
+    { date: d(year, 8, 19), name: ['主顯聖容節', 'Transfiguration'] },
+    { date: d(year, 8, 28), name: ['聖母安息節', 'Dormition of the Theotokos'] },
+    { date: d(year, 9, 21), name: ['聖母誕辰', 'Nativity of the Theotokos'] },
+    { date: d(year, 9, 27), name: ['聖十字架高舉節', 'Exaltation of the Cross'] },
+    { date: d(year, 10, 14), name: ['聖母帡幪節', 'Protection of the Theotokos'] },
+    { date: d(year, 12, 4), name: ['聖母進殿節', 'Entry of the Theotokos'] },
+    { date: d(year, 12, 19), name: ['聖尼古拉節', 'Feast of St Nicholas'] },
+  ] as Festival[];
+};
+
+const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox };
 
 /** Festivals from `from` (inclusive) for the next `days` days, sorted by date */
 export function upcomingFestivals(religionType: string, from = new Date(), days = 365): Festival[] {
