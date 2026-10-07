@@ -253,5 +253,6 @@ import { SCRIPTS as TH } from './info/thai';
 import { SCRIPTS as VN } from './info/vietnamese';
 import { SCRIPTS as OR } from './info/orthodox';
 import { SCRIPTS as TB } from './info/tibetan';
+import { SCRIPTS as TV } from './info/theravada';
 
-export const SCRIPTURES: Record<string, Scripture> = { ...BUDDHIST_SCRIPTURES, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR, ...TB };
+export const SCRIPTURES: Record<string, Scripture> = { ...BUDDHIST_SCRIPTURES, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR, ...TB, ...TV };

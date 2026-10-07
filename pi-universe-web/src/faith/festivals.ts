@@ -285,7 +285,16 @@ const tibetan: Maker = fromLunar([
   [10, 25, '甘丹燃燈節', 'Ganden Ngamchoe', '紀念宗喀巴大師圓寂', 'Lamp festival for Tsongkhapa'],
 ]);
 
-const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox, tibetan_buddhist: tibetan };
+/** 南傳佛教：滿月節日（衛塞節等）依各國月曆而定，這裡先放固定日期的新年潑水節。 */
+const theravada: Maker = (year) => [
+  {
+    date: d(year, 4, 13),
+    name: ['新年潑水節', 'New-year water festival'],
+    note: ['泰國宋干節、緬甸 Thingyan、柬埔寨與寮國新年，約 4 月 13–16 日', 'Songkran, Thingyan, Khmer and Lao new year, about 13–16 April'],
+  },
+];
+
+const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox, tibetan_buddhist: tibetan, theravada };
 
 /** Festivals from `from` (inclusive) for the next `days` days, sorted by date */
 export function upcomingFestivals(religionType: string, from = new Date(), days = 365): Festival[] {
