@@ -251,5 +251,6 @@ import { SCRIPTS as HD } from './info/hindu';
 import { SCRIPTS as SH } from './info/shinto';
 import { SCRIPTS as TH } from './info/thai';
 import { SCRIPTS as VN } from './info/vietnamese';
+import { SCRIPTS as OR } from './info/orthodox';
 
-export const SCRIPTURES: Record<string, Scripture> = { ...BUDDHIST_SCRIPTURES, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN };
+export const SCRIPTURES: Record<string, Scripture> = { ...BUDDHIST_SCRIPTURES, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR };
