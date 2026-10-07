@@ -61,6 +61,7 @@ import {
   StationsPanel,
   ThaiOfferingPanel,
   ThaiVisitPanel,
+  ShamanRitualPanel,
   TsukinamiPanel,
 } from './MoreActivities';
 
@@ -128,6 +129,11 @@ const ACTIVITIES: Record<string, Activity[]> = {
   ],
   mongol_shaman: [
     { key: 'pantheonShaman', icon: '🌌', title: ['天地與祖靈', 'Sky, earth & ancestors'], minutes: ['7 位', '7 figures'] },
+    { key: 'ritualSky', icon: '☁️', title: ['祭天（灑奶向天）', 'Sky offering'], minutes: ['約 3 分鐘', 'About 3 min'] },
+    { key: 'ritualOvoo', icon: '⛰️', title: ['祭敖包', 'Ovoo worship'], minutes: ['約 3 分鐘', 'About 3 min'] },
+    { key: 'ritualFire', icon: '🔥', title: ['祭火與火的禁忌', 'Fire offering & taboos'], minutes: ['約 2 分鐘', 'About 2 min'] },
+    { key: 'ritualKhadag', icon: '💙', title: ['獻哈達', 'Presenting a khadag'], minutes: ['約 1 分鐘', 'About 1 min'] },
+    { key: 'ritualGer', icon: '🏕️', title: ['做客蒙古包禮節', 'Visiting a ger'], minutes: ['約 2 分鐘', 'About 2 min'] },
     { key: 'candle', icon: '🕯️', title: ['點燈祈福', 'Light a lamp'], minutes: ['亮到今晚 12 點', 'Burns until midnight'] },
   ],
   orthodox: [
@@ -264,6 +270,16 @@ export function FaithActivities({
         return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={SHAMAN_SET} />;
       case 'pantheonOrthodox':
         return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={ORTHODOX_SET} />;
+      case 'ritualSky':
+        return <ShamanRitualPanel ritual="sky" tr={tr} lang={lang} />;
+      case 'ritualOvoo':
+        return <ShamanRitualPanel ritual="ovoo" tr={tr} lang={lang} />;
+      case 'ritualFire':
+        return <ShamanRitualPanel ritual="fire" tr={tr} lang={lang} />;
+      case 'ritualKhadag':
+        return <ShamanRitualPanel ritual="khadag" tr={tr} lang={lang} />;
+      case 'ritualGer':
+        return <ShamanRitualPanel ritual="ger" tr={tr} lang={lang} />;
       case 'pantheonShinto':
         return <PantheonPanel sanctuaryId={sanctuaryId} tr={tr} lang={lang} set={SHINTO_SET} />;
       case 'chant':

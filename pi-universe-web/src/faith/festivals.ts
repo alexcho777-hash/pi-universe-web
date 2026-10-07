@@ -294,7 +294,18 @@ const theravada: Maker = (year) => [
   },
 ];
 
-const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox, tibetan_buddhist: tibetan, theravada };
+/** 蒙古：白月節（新年）與祭火日以農曆推算，可能與蒙古曆差一天；那達慕為固定日期。 */
+const mongolShaman: Maker = (year) => {
+  const out: Festival[] = [];
+  const sar = lunar(year, 1, 1);
+  if (sar) out.push({ date: sar, name: ['白月節（查干薩日，新年）', 'Tsagaan Sar (Mongol New Year)'], note: ['以農曆推算，可能與蒙古曆差一天', 'Calculated by the Chinese lunar calendar; may differ by a day'] });
+  const fire = lunar(year - 1, 12, 23);
+  if (fire) out.push({ date: fire, name: ['祭火日', 'Fire offering day'], note: ['臘月二十三日前後，各地習俗不同', 'Around the 23rd of the last lunar month; customs vary'] });
+  out.push({ date: d(year, 7, 11), name: ['那達慕大會', 'Naadam festival'], note: ['7 月 11–13 日，摔角、賽馬與射箭', '11–13 July: wrestling, horse racing and archery'] });
+  return out;
+};
+
+const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox, tibetan_buddhist: tibetan, theravada, mongol_shaman: mongolShaman };
 
 /** Festivals from `from` (inclusive) for the next `days` days, sorted by date */
 export function upcomingFestivals(religionType: string, from = new Date(), days = 365): Festival[] {

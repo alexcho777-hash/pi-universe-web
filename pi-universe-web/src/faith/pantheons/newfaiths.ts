@@ -274,6 +274,17 @@ export const SHAMAN_SET: PantheonSet = {
       look: { body: 'standing', head: 'plain', held: 'none', robe: '#8a8374', trim: GOLD },
     },
     {
+      key: 'sh_khaldun', icon: '🏔️', group: 'nature',
+      title: ['布爾罕合勒敦山', 'Burkhan Khaldun, the sacred mountain'],
+      short: ['成吉思汗感念的神山', 'The mountain that sheltered Chinggis Khan'],
+      intro: [
+        '布爾罕合勒敦山位於蒙古東北部，被視為蒙古人最神聖的山之一。《蒙古秘史》記載成吉思汗年輕時曾躲入此山脫險，並以灑奶酒、跪拜的方式向山致謝。' + DRAFT[0],
+        'Burkhan Khaldun lies in north-eastern Mongolia and is among the most sacred mountains of the Mongols. The Secret History says that after Chinggis Khan escaped danger on the mountain he thanked it with libations and kneeling.' + DRAFT[1],
+      ],
+      wishCategory: 'health',
+      look: { body: 'standing', head: 'plain', held: 'none', robe: '#5a6a7a', trim: GOLD },
+    },
+    {
       key: 'sh_fire', icon: '🔥', group: 'nature',
       title: ['火神（嘎拉汗）', 'Gal Khan, Lord of Fire'],
       short: ['家的核心・不可冒犯的火', 'The hearth fire, treated with respect'],
