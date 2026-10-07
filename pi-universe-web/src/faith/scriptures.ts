@@ -246,6 +246,7 @@ const BUDDHIST_SCRIPTURES: Record<string, Scripture> = {
 };
 
 import { SCRIPTS as TW } from './info/taiwan';
+import { SCRIPTS as YG } from './info/yiguandao';
 import { SCRIPTS as CT } from './info/catholic';
 import { SCRIPTS as HD } from './info/hindu';
 import { SCRIPTS as SH } from './info/shinto';
@@ -255,4 +256,4 @@ import { SCRIPTS as OR } from './info/orthodox';
 import { SCRIPTS as TB } from './info/tibetan';
 import { SCRIPTS as TV } from './info/theravada';
 
-export const SCRIPTURES: Record<string, Scripture> = { ...BUDDHIST_SCRIPTURES, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR, ...TB, ...TV };
+export const SCRIPTURES: Record<string, Scripture> = { ...BUDDHIST_SCRIPTURES, ...TW, ...YG, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR, ...TB, ...TV };
