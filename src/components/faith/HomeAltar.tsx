@@ -77,7 +77,7 @@ export function IncensePanel({ tr }: { tr: TR }) {
           <Typography sx={{ mt: 1, color: 'text.secondary', mb: 2 }}>
             {tr('點三炷香，向神明稟報心願', 'Light three sticks of incense and speak your wish')}
           </Typography>
-          <Button variant="contained" onClick={() => (setLit(true), save(key, true))} sx={{ backgroundColor: '#8B4513' }}>
+          <Button variant="contained" onClick={() => (setLit(true), save(key, true))} sx={{ backgroundColor: '#B8912F' }}>
             {tr('上香', 'Light incense')}
           </Button>
         </>
@@ -320,7 +320,7 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         <Button
           variant={kind === 'god' ? 'contained' : 'outlined'}
           onClick={() => (setKind('god'), setPicked(0))}
-          sx={{ textTransform: 'none', py: 1, lineHeight: 1.3, ...(kind === 'god' ? { backgroundColor: '#8B4513' } : {}) }}
+          sx={{ textTransform: 'none', py: 1, lineHeight: 1.3, ...(kind === 'god' ? { backgroundColor: '#B8912F' } : {}) }}
         >
           {tr('金爐', 'Gold furnace')}
           <br />
@@ -354,7 +354,7 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
               p: 1.2,
               borderTop: i ? '1px solid #eee' : 'none',
               cursor: 'pointer',
-              bgcolor: picked === i ? '#FBF6EC' : undefined,
+              bgcolor: picked === i ? 'rgba(212,175,55,.10)' : undefined,
             }}
           >
             <Chip
@@ -365,7 +365,7 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
               sx={{ fontWeight: 700 }}
             />
             <Typography sx={{ fontSize: '0.95rem', color: 'text.secondary', flex: 1 }}>{pick(p.use, lang)}</Typography>
-            {picked === i && <Typography sx={{ color: '#5B2A93', fontWeight: 700 }}>✓</Typography>}
+            {picked === i && <Typography sx={{ color: '#D4AF37', fontWeight: 700 }}>✓</Typography>}
           </Box>
         ))}
       </Paper>
@@ -376,7 +376,7 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
             ? tr(`今天已焚化：${burnedLog.join('、')}`, `Burned today: ${burnedLog.join(', ')}`)
             : tr('今天還沒有焚化金紙', 'No joss paper burned yet today')}
         </Typography>
-        <Button variant="contained" onClick={burn} disabled={burning} sx={{ backgroundColor: '#8B4513' }}>
+        <Button variant="contained" onClick={burn} disabled={burning} sx={{ backgroundColor: '#B8912F' }}>
           {burning
             ? tr('焚化中…', 'Burning…')
             : tr(`焚燒「${pick(list[picked].name, lang)}」`, `Burn "${pick(list[picked].name, lang)}"`)}
@@ -388,9 +388,9 @@ export function JossPaperPanel({ tr, lang }: { tr: TR; lang: Lang }) {
 
 function CountdownCard({ title, days, lunarText, tr }: { title: string; days: number; lunarText: [string, string]; tr: TR }) {
   return (
-    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: days === 0 ? '#FFF6DD' : undefined }}>
+    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: days === 0 ? 'rgba(212,175,55,.14)' : undefined }}>
       <Typography sx={{ fontWeight: 700, mb: 0.5 }}>{title}</Typography>
-      <Typography sx={{ fontSize: '2rem', fontWeight: 800, color: days === 0 ? '#C62828' : '#5B2A93' }}>
+      <Typography sx={{ fontSize: '2rem', fontWeight: 800, color: days === 0 ? '#C62828' : '#D4AF37' }}>
         {days === 0 ? tr('就是今天', 'Today') : tr(`還有 ${days} 天`, `${days} day(s) left`)}
       </Typography>
       <Typography sx={{ color: 'text.secondary' }}>{tr(lunarText[0], lunarText[1])}</Typography>
@@ -441,7 +441,7 @@ export function FortuneVaultPanel({ tr }: { tr: TR }) {
       {done ? (
         <Alert severity="success">{tr('今天已完成補財庫 🙏', "You've completed today's ritual 🙏")}</Alert>
       ) : (
-        <Button variant="contained" onClick={() => (setDone(true), save(key, true))} sx={{ backgroundColor: '#8B4513' }}>
+        <Button variant="contained" onClick={() => (setDone(true), save(key, true))} sx={{ backgroundColor: '#B8912F' }}>
           {tr('完成補財庫祝禱', "I've prayed")}
         </Button>
       )}
@@ -524,14 +524,14 @@ export function MemorialPanel({ tr }: { tr: TR }) {
         <Typography sx={{ color: 'text.secondary' }}>{tr('載入中…', 'Loading…')}</Typography>
       ) : (
         withCountdown.map((m) => (
-          <Paper key={m.id} sx={{ p: 1.5, mb: 1, display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: m.days === 0 ? '#FFF6DD' : undefined }}>
+          <Paper key={m.id} sx={{ p: 1.5, mb: 1, display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: m.days === 0 ? 'rgba(212,175,55,.14)' : undefined }}>
             <Box sx={{ flex: 1 }}>
               <Typography sx={{ fontWeight: 700 }}>{m.name}</Typography>
               <Typography sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>
                 {m.calendar_type === 'lunar' ? tr('農曆', 'Lunar')  : tr('國曆', 'Solar')} {m.month}/{m.day}
               </Typography>
             </Box>
-            <Typography sx={{ fontWeight: 800, color: m.days === 0 ? '#C62828' : '#5B2A93' }}>
+            <Typography sx={{ fontWeight: 800, color: m.days === 0 ? '#C62828' : '#D4AF37' }}>
               {m.days === 0 ? tr('今天', 'Today') : tr(`${m.days} 天後`, `in ${m.days}d`)}
             </Typography>
             <IconButton size="small" onClick={() => remove(m.id)} aria-label={tr('刪除', 'Delete')}>
