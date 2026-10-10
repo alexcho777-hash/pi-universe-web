@@ -202,7 +202,7 @@ export default function HomePage() {
               textShadow: '0 2px 16px rgba(0,0,0,.65)',
             }}
           >
-            {tr('六聖地·一大道', 'Six Sanctuaries, One Avenue')}
+            {tr('十三聖地·一道場', 'Thirteen Sanctuaries, One Sacred Way')}
           </Typography>
           <Typography
             sx={{
