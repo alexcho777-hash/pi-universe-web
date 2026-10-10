@@ -37,7 +37,7 @@ export default function LoginPage() {
   };
 
   const busy = isLoading || redirecting;
-  const buttonSx = { backgroundColor: BRAND_PURPLE, padding: '12px 24px', fontSize: '1.1rem', '&:hover': { backgroundColor: '#4A1F7C' } };
+  const buttonSx = { backgroundColor: BRAND_PURPLE, color: '#1a1206', fontWeight: 800, padding: '12px 24px', fontSize: '1.1rem', '&:hover': { backgroundColor: '#E6C25A' } };
 
   return (
     <Container maxWidth="sm">
@@ -94,7 +94,7 @@ export default function LoginPage() {
                     tr('用 Pi 帳號登入', 'Sign in with Pi')
                   )}
                 </Button>
-                <Alert severity="info" sx={{ fontSize: '1rem' }}>
+                <Alert severity="info" icon={false} sx={{ fontSize: '1rem', bgcolor: 'rgba(212,175,55,.10)', color: '#F3E3B0', border: '1px solid rgba(212,175,55,.35)' }}>
                   {tr(
                     '一般瀏覽器可以登入、參拜、求籤與靜坐；捐獻 Pi 請用 Pi Browser 開啟本網站。',
                     'In a regular browser you can sign in, visit sanctuaries, draw oracle lots and meditate. To donate Pi, open this site in the Pi Browser.'
@@ -107,7 +107,7 @@ export default function LoginPage() {
               {tr('📅 查看今日農民曆・擇日（免登入）', "📅 Today's almanac & auspicious days (no sign-in)")}
             </Button>
 
-            <Typography variant="caption" color="textSecondary" sx={{ textAlign: 'center', mt: 1 }}>
+            <Typography variant="caption" color="textSecondary" sx={{ textAlign: 'center', mt: 1, '& a': { color: '#F4C152' } }}>
               <a href={`/privacy-policy.html?lang=${lang}`}>{tr('隱私權政策', 'Privacy Policy')}</a>
               {' · '}
               <a href={`/terms.html?lang=${lang}`}>{tr('服務條款', 'Terms of Service')}</a>
