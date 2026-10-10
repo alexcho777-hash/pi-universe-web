@@ -446,7 +446,6 @@ function startAmbientInner(kind: AmbientKind): AmbientHandle | null {
       every(7, 12, () => bell([1568, 1760][Math.floor(Math.random() * 2)], 0.02, 1.8, [1, 2.4], [1, 0.3]), 2);
       every(16, 26, () => drips(0.03), 2);
       break;
-    case 'mandir':
       // 印度教神廟：坦布拉持續音＋笛聲冥想＋鐘
       tanpura(0.06);
       drone([65.4, 98], 0.03);

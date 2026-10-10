@@ -9,12 +9,13 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { sceneFor } from './sceneConfig';
 import { Camera, Particle, renderScene, spawnParticle, stepParticles } from './renderScene';
-import { AmbientHandle, startAmbient } from './ambient';
+import { AmbientHandle, startAmbient, stopAllAmbient } from './ambient';
 
 export function SanctuaryScene({
   religionType,
   children,
   altar,
+  backdropUrl,
   soundOnLabel,
   soundOffLabel,
   overlay,
@@ -26,6 +27,8 @@ export function SanctuaryScene({
   children?: ReactNode;
   /** A statue shown at the far end of the hall (only some sanctuaries have one) */
   altar?: ReactNode;
+  /** 近景磅礴圖：正面走向該宗教建築大門的圖，半透明疊在大殿上 */
+  backdropUrl?: string;
   soundOnLabel: string;
   soundOffLabel: string;
   /** Drawn over the hall, under the welcome text (the welcome ceremony) */
@@ -152,9 +155,33 @@ export function SanctuaryScene({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [religionType]);
 
+  // 迎賓儀式結束的瞬間，自動輕聲接上該聖地的背景氛圍音。
+  // 只在儀式真的有播完時觸發；不寫入使用者的偏好設定（下次照舊要自己開）。
+  // 若瀏覽器還沒收到任何點擊而擋下自動播放，第一下觸控會立即把聲音叫醒。
+  const hadOverlay = useRef(false);
+  useEffect(() => {
+    if (overlay) {
+      hadOverlay.current = true;
+      return;
+    }
+    if (!hadOverlay.current) return;
+    hadOverlay.current = false;
+    if (ambient.current) return;
+    const h = startAmbient(sceneFor(religionType).ambient);
+    if (h) {
+      ambient.current = h;
+      setSoundOn(true);
+      window.addEventListener('pointerdown', () => h.resume(), { once: true });
+      const onReading = (e: Event) => h.duck(!!(e as CustomEvent).detail);
+      window.addEventListener('pu-reading', onReading);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [overlay]);
+
   const toggleSound = () => {
     if (soundOn) {
       ambient.current?.stop();
+      stopAllAmbient();
       ambient.current = null;
       setSoundOn(false);
       setPref(false);
@@ -187,6 +214,24 @@ export function SanctuaryScene({
         touchAction: 'pan-y',
       }}
     >
+      {/* 近景磅礴圖：疊在大殿繪圖之上，加強「走向建築」的臨場感 */}
+      {backdropUrl && (
+        <Box
+          aria-hidden="true"
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${backdropUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: { xs: 0.5, sm: 0.58 },
+            mixBlendMode: 'screen',
+            transformOrigin: 'center',
+            animation: 'pu-scene-zoom 30s ease-in-out infinite alternate',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: 'block' }} aria-hidden="true" />
       {altar && (
         <Box sx={{ position: 'absolute', left: 0, right: 0, top: { xs: 14, sm: 18 }, display: 'flex', justifyContent: 'center' }}>{altar}</Box>

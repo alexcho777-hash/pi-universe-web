@@ -19,6 +19,8 @@ import {
   keyframes,
 } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import furnaceGodUrl from '../../assets/ritual/furnace_god.jpg';
+import furnaceDeadUrl from '../../assets/ritual/furnace_dead.jpg';
 import { apiClient } from '../../api/ApiClient';
 import { Lang, tx } from '../../i18n/i18n';
 import { JOSS_PAPER, daysBetween, nextAnniversary, nextLunarDay } from '../../faith/homeAltar';
@@ -163,9 +165,10 @@ const glowPulse = keyframes`
  */
 function Furnace({ burning, kind = 'god' }: { burning: boolean; kind?: 'god' | 'dead' }) {
   const dead = kind === 'dead';
-  const uid = useId().replace(/:/g, '');
   const k = 1.45; // display scale
-  const arch = 'M58 196 V160 Q58 143 85 143 Q112 143 112 160 V196 Z';
+  const imgW = 170 * k;
+  const imgH = 226 * k;
+  const imgSrc = dead ? furnaceDeadUrl : furnaceGodUrl;
   return (
     <Box sx={{ position: 'relative', width: 170 * k, mx: 'auto', pt: `${70 * k}px` }}>
       {burning &&
@@ -175,32 +178,33 @@ function Furnace({ burning, kind = 'god' }: { burning: boolean; kind?: 'god' | '
             sx={{
               position: 'absolute',
               left: '50%',
-              top: `${76 * k}px`,
+              top: `${22 * k}px`,
               ml: `${(-(11 + (i % 4) * 3) + ((i % 3) - 1) * 3) * k}px`,
               width: (22 + (i % 4) * 6) * k,
               height: (22 + (i % 4) * 6) * k,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(215,215,220,.92) 0%, rgba(175,175,180,.42) 55%, rgba(175,175,180,0) 75%)',
+              background: 'radial-gradient(circle, rgba(255,225,190,.95) 0%, rgba(180,160,150,.45) 55%, rgba(180,160,150,0) 75%)',
               animation: `${smokeRise} ${2.2 + (i % 4) * 0.3}s ease-out ${i * 0.28}s infinite`,
               '--dx': `${(i % 2 === 0 ? 1 : -1) * (6 + (i % 4) * 4) * k}px`,
-              '--dy': `${-92 * k}px`,
+              '--dy': `${-110 * k}px`,
               zIndex: 2,
+              mixBlendMode: 'screen',
             }}
           />
         ))}
       <Box
-        component="svg"
-        viewBox="0 0 170 226"
-        width={170 * k}
-        height={226 * k}
+        component="img"
+        src={imgSrc}
+        alt={dead ? '銀紙爐' : '金爐'}
         sx={{
           display: 'block',
-          '& .fl': { transformBox: 'fill-box', transformOrigin: '50% 100%', animation: `${flicker} 0.46s ease-in-out infinite` },
-          '& .fl2': { animationDuration: '0.38s', animationDelay: '0.1s' },
-          '& .fl3': { animationDuration: '0.3s', animationDelay: '0.2s' },
-          '& .gl': { animation: `${glowPulse} 0.9s ease-in-out infinite` },
+          width: imgW,
+          height: imgH,
+          objectFit: 'contain',
+          filter: burning ? `drop-shadow(0 0 ${24 * k}px rgba(255,170,80,.55))` : 'drop-shadow(0 4px 12px rgba(0,0,0,.6))',
+          transition: 'filter .4s ease',
         }}
-      >
+      />
         <defs>
           <linearGradient id={`wall${uid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={dead ? '#6b7683' : '#b8372b'} />
@@ -289,9 +293,6 @@ function Furnace({ burning, kind = 'god' }: { burning: boolean; kind?: 'god' | '
         <rect x="76" y="48" width="18" height="4" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.6" />
         <rect x="76" y="64" width="18" height="4" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.6" />
         <path d="M72 35 L98 35 L94 27 L76 27Z" fill={`url(#roof${uid})`} stroke="#6b4a10" strokeWidth="1" />
-        <ellipse cx="85" cy="27" rx="9" ry="2" fill="#1a0c06" />
-        <circle cx="85" cy="24" r="2" fill="#f3d27a" />
-      </Box>
     </Box>
   );
 }

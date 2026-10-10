@@ -43,31 +43,11 @@ export function SanctuaryScene({
   const target = useRef({ x: 0, y: 0 });
   const [soundOn, setSoundOn] = useState(false);
   const ambient = useRef<AmbientHandle | null>(null);
-  // 使用者按過喇叭關掉後，迎賓結束時不可再自動開聲音
-  const mutedByUser = useRef(false);
-  // 真實大殿照片載入完成前先顯示暗色底，不露出手繪 3D 大殿（避免「閃一下卡通就跳走」）
-  const [bdReady, setBdReady] = useState(false);
-  useEffect(() => {
-    setBdReady(false);
-    if (!backdropUrl) return;
-    let alive = true;
-    const im = new Image();
-    const done = () => alive && setBdReady(true);
-    im.onload = done;
-    im.onerror = done;
-    im.src = backdropUrl;
-    const t = window.setTimeout(done, 6000);
-    return () => {
-      alive = false;
-      window.clearTimeout(t);
-    };
-  }, [backdropUrl]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
     if (!canvas || !wrap) return;
-    if (backdropUrl) return; // 有真實大殿照片就不畫手繪 3D 大殿
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const cfg = sceneFor(religionType);
@@ -137,7 +117,7 @@ export function SanctuaryScene({
       document.removeEventListener('visibilitychange', kick);
       window.removeEventListener('deviceorientation', onTilt);
     };
-  }, [religionType, backdropUrl]);
+  }, [religionType]);
 
   // The speaker choice is remembered: once turned on, every sanctuary starts its sound by itself
   const PREF = 'pu-sound';
@@ -186,12 +166,7 @@ export function SanctuaryScene({
     }
     if (!hadOverlay.current) return;
     hadOverlay.current = false;
-    if (ambient.current || mutedByUser.current) return;
-    try {
-      if (localStorage.getItem('pu-sound') === '0') return;
-    } catch {
-      /* ignore */
-    }
+    if (ambient.current) return;
     const h = startAmbient(sceneFor(religionType).ambient);
     if (h) {
       ambient.current = h;
@@ -203,25 +178,14 @@ export function SanctuaryScene({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overlay]);
 
-  // 離開道場（或換道場）時，不論聲音是怎麼開的，一律關掉
-  useEffect(
-    () => () => {
-      ambient.current?.stop();
-      ambient.current = null;
-    },
-    [religionType]
-  );
-
   const toggleSound = () => {
     if (soundOn) {
-      mutedByUser.current = true;
       ambient.current?.stop();
       stopAllAmbient();
       ambient.current = null;
       setSoundOn(false);
       setPref(false);
     } else {
-      mutedByUser.current = false;
       ambient.current = startAmbient(sceneFor(religionType).ambient);
       setSoundOn(!!ambient.current);
       setPref(!!ambient.current);
@@ -241,7 +205,7 @@ export function SanctuaryScene({
       onPointerLeave={() => (target.current = { x: 0, y: 0 })}
       sx={{
         position: 'relative',
-        height: backdropUrl ? { xs: 470, sm: 500 } : altar ? { xs: 530, sm: 560 } : { xs: 360, sm: 420 },
+        height: altar ? { xs: 530, sm: 560 } : { xs: 360, sm: 420 },
         borderRadius: 2,
         overflow: 'hidden',
         mb: 2,
@@ -250,8 +214,7 @@ export function SanctuaryScene({
         touchAction: 'pan-y',
       }}
     >
-      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: backdropUrl ? 'none' : 'block' }} aria-hidden="true" />
-      {/* 該宗教真實的大殿內景：畫在 3D 大殿之上，緩慢推進，讓人感覺站在殿內 */}
+      {/* 近景磅礴圖：疊在大殿繪圖之上，加強「走向建築」的臨場感 */}
       {backdropUrl && (
         <Box
           aria-hidden="true"
@@ -260,15 +223,16 @@ export function SanctuaryScene({
             inset: 0,
             backgroundImage: `url(${backdropUrl})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center 40%',
-            transformOrigin: 'center 55%',
+            backgroundPosition: 'center',
+            opacity: { xs: 0.5, sm: 0.58 },
+            mixBlendMode: 'screen',
+            transformOrigin: 'center',
             animation: 'pu-scene-zoom 30s ease-in-out infinite alternate',
-            opacity: bdReady ? 1 : 0,
-            transition: 'opacity .8s ease',
             pointerEvents: 'none',
           }}
         />
       )}
+      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, display: 'block' }} aria-hidden="true" />
       {altar && (
         <Box sx={{ position: 'absolute', left: 0, right: 0, top: { xs: 14, sm: 18 }, display: 'flex', justifyContent: 'center' }}>{altar}</Box>
       )}

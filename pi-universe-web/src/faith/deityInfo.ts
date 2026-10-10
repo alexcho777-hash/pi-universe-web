@@ -167,15 +167,10 @@ const BUDDHIST_INFO: Record<string, DeityInfo> = {
 };
 
 import { INFO as TW } from './info/taiwan';
-import { INFO as YG } from './info/yiguandao';
 import { INFO as CT } from './info/catholic';
 import { INFO as HD } from './info/hindu';
 import { INFO as SH } from './info/shinto';
 import { INFO as TH } from './info/thai';
 import { INFO as VN } from './info/vietnamese';
-import { INFO as OR } from './info/orthodox';
-import { INFO as TB } from './info/tibetan';
-import { INFO as TV } from './info/theravada';
-import { INFO as SM } from './info/shaman';
 
-export const DEITY_INFO: Record<string, DeityInfo> = { ...BUDDHIST_INFO, ...TW, ...YG, ...CT, ...HD, ...SH, ...TH, ...VN, ...OR, ...TB, ...TV, ...SM };
+export const DEITY_INFO: Record<string, DeityInfo> = { ...BUDDHIST_INFO, ...TW, ...CT, ...HD, ...SH, ...TH, ...VN };
