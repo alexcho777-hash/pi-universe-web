@@ -3,7 +3,7 @@
  * turns the sanctuary's background sound down meanwhile. No audio files are used.
  */
 import { useEffect, useRef, useState } from 'react';
-import { Button, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 
 function pickVoice(tag: string): SpeechSynthesisVoice | null {
   try {
@@ -15,23 +15,7 @@ function pickVoice(tag: string): SpeechSynthesisVoice | null {
   }
 }
 
-/** true when this device has a speech voice for the language (voices can load a moment late) */
-export function useVoiceAvailable(tag: string): boolean {
-  const [ok, setOk] = useState<boolean>(() => !!pickVoice(tag));
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    const update = () => setOk(!!pickVoice(tag));
-    update();
-    window.speechSynthesis.addEventListener?.('voiceschanged', update);
-    return () => window.speechSynthesis.removeEventListener?.('voiceschanged', update);
-  }, [tag]);
-  return ok;
-}
-
-export const NO_VOICE_NOTE: [string, string] = ['這個裝置沒有此語言的語音，目前無法朗讀（尚無錄音檔）。', 'This device has no voice for this language, so it cannot be read aloud (no recordings yet).'];
-
-export function ListenButton({ lines, voice, label, stopLabel, slow = true, sx, noVoiceText }: { lines: string[]; voice: string; label: string; stopLabel: string; slow?: boolean; sx?: object; noVoiceText?: string }) {
-  const hasVoiceForLang = useVoiceAvailable(voice);
+export function ListenButton({ lines, voice, label, stopLabel, slow = true, sx }: { lines: string[]; voice: string; label: string; stopLabel: string; slow?: boolean; sx?: object }) {
   const [playing, setPlaying] = useState(false);
   const run = useRef(0);
   const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -55,9 +39,6 @@ export function ListenButton({ lines, voice, label, stopLabel, slow = true, sx, 
   }, [playing]);
 
   if (!supported) return null;
-  if (!hasVoiceForLang) {
-    return noVoiceText ? <Typography sx={{ fontSize: '0.85rem', fontStyle: 'italic', color: 'text.secondary', mt: 1 }}>{noVoiceText}</Typography> : null;
-  }
 
   const start = () => {
     const my = ++run.current;
