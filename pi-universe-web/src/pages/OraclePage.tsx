@@ -28,6 +28,8 @@ import {
   Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import { LIUSHI_JIAZI, Lot } from '../oracle/liushiJiazi';
@@ -344,14 +346,56 @@ export default function OraclePage() {
     }, 1000);
   };
 
+  const [speaking, setSpeaking] = useState(false);
+  const [ttsNote, setTtsNote] = useState('');
+
+  // Read the petition aloud. Phones often load their voice list late and some in-app browsers have no
+  // Chinese voice at all, so pick a matching voice explicitly and tell the user when nothing can be heard.
   const readAloud = () => {
     const synth = window.speechSynthesis;
-    if (!synth) return;
+    if (!synth) {
+      setTtsNote(tr('這支手機的瀏覽器不支援唸出聲音，請自己在心中默唸就可以了。', "This phone's browser can't read aloud. Please just pray silently in your heart."));
+      return;
+    }
+    if (speaking) {
+      synth.cancel();
+      setSpeaking(false);
+      return;
+    }
+    setTtsNote('');
     synth.cancel();
-    const u = new SpeechSynthesisUtterance(petition);
-    u.lang = lang === 'zh' ? 'zh-TW' : 'en-US';
-    u.rate = lang === 'zh' ? 0.85 : 0.95;
-    synth.speak(u);
+    const want = lang === 'zh' ? 'zh' : 'en';
+    const speak = () => {
+      const u = new SpeechSynthesisUtterance(petition);
+      u.lang = lang === 'zh' ? 'zh-TW' : 'en-US';
+      u.rate = lang === 'zh' ? 0.85 : 0.95;
+      u.volume = 1;
+      const v = synth.getVoices().filter((x) => x.lang.toLowerCase().startsWith(want));
+      const best = v.find((x) => /tw|hant|hk/i.test(x.lang)) || v[0];
+      if (best) u.voice = best;
+      u.onstart = () => setSpeaking(true);
+      u.onend = () => setSpeaking(false);
+      u.onerror = () => {
+        setSpeaking(false);
+        setTtsNote(tr('這支手機或瀏覽器沒有辦法唸出聲音，請自己在心中默唸就可以了。', "This phone or browser can't read aloud. Please just pray silently in your heart."));
+      };
+      synth.speak(u);
+      // No sound started within 2.5 s: the engine is probably missing, so say so instead of staying silent.
+      window.setTimeout(() => {
+        if (!synth.speaking && !synth.pending) setTtsNote(tr('這支手機或瀏覽器沒有辦法唸出聲音，請自己在心中默唸就可以了。', "This phone or browser can't read aloud. Please just pray silently in your heart."));
+      }, 2500);
+    };
+    if (synth.getVoices().length === 0) {
+      const once = () => {
+        synth.removeEventListener('voiceschanged', once);
+        speak();
+      };
+      synth.addEventListener('voiceschanged', once);
+      window.setTimeout(() => {
+        synth.removeEventListener('voiceschanged', once);
+        speak();
+      }, 600);
+    } else speak();
   };
 
   const permitThrow = () => {
@@ -573,15 +617,25 @@ export default function OraclePage() {
               <Typography sx={{ fontFamily: '"Noto Serif TC", serif', fontSize: '1.3rem', lineHeight: 2, fontWeight: 700 }}>{petition}</Typography>
             </Box>
             <Box sx={{ textAlign: 'center' }}>
-              {'speechSynthesis' in window && (
-                <Button onClick={readAloud} sx={{ color: GOLD, fontSize: '1.05rem', mb: 1 }}>
-                  {tr('🔊 代為稟報（唸出來）', '🔊 Read it aloud for me')}
+                <Button
+                  onClick={readAloud}
+                  variant="outlined"
+                  startIcon={speaking ? <StopCircleIcon sx={{ fontSize: '2rem !important' }} /> : <VolumeUpIcon sx={{ fontSize: '2rem !important' }} />}
+                  sx={{ color: GOLD, borderColor: GOLD, borderWidth: 2, borderRadius: 8, px: 3, py: 1, fontSize: '1.1rem', fontWeight: 800, mb: 1, '&:hover': { borderColor: GOLD, borderWidth: 2, backgroundColor: 'rgba(232,193,112,.18)' } }}
+                >
+                  {speaking ? tr('停止唸誦', 'Stop') : tr('代為稟報（唸出來）', 'Read it aloud for me')}
                 </Button>
-              )}
+
+              {ttsNote && <Typography sx={{ fontSize: '0.95rem', color: '#d9b98a', mb: 1 }}>{ttsNote}</Typography>}
               <Typography sx={{ fontSize: '1.3rem', my: 1 }}>{prayLeft > 0 ? tr(`靜心默唸… ${prayLeft} 秒`, `Praying… ${prayLeft} s`) : tr('稟報完成 🙏', 'Prayer complete 🙏')}</Typography>
               <Button sx={goldButton} disabled={prayLeft > PRAY_SECONDS - 8} onClick={() => { window.speechSynthesis?.cancel(); setThrowResult(null); setStep('permit'); }}>
                 {tr('稟報完畢，請示聖母', "I'm done — ask the goddess")}
               </Button>
+              {prayLeft > PRAY_SECONDS - 8 && (
+                <Typography sx={{ fontSize: '0.9rem', color: '#d9b98a', mt: 1 }}>
+                  {tr('請先靜心默唸片刻，按鈕就會亮起來。', 'Pray quietly for a moment; the button will light up.')}
+                </Typography>
+              )}
             </Box>
           </Panel>
         )}
