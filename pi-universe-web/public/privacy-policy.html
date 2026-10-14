@@ -25,7 +25,7 @@
 </head>
 <body class="zh" data-title-ar="π Universe – سياسة الخصوصية" data-title-zh="π Universe 隱私權政策" data-title-vi="π Universe – Chính sách quyền riêng tư" data-title-th="π Universe – นโยบายความเป็นส่วนตัว" data-title-en="π Universe Privacy Policy" data-title-ja="π Universe – プライバシーポリシー" data-title-hi="π Universe – गोपनीयता नीति">
 <main>
-<div class="bar"><button type="button" data-set="zh" aria-pressed="true">中文</button><button type="button" data-set="en" aria-pressed="false">English</button><button type="button" data-set="vi" aria-pressed="false">Tiếng Việt</button><button type="button" data-set="th" aria-pressed="false">ภาษาไทย</button><button type="button" data-set="ja" aria-pressed="false">日本語</button><button type="button" data-set="hi" aria-pressed="false">हिन्दी</button><button type="button" data-set="ar" aria-pressed="false">العربية</button></div>
+<div class="bar"><button type="button" data-set="en" aria-pressed="true">English</button><button type="button" data-set="zh" aria-pressed="false">中文</button><button type="button" data-set="vi" aria-pressed="false">Tiếng Việt</button><button type="button" data-set="th" aria-pressed="false">ภาษาไทย</button><button type="button" data-set="ja" aria-pressed="false">日本語</button><button type="button" data-set="hi" aria-pressed="false">हिन्दी</button><button type="button" data-set="ar" aria-pressed="false">العربية</button></div>
 <section data-lang="zh">
 <h1>隱私權政策</h1>
 <p class="meta">π Universe · 最後更新：2026 年 9 月 25 日</p>
@@ -260,9 +260,8 @@
 <script>
 (function () {
   var q = new URLSearchParams(location.search).get('lang');
-  var nav = (navigator.language || '').toLowerCase().slice(0, 2);
   var ok = { zh: 1, en: 1, vi: 1, th: 1, ja: 1, hi: 1, ar: 1 };
-  var lang = ok[q] ? q : ok[nav] ? nav : 'en';
+  var lang = ok[q] ? q : 'en'; // English by default; other languages via ?lang= or the buttons
   function set(l) {
     document.body.className = l;
     document.documentElement.lang = l === 'zh' ? 'zh-Hant' : l;
