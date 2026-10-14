@@ -28,7 +28,20 @@ export default function AuthCallbackPage() {
       setError(result.error || tr('登入失敗', 'Sign-in failed'));
       return;
     }
-    signInWithPiToken(result.accessToken)
+    // The API may still be waking up (free hosting sleeps when idle), so the first try can fail
+    // even though the Pi token is fine. Retry a couple of times before showing an error.
+    const token = result.accessToken;
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const attempt = async (n: number): Promise<void> => {
+      try {
+        await signInWithPiToken(token);
+      } catch (e) {
+        if (n >= 2) throw e;
+        await sleep(4000);
+        return attempt(n + 1);
+      }
+    };
+    attempt(0)
       .then(() => navigate('/', { replace: true }))
       .catch((err: any) => setError(err?.message || tr('登入失敗', 'Sign-in failed')));
   }, [navigate, signInWithPiToken]);
