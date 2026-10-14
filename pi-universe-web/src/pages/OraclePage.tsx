@@ -32,7 +32,7 @@ import { apiClient } from '../api/ApiClient';
 import { useAuthStore } from '../stores/authStore';
 import { LIUSHI_JIAZI, Lot } from '../oracle/liushiJiazi';
 import { LotCylinder, MoonBlocks, SacredGlow, ThrowResult } from '../oracle/OracleArt';
-import alcoveBg from '../assets/oracle/alcove.jpg';
+import { castBlocks, dropStick, rattleLots } from '../oracle/oracleSound';
 import { useI18n, Lang, tx } from '../i18n/i18n';
 
 type Step = 'loading' | 'age' | 'ask' | 'pray' | 'permit' | 'shake' | 'verify' | 'poem' | 'limit';
@@ -355,6 +355,7 @@ export default function OraclePage() {
   };
 
   const permitThrow = () => {
+    castBlocks(650);
     setTossing(true);
     setThrowResult(null);
     const r = randomThrow();
@@ -370,12 +371,14 @@ export default function OraclePage() {
     setVerifyMsg(null);
     setDraw(null);
     setShaking(true);
+    rattleLots(1800);
     const started = Date.now();
     const r: any = await apiClient.drawLot(sanctuaryId);
     const wait = Math.max(0, 1800 - (Date.now() - started));
     window.setTimeout(() => {
       setShaking(false);
       if (r.success) {
+        dropStick();
         setDraw({ id: r.data.draw_id, lot: findLot(r.data.lot_no) });
       } else if (r.code === 'DAILY_LIMIT') {
         setStep('limit');
@@ -392,6 +395,7 @@ export default function OraclePage() {
   const verifyLot = async () => {
     if (!draw) return;
     setStep('verify');
+    castBlocks(650);
     setTossing(true);
     setThrowResult(null);
     setVerifyMsg(null);
@@ -459,11 +463,8 @@ export default function OraclePage() {
   );
 
   return (
-    <Box sx={{ ...pageSx, position: 'relative', overflow: 'hidden' }}>
-      {/* 擬真求籤神桌情境鋪底＋暗色紗罩，維持夜色莊嚴 */}
-      <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 0, backgroundImage: `url(${alcoveBg})`, backgroundSize: 'cover', backgroundPosition: 'center 38%', opacity: 0.26, pointerEvents: 'none' }} />
-      <Box aria-hidden sx={{ position: 'absolute', inset: 0, zIndex: 0, background: 'linear-gradient(180deg, rgba(16,6,3,.5) 0%, rgba(40,8,4,.66) 42%, rgba(14,4,2,.94) 100%)', pointerEvents: 'none' }} />
-      <Container maxWidth="sm" sx={{ pt: 1, position: 'relative', zIndex: 1 }}>
+    <Box sx={pageSx}>
+      <Container maxWidth="sm" sx={{ pt: 1 }}>
         <Button startIcon={<ArrowBackIcon className="flip-rtl" />} onClick={() => navigate(sanctuaryId ? `/sanctuary/${sanctuaryId}` : '/')} sx={{ color: GOLD, fontSize: '1.05rem' }}>
           {tr('返回', 'Back')}
         </Button>

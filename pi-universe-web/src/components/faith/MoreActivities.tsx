@@ -19,6 +19,7 @@ import { ANGELUS, ANGELUS_PRAYER, FEASTS, GAYATRI, NAMES_99, STATIONS, STATION_A
 import { hijri } from '../../faith/festivals';
 import { daysBetween } from '../../faith/homeAltar';
 import { Flame } from './FaithTools';
+import { RITUALS } from '../../faith/info/shaman';
 
 type TR = (zh: string, en: string) => string;
 type Pair = [string, string];
@@ -720,6 +721,18 @@ export function ThaiOfferingPanel({ tr, lang }: { tr: TR; lang: Lang }) {
           <Flame size={0.8} />
         </Box>
       )}
+    </Box>
+  );
+}
+
+/** 蒙古薩滿：儀式步驟（祭天、敖包、祭火、哈達、做客禮節） */
+export function ShamanRitualPanel({ ritual, tr, lang }: { ritual: string; tr: TR; lang: Lang }) {
+  const r = RITUALS[ritual];
+  if (!r) return null;
+  return (
+    <Box>
+      <Typography sx={{ color: 'text.secondary', mb: 2 }}>{ui(r.intro, lang)}</Typography>
+      <StepGuide steps={r.steps.map((s) => ({ icon: s.icon, title: ui(s.title, lang), body: ui(s.body, lang) }))} tr={tr} doneText={ui(r.done, lang)} />
     </Box>
   );
 }

@@ -3,7 +3,7 @@
  * wishes are kept only in this browser (nothing is sent to the server).
  */
 
-import { ListenButton, NO_VOICE_NOTE } from './ListenButton';
+import { ListenButton } from './ListenButton';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Box, Button, Chip, LinearProgress, MenuItem, TextField, Typography, keyframes } from '@mui/material';
 import { Lang, tx, localeOf } from '../../i18n/i18n';
@@ -87,7 +87,7 @@ export function BeadCounter({ faith, lang, tr }: { faith: 'buddhist' | 'hindu' |
       </Box>
       <Typography sx={{ fontSize: '1.5rem', fontWeight: 800, mb: 0.5 }}>{rec.text}</Typography>
       {faith !== 'islamic' && (
-        <ListenButton key={`${faith}-${idx}`} lines={[rec.text.split(' · ')[0]]} voice={faith === 'hindu' ? 'hi-IN' : 'zh-TW'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} slow={false} sx={{ color: '#D4AF37', borderColor: '#D4AF37', mt: 1, mb: 1 }} />
+        <ListenButton key={`${faith}-${idx}`} lines={[rec.text.split(' · ')[0]]} voice={faith === 'hindu' ? 'hi-IN' : 'zh-TW'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} slow={false} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
       )}
       {lang !== 'zh' && rec.romanized && <Typography sx={{ fontSize: '1.1rem', fontStyle: 'italic', mb: 0.5 }}>{rec.romanized}</Typography>}
       <Typography sx={{ color: 'text.secondary', mb: 2 }}>{pick(rec.hint, lang)}</Typography>
@@ -148,7 +148,7 @@ export function RosaryGuide({ lang, tr }: { lang: Lang; tr: TR }) {
                   width: i === 0 || i === 11 ? 20 : 14,
                   height: i === 0 || i === 11 ? 20 : 14,
                   borderRadius: '50%',
-                  bgcolor: i < bead ? '#D4AF37' : i === bead ? '#F4C152' : '#ddd',
+                  bgcolor: i < bead ? '#5B2A93' : i === bead ? '#F4C152' : '#ddd',
                   alignSelf: 'center',
                 }}
               />
@@ -160,7 +160,7 @@ export function RosaryGuide({ lang, tr }: { lang: Lang; tr: TR }) {
           </Typography>
           <Box sx={{ my: 1.5, p: 2, bgcolor: '#F8F4FF', borderRadius: 2 }}>
             <Big>{pick(prayer.text, lang)}</Big>
-            <ListenButton key={step} lines={[pick(prayer.text, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} sx={{ color: '#D4AF37', borderColor: '#D4AF37', mt: 1, mb: 1 }} />
+            <ListenButton key={step} lines={[pick(prayer.text, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
           </Box>
           <Button variant="contained" size="large" fullWidth onClick={() => setStep(step + 1)} sx={{ fontSize: '1.15rem', py: 1.4 }}>
             {tr('唸完，下一顆', 'Done — next bead')}
@@ -193,7 +193,7 @@ export function VersePanel({ lang, tr }: { lang: Lang; tr: TR }) {
       <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: '#FFF9EC', borderLeft: '5px solid #D4AF37' }}>
         <Typography sx={{ fontSize: '1.3rem', lineHeight: 1.9, fontFamily: '"Noto Serif TC", Georgia, serif' }}>{lang === 'zh' ? v.zh : v.en}</Typography>
         <Typography sx={{ mt: 1, textAlign: 'right', fontWeight: 700 }}>— {pick(v.ref, lang)}</Typography>
-        <ListenButton lines={[lang === 'zh' ? v.zh : v.en]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} sx={{ color: '#D4AF37', borderColor: '#D4AF37', mt: 1, mb: 1 }} />
+        <ListenButton lines={[lang === 'zh' ? v.zh : v.en]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
       </Box>
       <Typography sx={{ mt: 1, fontSize: '0.9rem', color: 'text.secondary' }}>
         {tr('經文：和合本（公共領域）・每天更新', 'Scripture: King James Version (public domain) · a new verse every day')}
@@ -227,7 +227,7 @@ export function PrayerPanel({ lang, tr }: { lang: Lang; tr: TR }) {
       <Typography sx={{ fontSize: '1.2rem', fontWeight: 800, mb: 1 }}>{tr('主禱文', "The Lord's Prayer")}</Typography>
       <Box sx={{ p: 2, bgcolor: '#F8F4FF', borderRadius: 2 }}>
         <Big>{pick(LORDS_PRAYER, lang)}</Big>
-        <ListenButton lines={[pick(LORDS_PRAYER, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} sx={{ color: '#D4AF37', borderColor: '#D4AF37', mt: 1, mb: 1 }} />
+        <ListenButton lines={[pick(LORDS_PRAYER, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
       </Box>
       <Typography sx={{ fontSize: '1.2rem', fontWeight: 800, mt: 3, mb: 1 }}>{tr('安靜禱告 3 分鐘', '3 minutes of quiet prayer')}</Typography>
       <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
@@ -309,7 +309,7 @@ export function CandlePanel({ tr, scope = '' }: { tr: TR; scope?: string }) {
         <Box sx={{ mt: 2 }}>
           {lit.intention && <Typography sx={{ mb: 1, fontStyle: 'italic', fontSize: '1.15rem' }}>「{lit.intention}」</Typography>}
           <Big>{tr('蠟燭會一直亮到今晚 12 點，關掉這個視窗也會繼續亮著。', 'Your candle burns until midnight tonight — it stays lit even after you close this window.')}</Big>
-          <Typography sx={{ mt: 1, fontSize: '1.2rem', fontWeight: 800, color: '#D4AF37' }}>{tr(`還會亮 ${left}`, `${left} left`)}</Typography>
+          <Typography sx={{ mt: 1, fontSize: '1.2rem', fontWeight: 800, color: '#5B2A93' }}>{tr(`還會亮 ${left}`, `${left} left`)}</Typography>
           <Button variant="outlined" color="inherit" sx={{ mt: 2 }} onClick={putOut}>
             {tr('熄滅蠟燭', 'Put out the candle')}
           </Button>

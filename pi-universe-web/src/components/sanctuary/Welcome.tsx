@@ -6,14 +6,17 @@
  * 各自緩慢推進形成視差縱深感——不用數百個 DOM 或 Canvas 節點，手機不卡。
  * 先前的扁平 SVG 小人已移除，改以真實莊嚴的人群質感呈現。
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, ButtonBase } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
 import { useI18n, tx } from '../../i18n/i18n';
-import { crowdFor } from './crowdBackdrop';
+import crowdFar from '../../assets/crowd/c_far.jpg';
+import crowdMid from '../../assets/crowd/c_mid.jpg';
+import crowdNear from '../../assets/crowd/c_near.jpg';
+import { crowdFor } from './backdrops';
 
 /** 一次儀式的長度（秒），以下所有動畫都以此為刻度 */
-const T = 30;
+const T = 16;
 
 // ---------------------------------------------------------------- the greeting
 
@@ -31,6 +34,14 @@ function greeting(religionType: string, lang: string): string {
       return lang === 'zh' ? '願主賜你平安' : tx('Peace be with you', lang as never);
     case 'catholic':
       return lang === 'zh' ? '願主與你同在' : tx('The Lord be with you', lang as never);
+    case 'theravada':
+      return 'สาธุ 🙏';
+    case 'tibetan_buddhist':
+      return 'Tashi Delek 🙏';
+    case 'mongol_shaman':
+      return 'Сайн байна уу 🌌';
+    case 'orthodox':
+      return lang === 'zh' ? '願主賜你平安 ☦️' : 'Peace be with you ☦️';
     case 'islamic':
       return 'السلام عليكم';
     case 'shinto':
@@ -46,8 +57,7 @@ function greeting(religionType: string, lang: string): string {
 
 /** 全場生命週期：開場淡入，尾聲隨金光散去 */
 const life = keyframes`
-  0%   { opacity: 0; }
-  3%   { opacity: 1; }
+  0%   { opacity: 1; }
   90%  { opacity: 1; }
   98%  { opacity: 0; }
   100% { opacity: 0; }
@@ -89,15 +99,41 @@ const nearIn = keyframes`
   100% { opacity: 0; transform: scale(1.55); }
 `;
 
-/** 歡祝詞浮現 */
+/** 該宗教專屬的迎賓人群照：鏡頭緩緩走進列隊、全場一同俯身致敬（輕微下沉），最後穿過光暈接進大殿 */
+const ownIn = keyframes`
+  0%   { opacity: 0; transform: scale(1) translateY(0); }
+  9%   { opacity: 1; transform: scale(1.03) translateY(0); }
+  44%  { opacity: 1; transform: scale(1.10) translateY(0); }
+  50%  { opacity: 1; transform: scale(1.115) translateY(1.6%); }
+  58%  { opacity: 1; transform: scale(1.125) translateY(0); }
+  80%  { opacity: 1; transform: scale(1.18) translateY(0); }
+  100% { opacity: 0; transform: scale(1.30) translateY(0); }
+`;
+
+/** 結尾的暖金光暈：把人群照與後面的大殿內景融在一起 */
+const bloom = keyframes`
+  0%   { opacity: 0; }
+  66%  { opacity: 0; }
+  86%  { opacity: .55; }
+  100% { opacity: 0; }
+`;
+
+/** 四周暗角：讓人群照與大殿內景有同樣的光線質感 */
+const vignetteIn = keyframes`
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
+/** 歡祝詞浮現：下方淡入、停留、淡出 */
 const pop = keyframes`
-  0%   { opacity: 0; transform: translate(-50%, -100%) scale(.82); }
-  20%  { opacity: 0; transform: translate(-50%, -100%) scale(.82); }
-  23%  { opacity: 1; transform: translate(-50%, -100%) scale(1.06); }
-  24%  { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-  88%  { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-  95%  { opacity: 0; transform: translate(-50%, -112%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -112%) scale(1); }
+  0%   { opacity: 0; transform: translate(-50%, 6px); }
+  22%  { opacity: 0; transform: translate(-50%, 6px); }
+  32%  { opacity: 1; transform: translate(-50%, 0); }
+  74%  { opacity: 1; transform: translate(-50%, 0); }
+  86%  { opacity: 0; transform: translate(-50%, -4px); }
+  100% { opacity: 0; transform: translate(-50%, -4px); }
 `;
 
 // ---------------------------------------------------------------- the ceremony
@@ -108,20 +144,39 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
   // welcomehold=1：把儀式「停格」在中段（截圖／設計檢視用），只對帶此參數的頁面生效
   const hold = typeof window !== 'undefined' && window.location.href.includes('welcomehold=1');
 
+  // 先等該宗教的列隊照片載入完，再開始播放，避免一開始閃出空白或半張圖
+  const own = crowdFor(religionType);
+  const [ready, setReady] = useState(!own);
   useEffect(() => {
-    if (hold) return;
+    if (!own) return;
+    let alive = true;
+    const im = new Image();
+    const done = () => alive && setReady(true);
+    im.onload = done;
+    im.onerror = done;
+    im.src = own;
+    const t = window.setTimeout(done, 6000);
+    return () => {
+      alive = false;
+      window.clearTimeout(t);
+    };
+  }, [own]);
+
+  useEffect(() => {
+    if (hold || !ready) return;
     const id = window.setTimeout(onDone, (T + 0.5) * 1000);
     return () => window.clearTimeout(id);
-  }, [onDone, hold]);
-
-  // 該宗教專屬的擬真迎接人群
-  const crowdSrc = crowdFor(religionType) || crowdFor('taiwan_folk');
+  }, [onDone, hold, ready]);
 
   const layers = [
-    { src: crowdSrc, anim: farIn, delay: hold ? 0 : 0, staticOpacity: 0.88, pos: 'center 42%', z: 1 },
-    { src: crowdSrc, anim: midIn, delay: hold ? 0 : 1.6, staticOpacity: 0.9, pos: 'center 52%', z: 2 },
-    { src: crowdSrc, anim: nearIn, delay: hold ? 0 : 3.6, staticOpacity: 0.95, pos: 'center 62%', z: 3 },
+    { src: crowdFar, anim: farIn, delay: hold ? 0 : 0, staticOpacity: 0.88, pos: 'center 42%', z: 1 },
+    { src: crowdMid, anim: midIn, delay: hold ? 0 : 1.6, staticOpacity: 0.9, pos: 'center 52%', z: 2 },
+    { src: crowdNear, anim: nearIn, delay: hold ? 0 : 3.6, staticOpacity: 0.95, pos: 'center 62%', z: 3 },
   ];
+
+  if (!ready) {
+    return <Box aria-hidden="true" sx={{ position: 'absolute', inset: 0, backgroundColor: '#0c0703', zIndex: 1 }} />;
+  }
 
   return (
     <Box
@@ -135,6 +190,9 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
         animation: hold ? 'none' : `${life} ${T}s ease-in-out both`,
       }}
     >
+      {/* 不透明暗底：從第一格就蓋住後面的大殿，列隊照片才在它上面淡入（不會先閃出大殿） */}
+      <Box aria-hidden="true" sx={{ position: 'absolute', inset: 0, zIndex: 0, backgroundColor: '#0c0703' }} />
+
       {/* 中央走道的柔金光，把隊伍「請」出來 */}
       <Box
         aria-hidden="true"
@@ -149,8 +207,56 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
         }}
       />
 
-      {/* 三層寫實人群：遠 → 中 → 近，逐一現身、緩慢推進（screen 疊光融入殿內黑暗） */}
-      {layers.map((L, i) => (
+      {/* 該宗教專屬的迎賓人群照（有的話就用它，不再每個聖地都一樣） */}
+      {own && (
+        <Box
+          aria-hidden="true"
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 2,
+            backgroundImage: `url(${own})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 55%',
+            opacity: hold ? 1 : 0,
+            transform: hold ? 'scale(1.12)' : undefined,
+            animation: hold ? 'none' : `${ownIn} ${T}s cubic-bezier(.3,.1,.4,1) both`,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      {own && (
+        <>
+          <Box
+            aria-hidden="true"
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 3,
+              background: 'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 45%, rgba(8,4,0,.55) 100%), linear-gradient(180deg, rgba(8,4,0,.25) 0%, rgba(8,4,0,0) 30%, rgba(8,4,0,.45) 100%)',
+              opacity: hold ? 1 : 0,
+              animation: hold ? 'none' : `${vignetteIn} ${T}s ease-in-out both`,
+              pointerEvents: 'none',
+            }}
+          />
+          <Box
+            aria-hidden="true"
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 4,
+              background: 'radial-gradient(ellipse at 50% 48%, rgba(255,214,130,.85), rgba(255,170,70,.25) 45%, rgba(255,170,70,0) 70%)',
+              mixBlendMode: 'screen',
+              opacity: 0,
+              animation: hold ? 'none' : `${bloom} ${T}s ease-in-out both`,
+              pointerEvents: 'none',
+            }}
+          />
+        </>
+      )}
+
+      {/* 通用三層人群（只有找不到專屬照片時才用）：遠 → 中 → 近 */}
+      {!own && layers.map((L, i) => (
         <Box
           key={i}
           aria-hidden="true"
@@ -170,31 +276,44 @@ export function WelcomeCeremony({ religionType, onDone }: { religionType: string
         />
       ))}
 
-      {/* the greeting */}
+      {/* the greeting：下方的金色題字，不用方框與表情符號，和照片同一種質感 */}
       <Box
         sx={{
           position: 'absolute',
           left: '50%',
-          top: '62%',
+          bottom: { xs: '15%', sm: '14%' },
           width: 'max-content',
-          maxWidth: '58%',
-          wordBreak: 'keep-all',
-          px: 2.2,
-          py: 1,
-          borderRadius: 3,
+          maxWidth: '86%',
+          px: 3,
+          pt: 1.2,
+          pb: 1.1,
           textAlign: 'center',
-          color: '#fff3d4',
-          background: 'linear-gradient(180deg, rgba(60,28,10,.82), rgba(30,12,4,.86))',
-          border: '1.5px solid rgba(240,200,120,.75)',
-          boxShadow: '0 4px 18px rgba(0,0,0,.45), 0 0 22px rgba(255,200,110,.35)',
-          textShadow: '0 1px 4px rgba(0,0,0,.6)',
+          wordBreak: 'keep-all',
+          background: 'radial-gradient(ellipse at 50% 50%, rgba(10,5,0,.62), rgba(10,5,0,0) 72%)',
           zIndex: 9,
           opacity: hold ? 1 : 0,
+          transform: hold ? 'translate(-50%, 0)' : undefined,
           animation: hold ? 'none' : `${pop} ${T}s ease-out both`,
+          pointerEvents: 'none',
         }}
       >
-        <Box sx={{ fontSize: { xs: '1.3rem', sm: '1.7rem' }, fontWeight: 800, lineHeight: 1.25, color: '#ffe3a3' }}>{greeting(religionType, lang)}</Box>
-        <Box sx={{ fontSize: { xs: '1rem', sm: '1.15rem' }, mt: 0.2 }}>{tr('歡迎蒞臨', 'Welcome')}</Box>
+        <Box
+          sx={{
+            fontFamily: '"Noto Serif TC", Georgia, serif',
+            fontSize: { xs: '1.55rem', sm: '1.9rem' },
+            fontWeight: 700,
+            letterSpacing: '.04em',
+            lineHeight: 1.25,
+            color: '#f7dd9a',
+            textShadow: '0 2px 10px rgba(0,0,0,.85), 0 0 18px rgba(255,200,110,.35)',
+          }}
+        >
+          {greeting(religionType, lang).replace(/[\p{Extended_Pictographic}\uFE0F]/gu, '').trim()}
+        </Box>
+        <Box sx={{ width: 54, height: '1px', mx: 'auto', my: 0.7, background: 'linear-gradient(90deg, transparent, rgba(247,221,154,.9), transparent)' }} />
+        <Box sx={{ fontSize: { xs: '0.98rem', sm: '1.1rem' }, color: 'rgba(255,243,212,.92)', letterSpacing: '.12em', textShadow: '0 1px 6px rgba(0,0,0,.85)' }}>
+          {tr('歡迎蒞臨', 'Welcome')}
+        </Box>
       </Box>
 
       <ButtonBase

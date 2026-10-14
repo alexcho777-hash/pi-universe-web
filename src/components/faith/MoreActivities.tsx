@@ -9,7 +9,7 @@
  * Everything is kept on this device only (localStorage) — nothing is sent to the server.
  */
 
-import { ListenButton, NO_VOICE_NOTE } from './ListenButton';
+import { ListenButton } from './ListenButton';
 import { useMemo, useState } from 'react';
 import { Alert, Box, Button, Chip, Divider, IconButton, LinearProgress, Paper, TextField, Typography } from '@mui/material';
 import { MalaRing, MALA_COLORS } from './MalaRing';
@@ -60,7 +60,7 @@ function StepGuide({ steps, tr, doneText, onDone }: { steps: { icon: string; tit
           <Typography sx={{ color: 'text.secondary', fontWeight: 700 }}>{tr(`第 ${step + 1} / ${steps.length} 步`, `Step ${step + 1} of ${steps.length}`)}</Typography>
           <Typography sx={{ fontSize: '1.3rem', fontWeight: 800, my: 1 }}>{s.title}</Typography>
           {s.body && <Big>{s.body}</Big>}
-          {s.extra && <Typography sx={{ mt: 1.2, fontStyle: 'italic', color: '#D4AF37' }}>{s.extra}</Typography>}
+          {s.extra && <Typography sx={{ mt: 1.2, fontStyle: 'italic', color: '#5B2A93' }}>{s.extra}</Typography>}
           <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
             {step > 0 && (
               <Button variant="outlined" onClick={() => setStep(step - 1)} sx={{ flex: 1 }}>
@@ -95,9 +95,9 @@ function StepGuide({ steps, tr, doneText, onDone }: { steps: { icon: string; tit
 
 function Countdown({ title, days, sub, tr }: { title: string; days: number; sub: string; tr: TR }) {
   return (
-    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: days === 0 ? 'rgba(212,175,55,.14)' : undefined }}>
+    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: days === 0 ? '#FFF6DD' : undefined }}>
       <Typography sx={{ fontWeight: 700, mb: 0.5 }}>{title}</Typography>
-      <Typography sx={{ fontSize: '2rem', fontWeight: 800, color: days === 0 ? '#C62828' : '#D4AF37' }}>
+      <Typography sx={{ fontSize: '2rem', fontWeight: 800, color: days === 0 ? '#C62828' : '#5B2A93' }}>
         {days === 0 ? tr('就是今天', 'Today') : tr(`還有 ${days} 天`, `${days} day(s) left`)}
       </Typography>
       <Typography sx={{ color: 'text.secondary' }}>{sub}</Typography>
@@ -261,7 +261,7 @@ export function AngelusPanel({ tr, lang }: { tr: TR; lang: Lang }) {
       ))}
       <Paper sx={{ p: 2, bgcolor: '#FFF9EC', borderLeft: '5px solid #D4AF37' }}>
         <Typography sx={{ fontSize: '1.08rem', lineHeight: 1.9 }}>{orig(ANGELUS_PRAYER, lang)}</Typography>
-        <ListenButton lines={[...ANGELUS.flatMap((a) => [orig(a.v, lang), orig(a.r, lang)]), orig(ANGELUS_PRAYER, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} sx={{ color: '#D4AF37', borderColor: '#D4AF37', mt: 1, mb: 1 }} />
+        <ListenButton lines={[...ANGELUS.flatMap((a) => [orig(a.v, lang), orig(a.r, lang)]), orig(ANGELUS_PRAYER, lang)]} voice={lang === 'zh' ? 'zh-TW' : 'en-US'} label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
       </Paper>
     </Box>
   );
@@ -311,7 +311,7 @@ export function SaintPanel({ tr, lang }: { tr: TR; lang: Lang }) {
       )}
       {upcoming.map((u) => (
         <Box key={u.date.toISOString()} sx={{ display: 'flex', gap: 1.5, alignItems: 'center', py: 1, borderTop: '1px solid #eee' }}>
-          <Typography sx={{ minWidth: 72, fontWeight: 700, color: '#D4AF37' }}>{dateText(u.date)}</Typography>
+          <Typography sx={{ minWidth: 72, fontWeight: 700, color: '#5B2A93' }}>{dateText(u.date)}</Typography>
           <Typography sx={{ flex: 1 }}>{orig(u.name, lang)}</Typography>
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>{tr(`${daysBetween(new Date(), u.date)} 天後`, `in ${daysBetween(new Date(), u.date)}d`)}</Typography>
         </Box>
@@ -570,7 +570,7 @@ export function GayatriPanel({ tr, lang }: { tr: TR; lang: Lang }) {
         <Typography sx={{ fontSize: '1.3rem', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{GAYATRI.devanagari}</Typography>
         <Typography sx={{ mt: 1, fontStyle: 'italic', whiteSpace: 'pre-line', color: '#6b3f10' }}>{GAYATRI.roman}</Typography>
         <Typography sx={{ mt: 1.2 }}>{orig(GAYATRI.meaning, lang)}</Typography>
-        <ListenButton lines={GAYATRI.devanagari.split('\n')} voice="hi-IN" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} noVoiceText={tr(NO_VOICE_NOTE[0], NO_VOICE_NOTE[1])} sx={{ color: '#D4AF37', borderColor: '#D4AF37', mt: 1, mb: 1 }} />
+        <ListenButton lines={GAYATRI.devanagari.split('\n')} voice="hi-IN" label={tr('聽', 'Listen')} stopLabel={tr('停止', 'Stop')} sx={{ color: '#5B2A93', borderColor: '#5B2A93', mt: 1, mb: 1 }} />
       </Paper>
       <MalaRing
         value={n}

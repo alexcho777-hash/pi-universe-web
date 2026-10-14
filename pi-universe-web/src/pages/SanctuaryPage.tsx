@@ -134,7 +134,14 @@ export default function SanctuaryPage() {
   const [donating, setDonating] = useState(false);
   const [toast, setToast] = useState<{ msg: string; severity: 'success' | 'info' | 'error' } | null>(null);
   // Welcome ceremony: 0 = not playing, otherwise a counter so a replay restarts it
-  const [ceremony, setCeremony] = useState(0);
+  const [ceremony, setCeremony] = useState(() => {
+    // 一開始就讓迎賓蓋住畫面，避免先露出大殿再跳成人群
+    try {
+      return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 1;
+    } catch {
+      return 1;
+    }
+  });
   const endCeremony = useCallback(() => setCeremony(0), []);
 
   const loadMerit = useCallback(async () => {
@@ -166,20 +173,16 @@ export default function SanctuaryPage() {
     })();
   }, [sanctuaryId, navigate, loadMerit]);
 
-  // Play the welcome when the sanctuary has loaded, unless the visitor was welcomed here a moment ago
+  // 每次進入聖地都播放迎賓（可按「略過」；進入後也能按右上角 ↻ 重看）
   const loadedId = merit?.sanctuary?.id;
   useEffect(() => {
     if (loadedId == null) return;
     try {
       if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-      const key = `pi-welcome-${loadedId}`;
-      const last = Number(sessionStorage.getItem(key) || 0);
-      if (Date.now() - last < 10 * 60 * 1000) return;
-      sessionStorage.setItem(key, String(Date.now()));
     } catch {
-      /* storage unavailable: just play it */
+      /* ignore */
     }
-    setCeremony(1);
+    setCeremony((c) => c || 1);
   }, [loadedId]);
 
   if (loading) {
@@ -211,7 +214,7 @@ export default function SanctuaryPage() {
           {/* Big welcome, over the sanctuary's 3D hall */}
           <SanctuaryScene
             religionType={s.religion_type}
-            altar={altarFor(s.religion_type)}
+            altar={backdropFor(s.religion_type) ? undefined : altarFor(s.religion_type)}
             backdropUrl={backdropFor(s.religion_type)}
             soundOnLabel={tr('播放環境音', 'Play ambient sound')}
             soundOffLabel={tr('關閉環境音', 'Turn off ambient sound')}
@@ -220,7 +223,7 @@ export default function SanctuaryPage() {
             onReplay={() => setCeremony((c) => c + 1)}
             replayLabel={tr('重看迎賓儀式', 'Replay welcome')}
           >
-            {!altarFor(s.religion_type) && <Typography sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>}
+            {!altarFor(s.religion_type) && !backdropFor(s.religion_type) && <Typography sx={{ fontSize: { xs: '2.2rem', sm: '2.6rem' }, lineHeight: 1.1 }}>{s.icon}</Typography>}
             <Typography sx={{ fontSize: { xs: '1.15rem', sm: '1.4rem' }, fontWeight: 600, mt: 0.5, color: '#F3E3C0' }}>
               {tr(`歡迎 ${user?.username || '善信'} 蒞臨`, `Welcome, ${user?.username || 'friend'}, to the`)}
             </Typography>

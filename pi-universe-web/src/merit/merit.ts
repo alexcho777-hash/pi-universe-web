@@ -59,7 +59,7 @@ export interface MyMerit {
 }
 
 const kind = (religionType?: string) =>
-  religionType === 'christian' || religionType === 'catholic' ? 'offering' : religionType === 'islamic' ? 'sadaqah' : 'merit';
+  religionType === 'christian' || religionType === 'catholic' || religionType === 'orthodox' ? 'offering' : religionType === 'islamic' ? 'sadaqah' : 'merit';
 
 /** Each faith's own word for giving (noun), e.g. 本月功德 / This month's donations */
 export function giftWord(religionType?: string, lang: Lang = 'zh'): string {

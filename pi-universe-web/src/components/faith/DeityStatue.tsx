@@ -54,6 +54,9 @@ export const LOOKS: Record<string, Look> = {
   zhushengniangniang: { body: 'seated', head: 'phoenix', held: 'baby', robe: '#c24a6a', trim: GOLD },
   guanyin: { body: 'seated', head: 'veil', held: 'vase', robe: '#f2efe6', trim: '#cbbf9a', halo: true, extra: 'lotus' },
   tianpeng: { body: 'armor', head: 'pig', held: 'rake', robe: '#a07a2a', trim: GOLD, skin: '#e8a8a0' },
+  wushenglaomu: { body: 'seated', head: 'phoenix', held: 'lotus', robe: '#c6892a', trim: '#f6dc8a', halo: true },
+  jigong: { body: 'seated', head: 'bald', held: 'none', robe: '#a88a52', trim: '#d9c48a', halo: true },
+  milezushi: { body: 'seated', head: 'bald', held: 'none', robe: '#c98a2a', trim: GOLD, halo: true },
   dizang: { body: 'seated', head: 'dizang', held: 'pearl', robe: '#d98b1f', trim: '#f6dc8a', halo: true, extra: 'lotus' },
 };
 

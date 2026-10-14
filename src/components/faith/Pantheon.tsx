@@ -69,7 +69,7 @@ function DeityIncense({ deityKey, tr }: { deityKey: string; tr: TR }) {
           </Button>
         </>
       ) : (
-        <Button variant="contained" size="small" sx={{ mt: 1, backgroundColor: '#B8912F' }} onClick={() => (setLit(true), save(key, true))}>
+        <Button variant="contained" size="small" sx={{ mt: 1, backgroundColor: '#8B4513' }} onClick={() => (setLit(true), save(key, true))}>
           🪔 {tr('上香', 'Light incense')}
         </Button>
       )}
@@ -200,7 +200,7 @@ function DeityDialog({ deity, sanctuaryId, tr, lang, onClose, disclaimer }: { de
           onChange={(e) => setText(e.target.value.slice(0, Math.max(0, 200 - prefix.length)))}
           sx={{ mb: 1.5 }}
         />
-        <Button variant="contained" fullWidth disabled={loading} onClick={submit} sx={{ backgroundColor: '#B8912F', mb: 1.5 }}>
+        <Button variant="contained" fullWidth disabled={loading} onClick={submit} sx={{ backgroundColor: '#F4A300', mb: 1.5 }}>
           🙏 {tr('許願', 'Make this wish')}
         </Button>
         {error && <Alert severity="error" sx={{ mb: 1.5 }}>{error}</Alert>}

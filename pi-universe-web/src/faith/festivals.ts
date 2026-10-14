@@ -245,7 +245,67 @@ const hindu: Maker = (year) =>
     return { date: d(y, m, day), name: [zh, en], note: ['日期依各地曆法可能略有不同', 'Dates can vary slightly by region'] } as Festival;
   });
 
-const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu };
+/** Orthodox Easter (Julian computus, +13 days for 1900–2099) and fixed feasts, given in the civil (Gregorian) calendar. */
+function orthodoxEaster(year: number): Date {
+  const a = year % 4, b = year % 7, c = year % 19;
+  const dd = (19 * c + 15) % 30;
+  const e = (2 * a + 4 * b - dd + 34) % 7;
+  const month = Math.floor((dd + e + 114) / 31);
+  const day = ((dd + e + 114) % 31) + 1;
+  return addDays(d(year, month, day), 13);
+}
+
+const orthodox: Maker = (year) => {
+  const easter = orthodoxEaster(year);
+  return [
+    { date: d(year, 1, 7), name: ['聖誕節（東正教）', 'Nativity of Christ (Orthodox)'] },
+    { date: d(year, 1, 19), name: ['主受洗節（主顯節）', 'Theophany'] },
+    { date: addDays(easter, -7), name: ['棕枝主日', 'Palm Sunday'] },
+    { date: d(year, 4, 7), name: ['聖母領報節', 'Annunciation'] },
+    { date: easter, name: ['復活節（東正教）', 'Pascha (Orthodox Easter)'], note: ['依儒略曆推算', 'Calculated by the Julian calendar'] },
+    { date: addDays(easter, 39), name: ['主升天節', 'Ascension'] },
+    { date: addDays(easter, 49), name: ['聖靈降臨節', 'Pentecost'] },
+    { date: d(year, 8, 19), name: ['主顯聖容節', 'Transfiguration'] },
+    { date: d(year, 8, 28), name: ['聖母安息節', 'Dormition of the Theotokos'] },
+    { date: d(year, 9, 21), name: ['聖母誕辰', 'Nativity of the Theotokos'] },
+    { date: d(year, 9, 27), name: ['聖十字架高舉節', 'Exaltation of the Cross'] },
+    { date: d(year, 10, 14), name: ['聖母帡幪節', 'Protection of the Theotokos'] },
+    { date: d(year, 12, 4), name: ['聖母進殿節', 'Entry of the Theotokos'] },
+    { date: d(year, 12, 19), name: ['聖尼古拉節', 'Feast of St Nicholas'] },
+  ] as Festival[];
+};
+
+/** 藏傳佛教節日：藏曆與農曆多半相同，但偶爾差一天或閏月不同，僅供參考，請以寺院公告為準。 */
+const tibetan: Maker = fromLunar([
+  [1, 1, '藏曆新年（洛薩）', 'Losar (Tibetan New Year)', '日期與農曆新年可能差一天或一個月', 'May differ from Chinese New Year by a day or a month'],
+  [1, 15, '神變節（曲果節）', 'Choetrul Duchen (Day of Miracles)', '藏曆正月初一至十五的法會期', 'Culmination of the first fortnight of prayers'],
+  [4, 15, '薩嘎達瓦節', 'Saga Dawa Düchen', '佛陀誕生、成道與涅槃紀念', 'Buddha’s birth, awakening and parinirvana'],
+  [6, 4, '初轉法輪節（曲果節）', 'Chokhor Düchen', '紀念佛陀在鹿野苑初轉法輪', 'First sermon at Sarnath'],
+  [9, 22, '天降節（拉巴節）', 'Lhabab Düchen', '紀念佛陀從三十三天返回人間', 'Buddha’s descent from the heaven of the Thirty-Three'],
+  [10, 25, '甘丹燃燈節', 'Ganden Ngamchoe', '紀念宗喀巴大師圓寂', 'Lamp festival for Tsongkhapa'],
+]);
+
+/** 南傳佛教：滿月節日（衛塞節等）依各國月曆而定，這裡先放固定日期的新年潑水節。 */
+const theravada: Maker = (year) => [
+  {
+    date: d(year, 4, 13),
+    name: ['新年潑水節', 'New-year water festival'],
+    note: ['泰國宋干節、緬甸 Thingyan、柬埔寨與寮國新年，約 4 月 13–16 日', 'Songkran, Thingyan, Khmer and Lao new year, about 13–16 April'],
+  },
+];
+
+/** 蒙古：白月節（新年）與祭火日以農曆推算，可能與蒙古曆差一天；那達慕為固定日期。 */
+const mongolShaman: Maker = (year) => {
+  const out: Festival[] = [];
+  const sar = lunar(year, 1, 1);
+  if (sar) out.push({ date: sar, name: ['白月節（查干薩日，新年）', 'Tsagaan Sar (Mongol New Year)'], note: ['以農曆推算，可能與蒙古曆差一天', 'Calculated by the Chinese lunar calendar; may differ by a day'] });
+  const fire = lunar(year - 1, 12, 23);
+  if (fire) out.push({ date: fire, name: ['祭火日', 'Fire offering day'], note: ['臘月二十三日前後，各地習俗不同', 'Around the 23rd of the last lunar month; customs vary'] });
+  out.push({ date: d(year, 7, 11), name: ['那達慕大會', 'Naadam festival'], note: ['7 月 11–13 日，摔角、賽馬與射箭', '11–13 July: wrestling, horse racing and archery'] });
+  return out;
+};
+
+const MAKERS: Record<string, Maker> = { buddhist, taiwan_folk: taiwanFolk, christian, catholic, shinto, hindu, orthodox, tibetan_buddhist: tibetan, theravada, mongol_shaman: mongolShaman };
 
 /** Festivals from `from` (inclusive) for the next `days` days, sorted by date */
 export function upcomingFestivals(religionType: string, from = new Date(), days = 365): Festival[] {

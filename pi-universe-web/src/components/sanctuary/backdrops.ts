@@ -1,38 +1,34 @@
 /**
- * 每個宗教聖地的「大殿內部」場景圖：站在宏偉大殿內、面向神聖焦點。
- * 疊在既有 3D 大殿 Canvas 之上（screen 疊光＋慢推進），讓訪客真的感覺「人站在殿內」，
- * 而不是只看到一條走道。
+ * 每個宗教聖地的「大殿內部」場景圖與「迎賓人群」照片。
+ * 以檔名自動對應（import.meta.glob）：
+ *   interiors/i_<religion_type>.jpg  → 大殿內部場景（疊在 3D 大殿之上）
+ *   crowds/<religion_type>.jpg       → 穿傳統服飾的信眾列隊（歡迎畫面）
+ * 新增聖地時只要把同名圖片放進資料夾即可，不必改程式；沒有圖時自動使用預設畫面。
  */
-import buddhist from '../../assets/interiors/i_buddhist.jpg';
-import christian from '../../assets/interiors/i_christian.jpg';
-import catholic from '../../assets/interiors/i_catholic.jpg';
-import islamic from '../../assets/interiors/i_islamic.jpg';
-import shinto from '../../assets/interiors/i_shinto.jpg';
-import hindu from '../../assets/interiors/i_hindu.jpg';
-import taiwanFolk from '../../assets/interiors/i_taiwan_folk.jpg';
-import thaiFourFace from '../../assets/interiors/i_thai_four_face.jpg';
-import vietnameseFolk from '../../assets/interiors/i_vietnamese_folk.jpg';
-import tibetanBuddhist from '../../assets/interiors/i_tibetan_buddhist.jpg';
-import mongolShaman from '../../assets/interiors/i_mongol_shaman.jpg';
-import theravada from '../../assets/interiors/i_theravada.jpg';
-import orthodox from '../../assets/interiors/i_orthodox.jpg';
+function byName(files: Record<string, string>, strip: RegExp): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [path, url] of Object.entries(files)) {
+    const key = (path.split('/').pop() || '').replace(strip, '');
+    out[key] = url;
+  }
+  return out;
+}
 
-const MAP: Record<string, string> = {
-  buddhist,
-  christian,
-  catholic,
-  islamic,
-  shinto,
-  hindu,
-  taiwan_folk: taiwanFolk,
-  thai_four_face: thaiFourFace,
-  vietnamese_folk: vietnameseFolk,
-  tibetan_buddhist: tibetanBuddhist,
-  mongol_shaman: mongolShaman,
-  theravada: theravada,
-  orthodox: orthodox,
-};
+const INTERIORS = byName(
+  import.meta.glob('../../assets/interiors/i_*.jpg', { eager: true, import: 'default' }) as Record<string, string>,
+  /^i_|\.jpg$/g,
+);
+
+const CROWDS = byName(
+  import.meta.glob('../../assets/crowds/*.jpg', { eager: true, import: 'default' }) as Record<string, string>,
+  /\.jpg$/,
+);
 
 export function backdropFor(religionType?: string): string | undefined {
-  return (religionType && MAP[religionType]) || undefined;
+  return (religionType && INTERIORS[religionType]) || undefined;
+}
+
+/** 每個宗教專屬的「迎賓人群」照片（穿著該宗教傳統服飾的信眾列隊） */
+export function crowdFor(religionType?: string): string | undefined {
+  return (religionType && CROWDS[religionType]) || undefined;
 }

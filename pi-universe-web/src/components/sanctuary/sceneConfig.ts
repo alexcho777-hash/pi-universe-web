@@ -187,4 +187,63 @@ export const SCENES: Record<string, SceneConfig> = {
   },
 };
 
+SCENES.theravada = {
+  sky: ['#1a0e03', '#7a4a0a'],
+  floor: ['#6b4a14', '#1c1204'],
+  wall: '#2a1a05',
+  grid: 'rgba(255,215,120,.12)',
+  glow: '255,200,90',
+  spacing: 3.0,
+  speed: 0.32,
+  pillar: { color: '#d9a43a', shade: '#7a5410', cap: '#ffe08a', width: 0.3, taper: true },
+  garland: '#f0b429',
+  landmark: 'stupa',
+  particles: { kind: 'petals', color: '255,190,80', count: 24 },
+  ambient: 'thai',
+};
+
+SCENES.tibetan_buddhist = {
+  ...templeBase,
+  sky: ['#1a0606', '#5a1410'],
+  floor: ['#4a1a10', '#160604'],
+  glow: '255,190,80',
+  pillar: { color: '#8e1d14', shade: '#4a0c08', cap: '#e8b73a', width: 0.34 },
+  beamStyle: 'flat',
+  landmark: 'stupa',
+  lantern: { style: 'lamp', color: '#f2b82e', glow: '255,200,90' },
+  garland: '#2f6ea5',
+  particles: { kind: 'smoke', color: '230,210,190', count: 30 },
+  ambient: 'temple',
+};
+
+SCENES.mongol_shaman = {
+  sky: ['#06182e', '#2a6aa8'],
+  floor: ['#6a7a3a', '#1a2410'],
+  wall: '#0c2038',
+  grid: 'rgba(255,255,255,.06)',
+  glow: '200,230,255',
+  spacing: 3.4,
+  speed: 0.3,
+  garland: '#3a8ee0',
+  particles: { kind: 'leaves', color: '170,200,120', count: 22 },
+  ambient: 'shrine',
+};
+
+SCENES.orthodox = {
+  sky: ['#120a06', '#3a2410'],
+  floor: ['#5a4020', '#180f06'],
+  wall: '#1c1208',
+  grid: 'rgba(255,215,120,.09)',
+  glow: '255,215,130',
+  spacing: 3.4,
+  speed: 0.28,
+  pillar: { color: '#c9a24a', shade: '#6a5018', cap: '#ffe08a', width: 0.3 },
+  arch: { style: 'round', color: '#b8923a', width: 0.16 },
+  landmark: 'cathedral_facade',
+  flames: 'candles',
+  shafts: ['255,225,150', '255,240,200'],
+  particles: { kind: 'dust', color: '255,235,190', count: 36 },
+  ambient: 'cathedral',
+};
+
 export const sceneFor = (religionType?: string): SceneConfig => SCENES[religionType || ''] || SCENES.buddhist;

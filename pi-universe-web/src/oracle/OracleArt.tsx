@@ -4,7 +4,6 @@
  */
 
 import { Box, keyframes } from '@mui/material';
-import cylinderImg from '../assets/oracle/cylinder.jpg';
 
 export type BlockFace = 'flat' | 'round';
 export type ThrowResult = 'sheng' | 'xiao' | 'yin';
@@ -111,68 +110,61 @@ const rise = keyframes`
 `;
 
 export function LotCylinder({ shaking, lotLabel }: { shaking: boolean; lotLabel?: string | null }) {
+  const sticks = Array.from({ length: 13 }, (_, i) => i);
   return (
-    <Box sx={{ position: 'relative', width: { xs: 190, sm: 230 }, mx: 'auto', mt: 1 }}>
-      {/* 擬真竹籤筒照片，搖籤時左右晃動 */}
+    <Box sx={{ position: 'relative', width: 180, height: 250, mx: 'auto' }}>
       <Box
-        sx={{
-          position: 'relative',
-          width: '100%',
-          aspectRatio: '3 / 4',
-          borderRadius: 3,
-          overflow: 'hidden',
-          border: '1.5px solid rgba(228,193,112,.55)',
-          boxShadow: '0 8px 28px rgba(0,0,0,.6), inset 0 0 26px rgba(0,0,0,.35), 0 0 34px rgba(255,205,110,.16)',
-          transformOrigin: '50% 96%',
-          animation: shaking ? `${shake} 0.42s ease-in-out infinite` : undefined,
-        }}
+        component="svg"
+        viewBox="0 0 180 250"
+        sx={{ width: 180, height: 250, transformOrigin: '50% 90%', animation: shaking ? `${shake} 0.5s ease-in-out infinite` : undefined }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url(${cylinderImg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 46%',
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'radial-gradient(ellipse at 50% 32%, rgba(255,214,140,.16), transparent 58%), linear-gradient(180deg, transparent 52%, rgba(10,4,2,.74) 100%)',
-          }}
-        />
-        {lotLabel && (
-          <Box
-            sx={{
-              position: 'absolute',
-              right: 10,
-              top: 6,
-              width: 34,
-              height: 170,
-              borderRadius: '4px',
-              background: 'linear-gradient(90deg,#F3DDA8,#E2C07A)',
-              border: '1.5px solid #B8924A',
-              boxShadow: '0 0 24px rgba(255,210,120,.9)',
-              writingMode: 'vertical-rl',
-              textOrientation: 'upright',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: '"Noto Serif TC", serif',
-              fontWeight: 800,
-              fontSize: '0.95rem',
-              color: '#7A1010',
-              letterSpacing: '0.02em',
-              animation: `${rise} 0.8s ease-out forwards`,
-            }}
-          >
-            {lotLabel}
-          </Box>
-        )}
+        <defs>
+          <linearGradient id="tube" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#6B0B0F" />
+            <stop offset="0.45" stopColor="#B3261E" />
+            <stop offset="1" stopColor="#5A080C" />
+          </linearGradient>
+        </defs>
+        {sticks.map((i) => (
+          <rect key={i} x={44 + i * 7} y={18 + ((i * 37) % 22)} width="5" height="120" rx="2" fill="#E9CF97" stroke="#B8924A" strokeWidth="0.8" />
+        ))}
+        <path d="M34 92 L146 92 L138 236 Q90 246 42 236 Z" fill="url(#tube)" stroke="#E8C170" strokeWidth="3" />
+        <ellipse cx="90" cy="92" rx="56" ry="10" fill="#4A0609" stroke="#E8C170" strokeWidth="3" />
+        <rect x="40" y="140" width="100" height="6" fill="#E8C170" opacity="0.8" />
+        <rect x="42" y="200" width="96" height="6" fill="#E8C170" opacity="0.8" />
+        <text x="90" y="182" textAnchor="middle" fontSize="26" fill="#F5D98B" fontFamily="serif" fontWeight="700">
+          籤
+        </text>
       </Box>
+      {lotLabel && (
+        <Box
+          sx={{
+            position: 'absolute',
+            left: '50%',
+            top: 0,
+            ml: '-18px',
+            width: 36,
+            height: 170,
+            borderRadius: '4px',
+            background: 'linear-gradient(90deg,#F3DDA8,#E2C07A)',
+            border: '1.5px solid #B8924A',
+            boxShadow: '0 0 24px rgba(255,210,120,.9)',
+            writingMode: 'vertical-rl',
+            textOrientation: 'upright',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: '"Noto Serif TC", serif',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            color: '#7A1010',
+            letterSpacing: '0.02em',
+            animation: `${rise} 0.8s ease-out forwards`,
+          }}
+        >
+          {lotLabel}
+        </Box>
+      )}
     </Box>
   );
 }

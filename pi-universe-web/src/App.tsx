@@ -3,9 +3,7 @@
  */
 
 import React, { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-// 預覽版改用 Hash 路由：打包成單一 HTML 後仍能直接開啟各分頁；正式版維持正常路徑
-const Router = PREVIEW ? HashRouter : BrowserRouter;
+import { BrowserRouter as Router, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CircularProgress, Box, CssBaseline, GlobalStyles, ThemeProvider, createTheme } from '@mui/material';
 import { useAuthStore } from './stores/authStore';
 import HomePage from './pages/HomePage';
