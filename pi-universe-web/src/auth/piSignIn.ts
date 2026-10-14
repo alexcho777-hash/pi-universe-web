@@ -8,8 +8,19 @@
 
 import { trNow } from '../i18n/i18n';
 
-export const PI_SIGNIN_CLIENT_ID =
-  import.meta.env.VITE_PI_SIGNIN_CLIENT_ID || 'D7A9mJ-dSTDVnw6m0T6Xbe3W7V6WNqCpngnJcK62h3A';
+// One Pi app per site: each has its own client ID and its own registered redirect URI. Picking the ID
+// by hostname lets both sites share one build (no per-site Render env var that can drift).
+const CLIENT_ID_MAINNET = 'OCaulyPg1Hz9JkCCCB4UbbHEk_4PUJYg8FkQF-WfUgg';
+const CLIENT_ID_TESTNET = 'hVRErcD0vzvupVcBJMae6RGbcslHjs0ku1zI2G-KXz8';
+
+function pickClientId(): string {
+  const host = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (host.startsWith('mainnet.')) return CLIENT_ID_MAINNET;
+  if (host.startsWith('testnet.')) return CLIENT_ID_TESTNET;
+  return import.meta.env.VITE_PI_SIGNIN_CLIENT_ID || CLIENT_ID_TESTNET;
+}
+
+export const PI_SIGNIN_CLIENT_ID = pickClientId();
 
 const AUTHORIZE_URL = 'https://accounts.pinet.com/oauth/authorize';
 const STATE_KEY = 'pi-signin-state';
