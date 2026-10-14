@@ -10,6 +10,7 @@ import { apiClient } from '../../api/ApiClient';
 import { usePiPayment, PaymentCancelledError } from '../../hooks/usePiPayment';
 
 type TR = (zh: string, en: string) => string;
+type LampKey = 'guangming' | 'taisui' | 'wenchang';
 
 const LAMP_PRICE = 3.14;
 const LAMP_TYPES: { key: 'guangming' | 'taisui' | 'wenchang'; icon: string; label: [string, string]; blurb: [string, string] }[] = [
@@ -88,16 +89,33 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
   const [lampType, setLampType] = useState<'guangming' | 'taisui' | 'wenchang'>('guangming');
   const [dedicateName, setDedicateName] = useState('');
   const [counts, setCounts] = useState<Record<string, number>>({ guangming: 0, taisui: 0, wenchang: 0 });
+  const [mine, setMine] = useState<{ id: number; lamp_type: LampKey; dedicate_name?: string | null; days_left: number }[]>([]);
+  const [lamps, setLamps] = useState<{ lamp_type: LampKey; dedicate_name?: string | null }[] | null>(null);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const { lightLamp, isLoading: paying } = usePiPayment();
 
   const loadCounts = async () => {
     const res: any = await apiClient.getSanctuaryLamps(sanctuaryId);
-    if (res.success) setCounts(res.data.counts || {});
+    if (res.success) {
+      setCounts(res.data.counts || {});
+      setLamps(Array.isArray(res.data.lamps) ? res.data.lamps : null);
+    }
+  };
+  // The visitor's own lamps in this sanctuary (needs sign-in; silently empty when signed out).
+  const loadMine = async () => {
+    try {
+      const res: any = await apiClient.getMyLamps();
+      if (res?.success && Array.isArray(res.data)) {
+        setMine(res.data.filter((l: any) => l.active && Number(l.sanctuary_id) === Number(sanctuaryId)));
+      }
+    } catch {
+      /* not signed in */
+    }
   };
   useEffect(() => {
     loadCounts();
+    loadMine();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sanctuaryId]);
 
@@ -115,6 +133,7 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
       setNotice(tr('點燈成功！燈已點亮一年 🙏', 'Lamp lit! It will stay lit for one year 🙏'));
       setDedicateName('');
       loadCounts();
+      loadMine();
     } catch (err: any) {
       if (err instanceof PaymentCancelledError) setError(tr('已取消付款', 'Payment cancelled'));
       else setError(err?.message || tr('點燈失敗', 'Failed to light the lamp'));
@@ -122,12 +141,35 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
   };
 
   const selected = LAMP_TYPES.find((l) => l.key === lampType)!;
+  const totalLit = (counts.guangming || 0) + (counts.taisui || 0) + (counts.wenchang || 0);
+  // Prefer the real list (with names); until the backend sends it, draw one lamp per counted lamp.
+  const wall: { lamp_type: LampKey; dedicate_name?: string | null }[] =
+    lamps ?? LAMP_TYPES.flatMap((l) => Array.from({ length: Math.min(counts[l.key] || 0, 60) }, () => ({ lamp_type: l.key })));
 
   return (
     <Box sx={{ py: 1 }}>
       <Typography sx={{ color: 'text.secondary', mb: 2 }}>
         {tr(`為 ${name} 點一盞燈，${LAMP_PRICE} π，效期一年（不開立收據）。`, `Light a lamp for the ${name} — ${LAMP_PRICE} π, lasts one year (no receipt is issued).`)}
       </Typography>
+
+      {mine.length > 0 && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: 'rgba(245,214,123,.10)', borderColor: '#F5D67B', boxShadow: '0 0 22px rgba(245,214,123,.22)' }}>
+          <Typography sx={{ fontWeight: 800, color: '#F5D67B', textAlign: 'center', mb: 1 }}>
+            {tr(`🪔 我點的燈（${mine.length} 盞，燃燒中）`, `🪔 My lamps (${mine.length}, burning)`)}
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1.5 }}>
+            {mine.map((m) => (
+              <Box key={m.id} sx={{ width: 84, textAlign: 'center' }}>
+                <LampArt kind={m.lamp_type} size={64} lit />
+                <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#f2ead9', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {m.dedicate_name || tr(LAMP_TYPES.find((l) => l.key === m.lamp_type)!.label[0], LAMP_TYPES.find((l) => l.key === m.lamp_type)!.label[1])}
+                </Typography>
+                <Typography sx={{ fontSize: '0.7rem', color: '#c9a24b' }}>{tr(`還剩 ${m.days_left} 天`, `${m.days_left} days left`)}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Paper>
+      )}
 
       <Grid container spacing={1} sx={{ mb: 2 }}>
         {LAMP_TYPES.map((l) => (
@@ -145,7 +187,7 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
               }}
             >
               <CardActionArea onClick={() => setLampType(l.key)} sx={{ height: '100%', py: 1.5, display: 'flex', flexDirection: 'column' }}>
-                <LampArt kind={l.key} size={52} lit={lampType === l.key} />
+                <LampArt kind={l.key} size={52} lit={lampType === l.key || (counts[l.key] || 0) > 0} />
                 <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, textAlign: 'center', color: '#f2ead9' }}>{tr(l.label[0], l.label[1])}</Typography>
                 <Typography sx={{ fontSize: '0.78rem', color: '#c9a24b' }}>
                   {tr('目前', 'Now')} {counts[l.key] || 0}
@@ -157,7 +199,7 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
       </Grid>
 
       <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: 'rgba(212,175,55,.10)', textAlign: 'center' }}>
-        <LampArt kind={lampType} size={120} />
+        <LampArt kind={lampType} size={120} lit={(counts[lampType] || 0) > 0} />
         <Typography sx={{ fontWeight: 700, mt: 0.5 }}>{tr(selected.label[0], selected.label[1])}</Typography>
         <Typography sx={{ color: 'text.secondary' }}>{tr(selected.blurb[0], selected.blurb[1])}</Typography>
         {dedicateName.trim() && (
@@ -167,6 +209,27 @@ export function LampPanel({ sanctuaryId, sanctuaryName: name, tr }: { sanctuaryI
           </Typography>
         )}
       </Paper>
+
+      {totalLit > 0 && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 2, bgcolor: 'rgba(20,12,4,.55)', borderColor: '#3a2f1d' }}>
+          <Typography sx={{ fontWeight: 700, color: '#F5D67B', textAlign: 'center', mb: 1 }}>
+            {tr(`🔥 正在燃燒的燈（${totalLit} 盞）`, `🔥 Lamps burning now (${totalLit})`)}
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1.25 }}>
+            {wall.slice(0, 60).map((w, i) => (
+              <Box key={i} sx={{ width: 64, textAlign: 'center' }}>
+                <LampArt kind={w.lamp_type} size={48} lit />
+                <Typography sx={{ fontSize: '0.68rem', color: '#e8d9b0', mt: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {w.dedicate_name || tr(LAMP_TYPES.find((l) => l.key === w.lamp_type)!.label[0], LAMP_TYPES.find((l) => l.key === w.lamp_type)!.label[1])}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+          {wall.length > 60 && (
+            <Typography sx={{ fontSize: '0.8rem', color: '#c9a24b', textAlign: 'center', mt: 1 }}>{tr(`還有 ${wall.length - 60} 盞…`, `and ${wall.length - 60} more…`)}</Typography>
+          )}
+        </Paper>
+      )}
 
       <TextField
         fullWidth

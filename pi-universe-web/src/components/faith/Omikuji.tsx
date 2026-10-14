@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Box, Button, Chip, Typography, keyframes } from '@mui/material';
 import { Lang, tx } from '../../i18n/i18n';
+import { rattleLots, dropStick } from '../../oracle/oracleSound';
 
 type TR = (zh: string, en: string) => string;
 type Pair = [string, string];
@@ -191,7 +192,7 @@ function Box6({ shaking }: { shaking: boolean }) {
     <Box
       component="svg"
       viewBox="0 0 160 200"
-      sx={{ width: 160, height: 200, display: 'block', mx: 'auto', animation: shaking ? `${shake} 1.1s ease-in-out` : 'none', transformOrigin: '50% 90%', filter: 'drop-shadow(0 8px 14px rgba(0,0,0,.55))' }}
+      sx={{ width: 160, height: 200, display: 'block', mx: 'auto', animation: shaking ? `${shake} 0.4s ease-in-out 4` : 'none', transformOrigin: '50% 90%', filter: 'drop-shadow(0 8px 14px rgba(0,0,0,.55))' }}
     >
       <defs>
         <linearGradient id="omWood" x1="0" x2="1">
@@ -266,7 +267,11 @@ export function OmikujiPanel({ tr, lang }: { tr: (zh: string, en: string) => str
     busy.current = true;
     setPhase('shaking');
     setMsg('');
-    later(() => setPhase('out'), 1100);
+    rattleLots(1600); // synthesized bamboo-sticks rattle (no audio file)
+    later(() => {
+      setPhase('out');
+      dropStick();
+    }, 1600);
     later(() => {
       const r = pickRank();
       const next: Slip = { r, v: Math.floor(Math.random() * RANKS[r].verses.length) };
@@ -276,7 +281,7 @@ export function OmikujiPanel({ tr, lang }: { tr: (zh: string, en: string) => str
       setHist(nh);
       setSlip(next);
       busy.current = false;
-    }, 1700);
+    }, 2300);
   }, [drawn, hist]);
 
   // Phone shake: only where no permission prompt is needed (Android / desktop browsers)
