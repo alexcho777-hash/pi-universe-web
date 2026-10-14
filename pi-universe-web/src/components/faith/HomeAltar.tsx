@@ -5,7 +5,7 @@
  * server so they follow the person across devices.
  */
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Box,
@@ -21,6 +21,8 @@ import {
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { apiClient } from '../../api/ApiClient';
 import { Lang, tx } from '../../i18n/i18n';
+import furnaceGod from '../../assets/ritual/furnace_god.jpg';
+import furnaceDead from '../../assets/ritual/furnace_dead.jpg';
 import { JOSS_PAPER, daysBetween, nextAnniversary, nextLunarDay } from '../../faith/homeAltar';
 
 type TR = (zh: string, en: string) => string;
@@ -139,12 +141,6 @@ export function OfferingsPanel({ tr }: { tr: TR }) {
   );
 }
 
-const flicker = keyframes`
-  0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.96; }
-  25% { transform: scaleY(1.14) scaleX(0.93); opacity: 1; }
-  50% { transform: scaleY(0.94) scaleX(1.06); opacity: 0.92; }
-  75% { transform: scaleY(1.1) scaleX(0.96); opacity: 1; }
-`;
 const smokeRise = keyframes`
   0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
   10% { opacity: 0.85; }
@@ -156,142 +152,103 @@ const glowPulse = keyframes`
   50% { opacity: 1; }
 `;
 
+const emberRise = keyframes`
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(var(--ex, 0px), var(--ey, -80px)) scale(0.3); opacity: 0; }
+`;
+const photoPulse = keyframes`
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.2) saturate(1.15); }
+`;
+
 /**
- * A Taiwanese-temple 金爐 (joss-paper burner): stone base, a red two-tier pagoda body that is
- * closed except for an arched mouth in front and a window on each side, a tiled roof with up-turned
- * eaves, and a chimney on top that carries the smoke away.
+ * A Taiwanese-temple 金爐 / 銀紙爐 shown as a photo. The picture already has a lit mouth; when the
+ * person burns paper we add a pulsing glow over the mouth, embers, and smoke from the chimney.
  */
 function Furnace({ burning, kind = 'god' }: { burning: boolean; kind?: 'god' | 'dead' }) {
   const dead = kind === 'dead';
-  const uid = useId().replace(/:/g, '');
-  const k = 1.45; // display scale
-  const arch = 'M58 196 V160 Q58 143 85 143 Q112 143 112 160 V196 Z';
+  const glow = dead ? '150,205,255' : '255,165,60';
   return (
-    <Box sx={{ position: 'relative', width: 170 * k, mx: 'auto', pt: `${70 * k}px` }}>
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        maxWidth: 340,
+        aspectRatio: '1 / 1',
+        mx: 'auto',
+        mb: 1.5,
+        borderRadius: 3,
+        overflow: 'hidden',
+        border: '1px solid #3a2f1d',
+        boxShadow: burning ? `0 0 34px rgba(${glow},.45)` : '0 4px 18px rgba(0,0,0,.5)',
+        transition: 'box-shadow .4s ease',
+        bgcolor: '#120a06',
+      }}
+    >
+      <Box
+        component="img"
+        src={dead ? furnaceDead : furnaceGod}
+        alt={dead ? '銀紙爐' : '金爐'}
+        sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', animation: burning ? `${photoPulse} 0.9s ease-in-out infinite` : 'none' }}
+      />
+      {/* glow over the furnace mouth */}
+      <Box
+        sx={{
+          position: 'absolute',
+          left: '36%',
+          top: '44%',
+          width: '26%',
+          height: '26%',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, rgba(${glow},.9) 0%, rgba(${glow},.35) 45%, rgba(${glow},0) 72%)`,
+          mixBlendMode: 'screen',
+          opacity: burning ? 1 : 0,
+          transition: 'opacity .5s ease',
+          animation: burning ? `${glowPulse} 0.7s ease-in-out infinite` : 'none',
+          pointerEvents: 'none',
+        }}
+      />
       {burning &&
-        Array.from({ length: 9 }).map((_, i) => (
+        Array.from({ length: 14 }).map((_, i) => (
           <Box
-            key={i}
+            key={`e${i}`}
             sx={{
               position: 'absolute',
-              left: '50%',
-              top: `${76 * k}px`,
-              ml: `${(-(11 + (i % 4) * 3) + ((i % 3) - 1) * 3) * k}px`,
-              width: (22 + (i % 4) * 6) * k,
-              height: (22 + (i % 4) * 6) * k,
+              left: `${44 + (i % 7) * 2.2}%`,
+              top: '58%',
+              width: 3 + (i % 3),
+              height: 3 + (i % 3),
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(215,215,220,.92) 0%, rgba(175,175,180,.42) 55%, rgba(175,175,180,0) 75%)',
-              animation: `${smokeRise} ${2.2 + (i % 4) * 0.3}s ease-out ${i * 0.28}s infinite`,
-              '--dx': `${(i % 2 === 0 ? 1 : -1) * (6 + (i % 4) * 4) * k}px`,
-              '--dy': `${-92 * k}px`,
-              zIndex: 2,
+              bgcolor: dead ? '#cfe6ff' : i % 2 ? '#ffcf5a' : '#ff8a2a',
+              boxShadow: `0 0 6px rgba(${glow},.9)`,
+              animation: `${emberRise} ${1.6 + (i % 4) * 0.35}s ease-out ${i * 0.22}s infinite`,
+              '--ex': `${(i % 2 ? 1 : -1) * (6 + (i % 5) * 5)}px`,
+              '--ey': `${-(50 + (i % 4) * 18)}px`,
+              pointerEvents: 'none',
             }}
           />
         ))}
-      <Box
-        component="svg"
-        viewBox="0 0 170 226"
-        width={170 * k}
-        height={226 * k}
-        sx={{
-          display: 'block',
-          '& .fl': { transformBox: 'fill-box', transformOrigin: '50% 100%', animation: `${flicker} 0.46s ease-in-out infinite` },
-          '& .fl2': { animationDuration: '0.38s', animationDelay: '0.1s' },
-          '& .fl3': { animationDuration: '0.3s', animationDelay: '0.2s' },
-          '& .gl': { animation: `${glowPulse} 0.9s ease-in-out infinite` },
-        }}
-      >
-        <defs>
-          <linearGradient id={`wall${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={dead ? '#6b7683' : '#b8372b'} />
-            <stop offset="1" stopColor={dead ? '#353c46' : '#7a1f17'} />
-          </linearGradient>
-          <linearGradient id={`roof${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={dead ? '#e3e6ea' : '#f0cd6a'} />
-            <stop offset="1" stopColor={dead ? '#8d939c' : '#b8872a'} />
-          </linearGradient>
-          <linearGradient id={`stone${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#8a7e70" />
-            <stop offset="1" stopColor="#5a5046" />
-          </linearGradient>
-          <radialGradient id={`fire${uid}`} cx="50%" cy="100%" r="80%">
-            <stop offset="0" stopColor="#ffb347" stopOpacity="0.95" />
-            <stop offset="1" stopColor="#c0392b" stopOpacity="0" />
-          </radialGradient>
-          <clipPath id={`arch${uid}`}>
-            <path d={arch} />
-          </clipPath>
-        </defs>
-
-        {/* stone base: two steps */}
-        <rect x="10" y="210" width="150" height="14" rx="2" fill={`url(#stone${uid})`} stroke="#2e2820" strokeWidth="1" />
-        <rect x="20" y="198" width="130" height="14" rx="2" fill={`url(#stone${uid})`} stroke="#2e2820" strokeWidth="1" />
-        <path d="M30 205 H140" stroke="#463e34" strokeWidth="0.8" opacity="0.7" />
-
-        {/* lower tier body */}
-        <rect x="28" y="126" width="114" height="72" fill={`url(#wall${uid})`} stroke="#3a0f0a" strokeWidth="1.4" />
-        <rect x="24" y="190" width="122" height="8" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.8" />
-        {/* corner pillars */}
-        <rect x="28" y="126" width="7" height="64" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
-        <rect x="135" y="126" width="7" height="64" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
-        {/* plaque */}
-        <rect x="68" y="130" width="34" height="11" rx="1.5" fill="#2c0b07" stroke="#e8c170" strokeWidth="0.9" />
-        <text x="85" y="139" textAnchor="middle" fontSize={dead ? 7.5 : 9} fontWeight={800} fill={dead ? '#e6e9ee' : '#f3d27a'} fontFamily="serif">
-          {dead ? '銀紙爐' : '金爐'}
-        </text>
-
-        {/* side windows (the burner is open on three sides) */}
-        {[34, 120].map((x) => (
-          <g key={x}>
-            <path d={`M${x} 184 V160 Q${x} 150 ${x + 8} 150 Q${x + 16} 150 ${x + 16} 160 V184 Z`} fill="#17080a" stroke="#e8c170" strokeWidth="1.6" />
-            <path d={`M${x} 184 V160 Q${x} 150 ${x + 8} 150 Q${x + 16} 150 ${x + 16} 160 V184 Z`} fill="#ff8a2a" className={burning ? 'gl' : undefined} opacity={burning ? 0.85 : 0.22} />
-            <path d={`M${x + 5.3} 152 V184 M${x + 10.6} 152 V184 M${x} 168 H${x + 16}`} stroke="#3a0f0a" strokeWidth="1.2" />
-          </g>
+      {burning &&
+        Array.from({ length: 8 }).map((_, i) => (
+          <Box
+            key={`s${i}`}
+            sx={{
+              position: 'absolute',
+              left: '52%',
+              top: '9%',
+              ml: `${-14 + ((i % 3) - 1) * 4}px`,
+              width: 26 + (i % 3) * 8,
+              height: 26 + (i % 3) * 8,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(225,225,230,.8) 0%, rgba(180,180,186,.35) 55%, rgba(180,180,186,0) 75%)',
+              animation: `${smokeRise} ${2.4 + (i % 4) * 0.3}s ease-out ${i * 0.3}s infinite`,
+              '--dx': `${(i % 2 ? 1 : -1) * (8 + (i % 4) * 5)}px`,
+              '--dy': '-70px',
+              pointerEvents: 'none',
+            }}
+          />
         ))}
-
-        {/* front mouth */}
-        <path d={arch} fill="#120605" />
-        <g clipPath={`url(#arch${uid})`}>
-          <rect x="58" y="150" width="54" height="46" fill={`url(#fire${uid})`} opacity={burning ? 1 : 0.28} className={burning ? 'gl' : undefined} />
-          {burning && (
-            <>
-              <path className="fl" d="M85 197 C64 197 59 178 68 165 C71 171 75 171 76 164 C73 154 80 149 84 143 C86 153 94 155 96 165 C100 159 101 166 101 171 C108 184 101 197 85 197Z" fill="#ff7a1a" />
-              <path className="fl fl2" d="M85 197 C73 197 71 184 77 176 C79 180 82 180 83 173 C81 167 85 163 88 158 C90 166 96 169 96 177 C98 185 94 197 85 197Z" fill="#ffc93a" />
-              <path className="fl fl3" d="M85 197 C79 197 78 189 82 183 C84 186 86 186 87 182 C91 187 91 197 85 197Z" fill="#fff3b0" />
-              <path className="fl fl2" d="M66 197 C58 197 58 187 62 181 C64 185 66 185 67 181 C71 187 72 197 66 197Z" fill="#ff9a2a" />
-              <path className="fl fl3" d="M104 197 C97 197 97 187 101 181 C103 185 105 185 106 181 C110 187 111 197 104 197Z" fill="#ff9a2a" />
-            </>
-          )}
-          {!burning && <ellipse cx="85" cy="193" rx="18" ry="4" fill="#ff7a1a" opacity="0.5" className="gl" />}
-        </g>
-        <path d={arch} fill="none" stroke="#e8c170" strokeWidth="3" />
-        <path d={arch} fill="none" stroke="#7a5a12" strokeWidth="0.8" />
-
-        {/* lower roof with up-turned eaves */}
-        <path d="M6 138 Q8 124 26 121 L144 121 Q162 124 164 138 Q152 132 144 133 L26 133 Q18 132 6 138Z" fill={`url(#roof${uid})`} stroke="#6b4a10" strokeWidth="1.2" />
-        <path d="M24 124 V132 M36 123 V132 M48 123 V132 M60 123 V132 M72 123 V132 M84 123 V132 M96 123 V132 M108 123 V132 M120 123 V132 M132 123 V132 M146 124 V132" stroke="#8a5f12" strokeWidth="0.9" opacity="0.6" />
-        <path d="M6 138 Q4 132 8 128 M164 138 Q166 132 162 128" stroke="#6b4a10" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-
-        {/* upper tier */}
-        <rect x="50" y="94" width="70" height="28" fill={`url(#wall${uid})`} stroke="#3a0f0a" strokeWidth="1.2" />
-        <rect x="50" y="94" width="6" height="28" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
-        <rect x="114" y="94" width="6" height="28" fill={dead ? '#b9bec6' : '#d6a93e'} opacity="0.9" />
-        <path d="M78 118 V106 Q78 99 85 99 Q92 99 92 106 V118 Z" fill="#17080a" stroke="#e8c170" strokeWidth="1.4" />
-        <path d="M78 118 V106 Q78 99 85 99 Q92 99 92 106 V118 Z" fill="#ff8a2a" className={burning ? 'gl' : undefined} opacity={burning ? 0.8 : 0.2} />
-
-        {/* upper roof */}
-        <path d="M36 98 Q38 86 54 83 L116 83 Q132 86 134 98 Q124 93 116 94 L54 94 Q46 93 36 98Z" fill={`url(#roof${uid})`} stroke="#6b4a10" strokeWidth="1.2" />
-        <path d="M36 98 Q34 92 38 88 M134 98 Q136 92 132 88" stroke="#6b4a10" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <rect x="66" y="79" width="38" height="5" rx="2" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#6b4a10" strokeWidth="0.8" />
-
-        {/* chimney */}
-        <rect x="78" y="34" width="14" height="46" fill={`url(#wall${uid})`} stroke="#3a0f0a" strokeWidth="1.1" />
-        <rect x="76" y="48" width="18" height="4" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.6" />
-        <rect x="76" y="64" width="18" height="4" fill={dead ? '#b9bec6' : '#d6a93e'} stroke="#7a5a12" strokeWidth="0.6" />
-        <path d="M72 35 L98 35 L94 27 L76 27Z" fill={`url(#roof${uid})`} stroke="#6b4a10" strokeWidth="1" />
-        <ellipse cx="85" cy="27" rx="9" ry="2" fill="#1a0c06" />
-        <circle cx="85" cy="24" r="2" fill="#f3d27a" />
-      </Box>
     </Box>
   );
 }
