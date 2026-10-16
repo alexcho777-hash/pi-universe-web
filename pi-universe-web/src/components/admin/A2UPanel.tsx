@@ -33,6 +33,18 @@ export default function A2UPanel() {
   const [amount, setAmount] = useState('0.1');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [chk, setChk] = useState<any>(null);
+  const check = async () => {
+    setBusy(true);
+    try {
+      const res: any = await apiClient.get('/api/admin/a2u/check');
+      setChk(res?.success ? res.data : { error: res?.error || 'Failed' });
+    } catch (e: any) {
+      setChk({ error: e?.response?.data?.error || e?.message || 'Failed' });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const load = async () => {
     const res: any = await apiClient.get('/api/admin/a2u/status');
@@ -115,6 +127,38 @@ export default function A2UPanel() {
       <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mb: 1 }}>
         {tr(`單筆上限 ${st.maxAmount} π。對方需先用 Pi 瀏覽器登入過 π Universe。`, `Max ${st.maxAmount} π per payment. The user must have logged in to π Universe once in the Pi Browser.`)}
       </Typography>
+
+      <Button size="small" variant="outlined" disabled={busy} onClick={check} sx={{ mb: 1 }}>
+        {tr('向 Pi 查詢最近 10 筆付款', 'Ask Pi about the last 10 payments')}
+      </Button>
+      {chk && (
+        <Box sx={{ mb: 1.5, p: 1, border: '1px dashed', borderColor: 'divider', borderRadius: 1, fontSize: '0.8rem', wordBreak: 'break-all' }}>
+          {chk.error ? (
+            <span>{chk.error}</span>
+          ) : (
+            <>
+              <div>{tr('伺服器簽名的錢包', 'Server signs with wallet')}: {chk.wallet || '—'}</div>
+              <div>{tr('網路', 'Network')}: {chk.network}</div>
+              {chk.payments.map((p: any, i: number) => (
+                <div key={i} style={{ marginTop: 6 }}>
+                  {p.to} · {p.amount} π · ours: {p.ours}
+                  <div>payment_id: {p.payment_id}</div>
+                  {p.error ? (
+                    <div>ERROR: {p.error}</div>
+                  ) : (
+                    <>
+                      <div>direction: {String(p.direction)} · network: {String(p.pi_network)}</div>
+                      <div>verified: {String(p.transaction_verified)} · completed: {String(p.developer_completed)} · cancelled: {String(p.cancelled)}</div>
+                      <div>to_address: {p.to_address}</div>
+                      <div>txid: {p.txid}</div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+        </Box>
+      )}
 
       {msg && <Alert severity={msg.ok ? 'success' : 'error'} sx={{ mb: 1 }}>{msg.text}</Alert>}
 
