@@ -139,6 +139,13 @@ export default function A2UPanel() {
             <>
               <div>{tr('伺服器簽名的錢包', 'Server signs with wallet')}: {chk.wallet || '—'}</div>
               <div>{tr('網路', 'Network')}: {chk.network}</div>
+              <div style={{ marginTop: 8, fontWeight: 600 }}>{tr('我們資料庫裡的帳號', 'Accounts in our database')}</div>
+              {(chk.accounts || []).map((a: any, i: number) => (
+                <div key={'a' + i} style={{ marginTop: 4 }}>
+                  {a.for}: id={a.id} · username={a.username} · pi_username={String(a.pi_username)} · pi_uid={a.pi_uid}
+                </div>
+              ))}
+              <div style={{ marginTop: 8, fontWeight: 600 }}>{tr('付款', 'Payments')}</div>
               {chk.payments.map((p: any, i: number) => (
                 <div key={i} style={{ marginTop: 6 }}>
                   {p.to} · {p.amount} π · ours: {p.ours}
@@ -150,6 +157,7 @@ export default function A2UPanel() {
                       <div>direction: {String(p.direction)} · network: {String(p.pi_network)}</div>
                       <div>verified: {String(p.transaction_verified)} · completed: {String(p.developer_completed)} · cancelled: {String(p.cancelled)}</div>
                       <div>to_address: {p.to_address}</div>
+                      <div>pi_user_uid: {p.pi_user_uid}</div>
                       <div>txid: {p.txid}</div>
                     </>
                   )}
